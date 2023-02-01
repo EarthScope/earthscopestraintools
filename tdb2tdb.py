@@ -31,9 +31,10 @@ logger = logging.getLogger()
 def find_station_edid(network, station):
     client = Client(base_url="https://datasources-api.dev.earthscope.org")
     r = api.station.sync.find_stations(
-        client=client, network_name=network, name=station, name_to_id_map=True
+        client=client, network_name=f'FDSN-{network}', name=f'FDSN-{station}', name_to_id_map=True
     )
-    return r.additional_properties[network].additional_properties[station]
+    #print(r)
+    return r.additional_properties[f'FDSN-{network}'].additional_properties[f'FDSN-{station}']
 
 def to_date(datetime64):
     ts = pd.to_datetime(str(datetime64))
@@ -69,9 +70,9 @@ def write_new_tdb(df, array):
     logger.info("Export complete")
 
 if __name__ == '__main__':
-    fcid = "B018"
+    fcid = "B007"
     net = "PB"
-    start = np.datetime64("2022-01-01T00:00:00")
+    start = np.datetime64("2020-01-01T00:00:00")
     end = np.datetime64("2023-01-01T00:00:00")
 
     edid = find_station_edid(net, fcid)

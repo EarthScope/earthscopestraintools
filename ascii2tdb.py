@@ -1,5 +1,5 @@
 # ETL from ascii level2 files to tiledb
-# write tiledb arrays locally, then aws s3 cp
+# write tiledb arrays locally, then aws s3 sync
 
 import tarfile
 import tiledb
@@ -21,14 +21,16 @@ logging.basicConfig(
         format='%(asctime)s %(levelname)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
 )
+logger = logging.getLogger()
 workdir = "arrays"
 
 def find_station_edid(network, station):
     client = Client(base_url="https://datasources-api.dev.earthscope.org")
     r = api.station.sync.find_stations(
-        client=client, network_name=network, name=station, name_to_id_map=True
+        client=client, network_name=f'FDSN-{network}', name=f'FDSN-{station}', name_to_id_map=True
     )
-    return r.additional_properties[network].additional_properties[station]
+    #print(r)
+    return r.additional_properties[f'FDSN-{network}'].additional_properties[f'FDSN-{station}']
 
 def write_df_to_tiledb(df, array):
     # print(df)
@@ -150,7 +152,20 @@ def loop_through_ts(filebase, file, array):
         logger.info(f"{timeseries}: {len(tmp_df)} samples")
         write_df_to_tiledb(tmp_df, array)
 
-def etl_yearly_ascii_file(fcid, array, year):
+def etl_yearly_ascii_file(network, fcid, year, delete_array=False):
+    edid = find_station_edid(network, fcid)
+    os.makedirs(workdir, exist_ok=True)
+    uri = f"{workdir}/{edid}_level2.tdb"
+    logger.info(f"Array uri: {uri}")
+    array = StrainTiledbArray(uri, period=300, location='local')
+    # delete any existing array at that uri
+    if delete_array:
+        array.delete()
+
+    # create new array if needed.  note: array_exists only works locally not in s3.
+    if not tiledb.array_exists(array.uri):
+        array.create()
+
     filebase = fcid + "." + year + ".bsm.level2"
     url = "http://bsm.unavco.org/bsm/level2/" + fcid + "/" + filebase + ".tar"
     response = requests.get(url, stream=True)
@@ -160,33 +175,7 @@ def etl_yearly_ascii_file(fcid, array, year):
     for file in files:
         logger.info(file)
         loop_through_ts(filebase, file, array)
-    #shutil.rmtree(filebase)
-
-
-if __name__ == '__main__':
-    logger = logging.getLogger()
-    fcid = "B018"
-    net = "PB"
-    edid = find_station_edid(net, fcid)
-    os.makedirs(workdir, exist_ok=True)
-    uri = f"{workdir}/{edid}_level2.tdb"
-    logger.info(f"Array uri: {uri}")
-    array = StrainTiledbArray(uri, period=300, location='local')
-
-    # delete any existing array at that uri
-    array.delete()
-
-    # create new array.  array_exists only works locally not in s3.
-    if not tiledb.array_exists(array.uri):
-        array.create()
-
-    # years = ["2006","2007","2008","2009",
-    #         "2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
-    #         "2020","2021","2022"]
-
-    years = ["2022"]
-    for year in years:
-       etl_yearly_ascii_file(fcid, array, year)
+    shutil.rmtree(filebase)
 
     logger.info("Consolidating meta")
     array.consolidate_meta()
@@ -196,3 +185,22 @@ if __name__ == '__main__':
     array.consolidate_fragments()
     logger.info("Vacuuming fragments")
     array.vacuum_fragments()
+
+
+if __name__ == '__main__':
+
+    network = sys.argv[1]
+    fcid = sys.argv[2]
+    #year = sys.argv[3]
+    #etl_yearly_ascii_file(network, fcid, year)
+    years = ["2005","2006","2007","2008","2009",
+            "2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
+            "2020","2021","2022"]
+    for year in years:
+        etl_yearly_ascii_file(network, fcid, year)
+
+
+
+
+
+

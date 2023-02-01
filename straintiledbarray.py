@@ -53,7 +53,7 @@ class StrainTiledbArray:
         end = np.datetime64('2069-12-07T00:00:00.000000')
 
         # time dimension with second precision and 24 hour tiles
-        d0 = tiledb.Dim(name="data_type", dtype="ascii", filters=filters2)
+        d0 = tiledb.Dim(name="data_type", dtype="ascii", filters=filters1)
         d1 = tiledb.Dim(name="timeseries", dtype="ascii", filters=filters1)
         d2 = tiledb.Dim(name="time", domain=(stt, end), tile=np.timedelta64(1, 'D'), dtype='datetime64[us]',
                         filters=filters4)
@@ -96,10 +96,14 @@ class StrainTiledbArray:
             print(e)
 
     def consolidate_meta(self):
-        config = self.ctx.config()
-        config["sm.consolidation.mode"] = "fragment_meta"
+        #config = self.ctx.config()
+        #config["sm.consolidation.mode"] = "fragment_meta"
+        config = tiledb.Config(
+            {"sm.consolidation.mode": "fragment_meta"}
+        )
         ctx = tiledb.Ctx(config)
         tiledb.consolidate(self.uri, ctx=ctx)
+        logger.info("consolidated meta")
 
     def consolidate_fragments(self):
         config = self.ctx.config()
@@ -108,10 +112,14 @@ class StrainTiledbArray:
         tiledb.consolidate(self.uri, ctx=ctx)
 
     def vacuum_meta(self):
-        config = self.ctx.config()
-        config["sm.vacuum.mode"] = "fragment_meta"
+        #config = self.ctx.config()
+        #config["sm.vacuum.mode"] = "fragment_meta"
+        config = tiledb.Config(
+            {"sm.consolidation.mode": "fragment_meta"}
+        )
         ctx = tiledb.Ctx(config)
         tiledb.vacuum(self.uri, ctx=ctx)
+        logger.info("vacuumed meta")
 
     def vacuum_fragments(self):
         config = self.ctx.config()
