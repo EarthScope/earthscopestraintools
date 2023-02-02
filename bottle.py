@@ -58,6 +58,7 @@ class Bottle:
 
         if f[-3:] == '_20' and len(f) == 19:
             # this is a Min file
+            self.file_metadata['session'] = "Min"
             hour = f[9:11]
             min = f[11:13]
             channel = f[13:16]
@@ -70,12 +71,14 @@ class Bottle:
 
         elif f[-3:-1] == 'CH' and len(f) == 14:
             # this is an Hour file
+            self.file_metadata['session'] = "Hour"
             hour = f[9:11]
             min = None
             channel = f[11:14]
 
         else:
             # well, we have to assume it is a Day file
+            self.file_metadata['session'] = "Day"
             hour = None
             min = None
             channel = f[9:]
@@ -108,8 +111,15 @@ class Bottle:
                  "CalOffsetCH0G0": ["T7", "RCA"], "CalOffsetCH1G0": ["T7", "RCB"], "CalOffsetCH2G0": ["T7", "RCC"],
                  "CalOffsetCH3G0": ["T7", "RCD"], "CalStepCH0G0": ["T8", "RCA"], "CalStepCH1G0": ["T8", "RCB"],
                  "CalStepCH2G0": ["T8", "RCC"], "CalStepCH3G0": ["T8", "RCD"]}
+
         self.file_metadata['seed_loc'] = codes[self.file_metadata['channel']][0]
         self.file_metadata['seed_ch'] = codes[self.file_metadata['channel']][1]
+        if self.file_metadata['channel'].startswith("CH"):
+            if self.file_metadata['session'] == "Min":
+                self.file_metadata['seed_ch'] = self.file_metadata['seed_ch'].replace("R","B")
+            elif self.file_metadata['session'] == "Hour":
+                self.file_metadata['seed_ch'] = self.file_metadata['seed_ch'].replace("R","L")
+
 
     def read_header(self, print_it=False):
         """

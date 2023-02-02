@@ -6,7 +6,7 @@ import tiledb
 import pandas as pd
 import sys, os
 import shutil
-import boto3
+#import boto3
 import json
 from io import BytesIO
 import requests
@@ -33,7 +33,7 @@ def find_station_edid(network, station):
     return r.additional_properties[f'FDSN-{network}'].additional_properties[f'FDSN-{station}']
 
 def write_df_to_tiledb(df, array):
-    # print(df)
+    #print(df)
     mode = "append"
     tiledb.from_pandas(uri=array.uri,
                        dataframe=df,
@@ -164,11 +164,12 @@ def etl_yearly_ascii_file(network, fcid, year, delete_array=False):
 
     # create new array if needed.  note: array_exists only works locally not in s3.
     if not tiledb.array_exists(array.uri):
-        array.create()
+        array.create(schema_source='s3')
 
     filebase = fcid + "." + year + ".bsm.level2"
     url = "http://bsm.unavco.org/bsm/level2/" + fcid + "/" + filebase + ".tar"
     response = requests.get(url, stream=True)
+    print(url)
     tar = tarfile.open(fileobj=BytesIO(response.raw.read()), mode='r')
     tar.extractall()
     files = os.listdir(filebase)
@@ -177,13 +178,11 @@ def etl_yearly_ascii_file(network, fcid, year, delete_array=False):
         loop_through_ts(filebase, file, array)
     shutil.rmtree(filebase)
 
-    logger.info("Consolidating meta")
-    array.consolidate_meta()
-    logger.info("Vacuuming meta")
-    array.vacuum_meta()
-    logger.info("Consolidating fragments")
+    array.consolidate_array_meta()
+    array.vacuum_array_meta()
+    array.consolidate_fragment_meta()
+    array.vacuum_fragment_meta()
     array.consolidate_fragments()
-    logger.info("Vacuuming fragments")
     array.vacuum_fragments()
 
 
@@ -191,13 +190,13 @@ if __name__ == '__main__':
 
     network = sys.argv[1]
     fcid = sys.argv[2]
-    #year = sys.argv[3]
-    #etl_yearly_ascii_file(network, fcid, year)
-    years = ["2005","2006","2007","2008","2009",
-            "2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
-            "2020","2021","2022"]
-    for year in years:
-        etl_yearly_ascii_file(network, fcid, year)
+    year = sys.argv[3]
+    etl_yearly_ascii_file(network, fcid, year)
+    # years = ["2005","2006","2007","2008","2009",
+    #         "2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
+    #         "2020","2021","2022"]
+    # for year in years:
+    #     etl_yearly_ascii_file(network, fcid, year)
 
 
 

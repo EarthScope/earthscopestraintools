@@ -7,7 +7,8 @@ Methods include create, delete, consolidate, vacuum, read, write.  it also
 includes the current schema definition.
 
 ### ascii2tdb.py
-ETL script to read level 2 ascii files and write them to tiledb
+ETL script to read level 2 ascii files and write them to tiledb local arrays.  then need to
+> aws s3 sync arrayname s3://tiledb-strain/arrayname
 
 ### tdb2ascii.py
 distrubution script to generate level 2 ascii files based on a time query
@@ -20,3 +21,9 @@ package as tarball
 ### load_level2 notebook
 notebook for demoing various ways to query processed strain data from tiledb and
 how to plot the data
+
+### bottle.py
+library for reading gtsm bottle files
+
+## bottletar.py
+wrapper class for reading 5 cases of tarballs of bottle files and writing to tiledb or miniseed

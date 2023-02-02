@@ -33,7 +33,7 @@ class GtsmBottleTar:
         self.file_metadata = {}
         self.file_metadata['filename'] = filename
         self.file_metadata['fcid'] = filename.split('/')[-1][0:4]
-        self.file_metadata['filebase'] = filename[:-4]
+        self.file_metadata['filebase'] = filename.split('/')[-1][:-4]
         self.file_metadata['session'] = session
         if fileobj:
             self.fileobj = fileobj
@@ -147,40 +147,6 @@ class GtsmBottleTar:
         self.delete_bottles_from_disk()
         return tiledb_buffer
 
-    # def build_tiledb_buffer(self, bottles):
-    #     #builds a 3d tiledb buffer dataframe from a given set of bottles
-    #     # index as row number
-    #     # columns are data_type, timeseries, time, data, level, quality, version (3 dim + 4 attr)
-    #
-    #     logger.info(f"{self.file_metadata['filename']}: loading {len(bottles)} bottles into dataframe")
-    #     bottle_dfs = []
-    #     for i, bottle in enumerate(bottles):
-    #         # logger.info(f"{i}: {bottle.file_metadata['filename']}")
-    #         data_type = bottle.file_metadata['channel']
-    #         timeseries = 'raw'
-    #         timestamps = bottle.get_datetime_timestamps()
-    #
-    #         data = bottle.read_data()
-    #         #Important for Min_Archive session: close open bottles when done reading to free up memory
-    #         bottle.file.close()
-    #         level = '0'
-    #         quality = 'g'
-    #         version = int(datetime.datetime.now().strftime("%Y%j%H%M%S"))
-    #         d = {'data_type': data_type,
-    #              'timeseries': timeseries,
-    #              'time': timestamps,
-    #              'data': data,
-    #              'level': level,
-    #              'quality': quality,
-    #              'version': version}
-    #         bottle_df = pd.DataFrame(data=d)
-    #         bottle_df.loc[bottle_df['data'] == 999999, 'quality'] = 'm'
-    #         bottle_dfs.append(bottle_df)
-    #     tiledb_buffer = pd.concat(bottle_dfs, axis=0).reset_index(
-    #         drop=True)
-    #     tiledb_buffer['data'] = tiledb_buffer['data'].astype(np.float64)
-    #     tiledb_buffer['version'] = tiledb_buffer['version'].astype(np.int64)
-    #     return tiledb_buffer
 
     def write_array(self, array):
         #writes a 3d tiledb buffer dataframe to a given tiledb array
@@ -232,8 +198,6 @@ class GtsmBottleTar:
             logger.exception(e)
 
 
-
-
 if __name__ == '__main__':
 
     #function for running local tests
@@ -241,13 +205,22 @@ if __name__ == '__main__':
     t1 = datetime.datetime.now()
 
     #filename = 'B001.2022001Day.tgz'  #24 hr Day session (archive and logger format)
+    #session = "Day"
     #filename = 'B001.2022001_01.tar' #24 Hour, Hour Session (archive format)
+    #session = "Hour_Archive"
     #filename = 'B001.2022001_20.tar' #24 Hour, Min session (archive format)
-    #filename = 'B0012200100.tgz'  #1 Hour, Hour Session (logger format)
+    #session = "Min_Archive"
+    filename = 'B0012200100.tgz'  #1 Hour, Hour Session (logger format)
+    session = "Hour"
     #filename = 'B0012200100_20.tar' #1 Hour, Min Session (logger format)
+    #session = "Min"
+    gbt = GtsmBottleTar(f"bottles/{filename}", session)
+    gbt.load_bottles()
+    for bottle in gbt.bottles:
+        print(bottle.file_metadata['seed_ch'])
 
-    gbt = GtsmBottleTar(filename)
+    gbt.delete_bottles_from_disk()
     t2 = datetime.datetime.now()
     elapsed_time = t2 - t1
     logger.info(f'{gbt.file_metadata["filename"]}: Elapsed time {elapsed_time} seconds')
-    #print(gbt.file_metadata['filename'], gbt.file_metadata['fcid'])#, gbt.file_metadata['session'])
+    #print(gbt.file_metadata['filename'], gbt.file_metadata['fcid'], gbt.file_metadata['session'])

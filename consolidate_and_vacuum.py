@@ -1,15 +1,5 @@
 # script to clean up arrays after writing before syncing to s3
-
-import tarfile
-import tiledb
-import pandas as pd
 import sys, os
-import shutil
-import boto3
-import json
-from io import BytesIO
-import requests
-import configparser
 
 from straintiledbarray import StrainTiledbArray
 from es_datasources_client import Client, api
@@ -40,16 +30,36 @@ if __name__ == '__main__':
     os.makedirs(workdir, exist_ok=True)
     uri = f"{workdir}/{edid}_level2.tdb"
     logger.info(f"Array uri: {uri}")
+
+
     array = StrainTiledbArray(uri, period=300, location='local')
 
-    logger.info("Consolidating meta")
-    array.consolidate_meta()
-    logger.info("Vacuuming meta")
-    array.vacuum_meta()
-    # logger.info("Consolidating fragments")
-    # array.consolidate_fragments()
-    # logger.info("Vacuuming fragments")
-    # array.vacuum_fragments()
+    array.consolidate_array_meta()
+    array.vacuum_array_meta()
+    array.consolidate_fragment_meta()
+    array.vacuum_fragment_meta()
+    array.consolidate_fragments()
+    array.vacuum_fragments()
+
+    # config = tiledb.Config()
+    # config["sm.consolidation.mode"] = "fragment_meta"
+    # config["sm.vacuum.mode"] = "fragment_meta"
+    # logger.info("Consolidating fragment_meta")
+    # tiledb.consolidate(uri, config=config)
+    # logger.info("Vacuuming fragment_meta")
+    # tiledb.vacuum(uri, config=config)
+    #
+    # config["sm.consolidation.mode"] = "array_meta"
+    # config["sm.vacuum.mode"] = "array_meta"
+    # logger.info("Consolidating meta")
+    # tiledb.consolidate(uri, config=config)
+    # logger.info("Vacuuming meta")
+    # tiledb.vacuum(uri, config=config)
+    #
+    #
+
+
+
 
 
 

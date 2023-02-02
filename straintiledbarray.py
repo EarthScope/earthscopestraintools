@@ -9,9 +9,9 @@ from typing import Union
 logger = logging.getLogger(__name__)
 
 class StrainTiledbArray:
-    def __init__(self, uri, period=None, location='S3'):
+    def __init__(self, uri, period=None, location='s3'):
         #self.session_edid = session_edid
-        if location == 'S3':
+        if location == 's3':
             self.set_s3_ctx()
         elif location == 'local':
             self.set_local_ctx()
@@ -77,8 +77,25 @@ class StrainTiledbArray:
 
         return schema
 
-    def create(self):
-        self.schema = self.get_schema()
+    def get_schema_from_s3(self):
+        s3_schema_uri = "s3://tiledb-strain/STRAIN_SCHEMA.tdb"
+        config = tiledb.Config()
+        config["vfs.s3.region"] = "us-east-2"
+        config["vfs.s3.scheme"] = "https"
+        config["vfs.s3.endpoint_override"] = ""
+        config["vfs.s3.use_virtual_addressing"] = "true"
+        config["sm.consolidation.mode"] = "fragment_meta"
+        config["sm.vacuum.mode"] = "fragment_meta"
+
+        with tiledb.open(s3_schema_uri, 'r', config=config) as A:
+            schema = A.schema
+        return schema
+
+    def create(self, schema_source='s3'):
+        if schema_source == 's3':
+            self.schema = self.get_schema_from_s3()
+        else:
+            self.schema = self.get_schema()
         try:
             tiledb.Array.create(self.uri, self.schema, ctx=self.ctx)
             with tiledb.Array(self.uri, "w", ctx=self.ctx) as A:
@@ -95,37 +112,41 @@ class StrainTiledbArray:
         except tiledb.TileDBError as e:
             print(e)
 
-    def consolidate_meta(self):
-        #config = self.ctx.config()
-        #config["sm.consolidation.mode"] = "fragment_meta"
-        config = tiledb.Config(
-            {"sm.consolidation.mode": "fragment_meta"}
-        )
-        ctx = tiledb.Ctx(config)
-        tiledb.consolidate(self.uri, ctx=ctx)
-        logger.info("consolidated meta")
+    def consolidate_fragment_meta(self):
+        config = self.ctx.config()
+        config["sm.consolidation.mode"] = "fragment_meta"
+        tiledb.consolidate(self.uri, config=config)
+        logger.info("consolidated fragment_meta")
+
+    def consolidate_array_meta(self):
+        config = self.ctx.config()
+        config["sm.consolidation.mode"] = "array_meta"
+        tiledb.consolidate(self.uri, config=config)
+        logger.info("consolidated array_meta")
 
     def consolidate_fragments(self):
         config = self.ctx.config()
         config["sm.consolidation.mode"] = "fragments"
-        ctx = tiledb.Ctx(config)
-        tiledb.consolidate(self.uri, ctx=ctx)
+        tiledb.consolidate(self.uri, config=config)
+        logger.info("consolidated fragments")
 
-    def vacuum_meta(self):
-        #config = self.ctx.config()
-        #config["sm.vacuum.mode"] = "fragment_meta"
-        config = tiledb.Config(
-            {"sm.consolidation.mode": "fragment_meta"}
-        )
-        ctx = tiledb.Ctx(config)
-        tiledb.vacuum(self.uri, ctx=ctx)
-        logger.info("vacuumed meta")
+    def vacuum_fragment_meta(self):
+        config = self.ctx.config()
+        config["sm.vacuum.mode"] = "fragment_meta"
+        tiledb.vacuum(self.uri, config=config)
+        logger.info("vacuumed fragment_meta")
+
+    def vacuum_array_meta(self):
+        config = self.ctx.config()
+        config["sm.vacuum.mode"] = "array_meta"
+        tiledb.vacuum(self.uri, config=config)
+        logger.info("vacuumed array_meta")
 
     def vacuum_fragments(self):
         config = self.ctx.config()
         config["sm.vacuum.mode"] = "fragments"
-        ctx = tiledb.Ctx(config)
-        tiledb.vacuum(self.uri, ctx=ctx)
+        tiledb.vacuum(self.uri, config=config)
+        logger.info("vacuumed fragments")
 
     def get_nonempty_domain(self):
         with tiledb.open(self.uri, 'r', ctx=self.ctx) as A:
@@ -289,5 +310,4 @@ class StrainTiledbArray:
         if print_it:
             print(df_buffer)
         self.write_df_to_tiledb(df_buffer)
-
 

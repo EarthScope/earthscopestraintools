@@ -2,24 +2,17 @@
 # slice by start and end time
 # use in lambda with web service to deliver data in tiledb
 
-import tarfile
 import tiledb
 import numpy as np
 import pandas as pd
-import datetime
-import sys, os
+# import datetime
+# import sys, os
 import shutil
-import boto3
-from IPython.display import display
 import json
 
 from straintiledbarray import StrainTiledbArray
 from es_datasources_client import Client, api
-#from timeseries import Timeseries
 
-from io import BytesIO
-import requests
-import configparser
 import logging
 logging.basicConfig(
         level=logging.INFO,
@@ -72,8 +65,8 @@ def write_new_tdb(df, array):
 if __name__ == '__main__':
     fcid = "B007"
     net = "PB"
-    start = np.datetime64("2020-01-01T00:00:00")
-    end = np.datetime64("2023-01-01T00:00:00")
+    start = np.datetime64("2019-01-01T00:00:00")
+    end = np.datetime64("2021-01-01T00:00:00")
 
     edid = find_station_edid(net, fcid)
     workdir = "arrays"
@@ -84,7 +77,7 @@ if __name__ == '__main__':
     df, data_types, timeseries_list = read_date_range(array, start, end)
     #logger.info(df)
 
-    uri2 = f"{workdir}/{net}_{fcid}_level2.tdb"
+    uri2 = f"{workdir}/{net}_{fcid}_level2_{start}.tdb"
     logger.info(f"Array uri: {uri2}")
     array2 = StrainTiledbArray(uri2, period=300, location='local')
     write_new_tdb(df, array2)
