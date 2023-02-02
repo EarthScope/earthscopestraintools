@@ -1,0 +1,10 @@
+miniseed
+ignore
+bottles
+ascii_output
+arrays
+.ipynb_checkpoints
+.idea
+venv
+.DS_Store
+__pycache__/
