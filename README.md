@@ -25,5 +25,8 @@ how to plot the data
 ### bottle.py
 library for reading gtsm bottle files
 
-## bottletar.py
-wrapper class for reading 5 cases of tarballs of bottle files and writing to tiledb or miniseed
+### bottletar.py
+wrapper class for reading 5 cases of tarballs of bottle files and writing to tiledb
+
+### bottle2mseed.py
+add on functionality around bottletar to use obspy to write mseed files
