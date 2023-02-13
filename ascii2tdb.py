@@ -4,16 +4,17 @@
 import tarfile
 import tiledb
 import pandas as pd
+import datetime
 import sys, os
 import shutil
-#import boto3
+from edid import find_station_edid
 import json
 from io import BytesIO
 import requests
 import configparser
 
 from straintiledbarray import StrainTiledbArray
-from es_datasources_client import Client, api
+
 
 import logging
 logging.basicConfig(
@@ -21,16 +22,9 @@ logging.basicConfig(
         format='%(asctime)s %(levelname)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
 )
-logger = logging.getLogger()
-workdir = "arrays"
+logger = logging.getLogger(__name__)
+workdir = ""
 
-def find_station_edid(network, station):
-    client = Client(base_url="https://datasources-api.dev.earthscope.org")
-    r = api.station.sync.find_stations(
-        client=client, network_name=f'FDSN-{network}', name=f'FDSN-{station}', name_to_id_map=True
-    )
-    #print(r)
-    return r.additional_properties[f'FDSN-{network}'].additional_properties[f'FDSN-{station}']
 
 def write_df_to_tiledb(df, array):
     #print(df)
@@ -71,11 +65,17 @@ def write_df_to_tiledb(df, array):
 def loop_through_ts(filebase, file, array):
     df = pd.read_csv(filebase + '/' + file, delimiter='\s+')
     label = df['strain'][0] + "(mstrain)"
-    df = df.rename(
-        columns={"strain": "data_type", label: "microstrain", "s_offset": "offset_c", "MJD": "mjd", "date": "time"})
+    df = df.rename(columns={"strain": "data_type",
+                             label: "microstrain",
+                             "s_offset": "offset_c",
+                             "detrend_c": "trend_c",
+                             "MJD": "mjd",
+                             "date": "time"})
     df['data_type'] = df['data_type'].str.replace('gauge', 'CH')
     # display(df)
     cols = ['data_type', 'timeseries', 'time', 'data', 'quality', 'level', 'version']
+    #convert time string to unix ms
+    df['time'] = (pd.to_datetime(df['time']).astype(int) / 10**6).astype(int)
 
     timeseries = "microstrain"
     tmp_df = df[['data_type', 'time', timeseries, 'strain_quality', 'level', 'version']]
@@ -103,7 +103,7 @@ def loop_through_ts(filebase, file, array):
     logger.info(f"{timeseries}: {len(tmp_df)} samples")
     write_df_to_tiledb(tmp_df, array)
 
-    timeseries = 'detrend_c'
+    timeseries = 'trend_c'
     tmp_df = df[['data_type', 'time', timeseries, 'level', 'version']]
     tmp_df = tmp_df.rename(columns={timeseries: "data"})
     tmp_df['timeseries'] = timeseries
@@ -187,17 +187,17 @@ def etl_yearly_ascii_file(network, fcid, year, delete_array=False):
 
 
 if __name__ == '__main__':
-
+    workdir = 'arrays'
     network = sys.argv[1]
     fcid = sys.argv[2]
     year = sys.argv[3]
     etl_yearly_ascii_file(network, fcid, year)
     # years = ["2005","2006","2007","2008","2009",
-    #         "2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
-    #         "2020","2021","2022"]
+    #          "2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
+    #          "2020","2021","2022"]
     # for year in years:
     #     etl_yearly_ascii_file(network, fcid, year)
-
+    # 
 
 
 

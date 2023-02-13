@@ -122,7 +122,9 @@ class GtsmBottleTar:
             #logger.info(bottle.file_metadata)
             data_type = bottle.file_metadata['channel']
             timeseries = 'raw'
-            timestamps = bottle.get_datetime_timestamps()
+            logger.info(f"{data_type}, {timeseries}")
+            timestamps = bottle.get_unix_ms_timestamps()
+            #timestamps = bottle.get_datetime_timestamps()
 
             data = bottle.read_data()
             # Important for Min_Archive session: close open bottles when done reading to free up memory
@@ -204,22 +206,26 @@ if __name__ == '__main__':
 
     t1 = datetime.datetime.now()
 
-    #filename = 'B001.2022001Day.tgz'  #24 hr Day session (archive and logger format)
-    #session = "Day"
-    #filename = 'B001.2022001_01.tar' #24 Hour, Hour Session (archive format)
+    filename = 'B001.2022001Day.tgz'  #24 hr Day session (archive and logger format)
+    session = "Day"
+    #filename = 'B018.2016366_01.tar' #24 Hour, Hour Session (archive format)
     #session = "Hour_Archive"
-    #filename = 'B001.2022001_20.tar' #24 Hour, Min session (archive format)
-    #session = "Min_Archive"
-    filename = 'B0012200100.tgz'  #1 Hour, Hour Session (logger format)
-    session = "Hour"
+    # filename = 'B018.2016366_20.tar' #24 Hour, Min session (archive format)
+    # session = "Min_Archive"
+    #filename = 'B0012200100.tgz'  #1 Hour, Hour Session (logger format)
+    #session = "Hour"
     #filename = 'B0012200100_20.tar' #1 Hour, Min Session (logger format)
     #session = "Min"
     gbt = GtsmBottleTar(f"bottles/{filename}", session)
     gbt.load_bottles()
-    for bottle in gbt.bottles:
-        print(bottle.file_metadata['seed_ch'])
-
-    gbt.delete_bottles_from_disk()
+    #for bottle in gbt.bottles:
+    #    print(bottle.file_metadata['start'], bottle.file_metadata['num_pts'],  bottle.file_metadata['interval'])
+    #print(bottle.get_unix_ms_timestamps())
+    #gbt.delete_bottles_from_disk()
+    
+    #print(gbt.build_tiledb_buffer())
+    gbt.build_tiledb_buffer()
+    
     t2 = datetime.datetime.now()
     elapsed_time = t2 - t1
     logger.info(f'{gbt.file_metadata["filename"]}: Elapsed time {elapsed_time} seconds')

@@ -41,24 +41,6 @@ if __name__ == '__main__':
     array.consolidate_fragments()
     array.vacuum_fragments()
 
-    # config = tiledb.Config()
-    # config["sm.consolidation.mode"] = "fragment_meta"
-    # config["sm.vacuum.mode"] = "fragment_meta"
-    # logger.info("Consolidating fragment_meta")
-    # tiledb.consolidate(uri, config=config)
-    # logger.info("Vacuuming fragment_meta")
-    # tiledb.vacuum(uri, config=config)
-    #
-    # config["sm.consolidation.mode"] = "array_meta"
-    # config["sm.vacuum.mode"] = "array_meta"
-    # logger.info("Consolidating meta")
-    # tiledb.consolidate(uri, config=config)
-    # logger.info("Vacuuming meta")
-    # tiledb.vacuum(uri, config=config)
-    #
-    #
-
-
 
 
 

@@ -201,6 +201,13 @@ class Bottle:
 
         return self.data
 
+    def get_unix_ms_timestamps(self):
+        interval = round(self.file_metadata['interval'], 3)
+        timestamps = []
+        for i in range(self.file_metadata['num_pts']):
+            timestamps.append(int((self.file_metadata['start'] + (i * interval)) * 1000))
+        return timestamps
+
     def get_timestamps(self):
         seconds = int(self.file_metadata['interval'])
         microseconds = int((self.file_metadata['interval'] - seconds) * 1000000)
