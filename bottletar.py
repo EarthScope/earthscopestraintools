@@ -5,7 +5,7 @@ import tarfile
 import numpy as np
 import pandas as pd
 import datetime
-from es-strain-tools.btl.bottle import Bottle
+from bottle import Bottle
 import logging
 
 logger = logging.getLogger(__name__)
