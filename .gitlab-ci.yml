@@ -1,4 +1,4 @@
-include:
-  - project: earthscope/infrastructure/gitlab-ci
-    ref: "0"
-    file: project-template-library-python.yml
+#include:
+#  - project: earthscope/infrastructure/gitlab-ci
+#    ref: "0"
+#    file: project-template-library-python.yml
