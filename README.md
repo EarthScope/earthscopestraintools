@@ -1,5 +1,19 @@
-This repo contains code to read and write strainmeter data to tiledb.
+This repo contains the code associated with a library on pypi
+https://pypi.org/project/earthscopestraintools/
 M. Gottlieb 1-20-23
+
+It can be installed with 
+    
+> pip install earthscopestraintools
+
+Or with optional dependencies:
+
+> pip install eartschopestraintools'[mseed]'
+> 
+> pip install eartschopestraintools'[tiledb]'
+> 
+> pip install eartschopestraintools'[mseed,tiledb]'
+
 
 ### straintiledbarray.py
 class with methods and metadata to interact with strain tiledb arrays.  
@@ -29,3 +43,9 @@ add on functionality around bottletar to use obspy to write mseed files
 
 ### bottle2tiledb.py
 add on functionality around bottletar to use straintiledbarray to write to tiledb
+
+### mseed_tools.py
+functions to download miniseed from DataSelect and load into pandas dataframes
+
+### gtsm_metadata.py
+class to load GTSM metadata 
