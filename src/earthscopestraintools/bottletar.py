@@ -1,9 +1,6 @@
 import os
 import shutil
-import tiledb
 import tarfile
-import numpy as np
-import pandas as pd
 import datetime
 from bottle import Bottle
 import logging
@@ -107,98 +104,6 @@ class GtsmBottleTar:
         for bottle in self.bottles:
             bottle_names.append(bottle.file_metadata['filename'])
         return bottle_names
-
-    # def build_tiledb_buffer(self):
-    #     # builds a 3d tiledb buffer dataframe from a given set of bottles
-    #     # index as row number
-    #     # columns are data_type, timeseries, time, data, level, quality, version (3 dim + 4 attr)
-    # 
-    # 
-    #     logger.info(f"{self.file_metadata['filename']}: loading {len(self.bottle_list)} bottles into dataframe")
-    #     bottle_dfs = []
-    #     for i, name in enumerate(self.bottle_list):
-    #         bottle = self.load_bottle(name)
-    #         bottle.read_header()
-    #         #logger.info(bottle.file_metadata)
-    #         data_type = bottle.file_metadata['channel']
-    #         timeseries = 'raw'
-    #         logger.info(f"{data_type}, {timeseries}")
-    #         timestamps = bottle.get_unix_ms_timestamps()
-    #         #timestamps = bottle.get_datetime_timestamps()
-    # 
-    #         data = bottle.read_data()
-    #         # Important for Min_Archive session: close open bottles when done reading to free up memory
-    #         bottle.file.close()
-    #         level = '0'
-    #         quality = 'g'
-    #         version = int(datetime.datetime.now().strftime("%Y%j%H%M%S"))
-    #         d = {'data_type': data_type,
-    #              'timeseries': timeseries,
-    #              'time': timestamps,
-    #              'data': data,
-    #              'level': level,
-    #              'quality': quality,
-    #              'version': version}
-    #         bottle_df = pd.DataFrame(data=d)
-    #         bottle_df.loc[bottle_df['data'] == 999999, 'quality'] = 'm'
-    #         bottle_dfs.append(bottle_df)
-    #     tiledb_buffer = pd.concat(bottle_dfs, axis=0).reset_index(
-    #         drop=True)
-    #     tiledb_buffer['data'] = tiledb_buffer['data'].astype(np.float64)
-    #     tiledb_buffer['version'] = tiledb_buffer['version'].astype(np.int64)
-    #     self.delete_bottles_from_disk()
-    #     return tiledb_buffer
-    # 
-    # 
-    # def write_array(self, array):
-    #     #writes a 3d tiledb buffer dataframe to a given tiledb array
-    #     tiledb.from_pandas(uri=array.uri,
-    #                        dataframe=self.tiledb_buffer,
-    #                        index_dims=['data_type', 'timeseries', 'time'],
-    #                        mode='append',
-    #                        ctx=array.ctx
-    #                        )
-    # 
-    # def to_tiledb(self, array):
-    #     #method called to trigger building buffer dataframe and writing to tiledb
-    #     #if specified array does not exist, it will make one
-    #     try:
-    #         #num_bottles = len(self.bottles)
-    #         num_bottles = len(self.bottle_list)
-    #         if num_bottles:
-    #             logger.info(f"{self.file_metadata['filename']}: {self.file_metadata['session']} tar contains {num_bottles} bottles.")
-    #             #self.tiledb_buffer = self.build_tiledb_buffer(self.bottles)
-    #             self.tiledb_buffer = self.build_tiledb_buffer()
-    #             logger.info(f"{self.file_metadata['filename']}: Writing to {array.uri}")
-    #             self.write_array(array)
-    #             logger.info(f"{self.file_metadata['filename']}: Written to {array.uri}")
-    #             array.consolidate_meta()
-    #             array.vacuum_meta()
-    #             self.file_metadata['start_time'] = self.tiledb_buffer['time'].iloc[0]
-    #             self.file_metadata['end_time'] = self.tiledb_buffer['time'].sort_values().iloc[-1]
-    #         else:
-    #             logger.error(f"Error: GtsmLoggerFile object {self.file_metadata['filename']} contains no bottles")
-    # 
-    #     except tiledb.TileDBError as e:
-    #         try:
-    #             logger.error(e)
-    #             logger.warning(f"Array {array.uri} does not exist, creating.")
-    #             array.create()
-    #             logger.info(f"Created {array.uri}")
-    #             logger.info(f"{self.file_metadata['filename']}: Writing to {array.uri}")
-    #             self.write_array(array)
-    #             logger.info(f"{self.file_metadata['filename']}: Written to {array.uri}")
-    #             array.consolidate_meta()
-    #             array.vacuum_meta()
-    #             self.file_metadata['start_time'] = self.tiledb_buffer['time'].iloc[0]
-    #             self.file_metadata['end_time'] = self.tiledb_buffer['time'].sort_values().iloc[-1]
-    # 
-    #         except Exception as e:
-    #             logger.exception(e)
-    # 
-    #     except Exception as e:
-    #         logger.exception(e)
-
 
 if __name__ == '__main__':
 

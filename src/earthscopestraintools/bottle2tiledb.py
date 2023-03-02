@@ -17,8 +17,6 @@ def build_tiledb_buffer(gbt: GtsmBottleTar):
     # builds a tiledb buffer dataframe from a given set of bottles
     # index as row number
     # columns are data_type, timeseries, time, data, level, quality, version (3 dim + 4 attr)
-
-
     logger.info(f"{gbt.file_metadata['filename']}: loading {len(gbt.bottle_list)} bottles into dataframe")
     bottle_dfs = []
     for i, name in enumerate(gbt.bottle_list):
@@ -53,16 +51,6 @@ def build_tiledb_buffer(gbt: GtsmBottleTar):
     tiledb_buffer['version'] = tiledb_buffer['version'].astype(np.int64)
     gbt.delete_bottles_from_disk()
     return tiledb_buffer
-
-
-# def write_buffer_to_array(array, tiledb_buffer):
-#     #writes a tiledb buffer dataframe to a given tiledb array
-#     tiledb.from_pandas(uri=array.uri,
-#                        dataframe=tiledb_buffer,
-#                        index_dims=['data_type', 'timeseries', 'time'],
-#                        mode='append',
-#                        ctx=array.ctx
-#                        )
 
 def to_tiledb(gbt, array):
     #method called to trigger building buffer dataframe and writing to tiledb
@@ -110,31 +98,7 @@ def to_tiledb(gbt, array):
 
     except Exception as e:
         logger.exception(e)
-#
-# def build_stream(network: str,
-#                    station: str,
-#                    gbt: GtsmBottleTar):
-#     st = obspy.core.stream.Stream()
-#     gbt.load_bottles()
-#     for bottle in gbt.bottles:
-#         stats = obspy.core.trace.Stats()
-#         stats.station = station
-#         stats.network = network
-#         stats.location = bottle.file_metadata['seed_loc']
-#         stats.channel = bottle.file_metadata['seed_ch']
-#         #(stats.station, channel, year, dayofyear, hour, min) = btl.parse_filename()
-#         #metadata = btl.read_header()
-#         stats.delta = bottle.file_metadata['interval']
-#         stats.npts = bottle.file_metadata['num_pts']
-#         stats.starttime += timedelta(seconds=bottle.file_metadata['start'])
-#
-#         data = np.array(bottle.read_data(), dtype=np.int32)
-#         tr = obspy.core.trace.Trace(data=data, header=stats)
-#         st.append(tr)
-#     st.merge()
-#     logger.info(st)
-#     gbt.delete_bottles_from_disk()
-#     return st
+
 
 if __name__ == '__main__':
 

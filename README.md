@@ -18,10 +18,6 @@ back from tiledb and package as tarball
 distribution script to generate a subset tdb array based on a time query and 
 package as tarball
 
-### load_level2 notebook
-notebook for demoing various ways to query processed strain data from tiledb and
-how to plot the data
-
 ### bottle.py
 library for reading gtsm bottle files
 
@@ -30,3 +26,6 @@ wrapper class for reading 5 cases of tarballs of bottle files and writing to til
 
 ### bottle2mseed.py
 add on functionality around bottletar to use obspy to write mseed files
+
+### bottle2tiledb.py
+add on functionality around bottletar to use straintiledbarray to write to tiledb

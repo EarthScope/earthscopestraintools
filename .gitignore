@@ -8,3 +8,4 @@ arrays
 venv
 .DS_Store
 __pycache__/
+commands.txt
