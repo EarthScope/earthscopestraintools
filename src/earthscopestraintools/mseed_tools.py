@@ -13,10 +13,21 @@ inv_client = Client("IRIS")
 from requests.exceptions import HTTPError
 
 
-def load_miniseed(net: str, sta: str, loc: str, cha: str, start: str, end: str):
+def load_miniseed(
+    net: str, sta: str, loc: str, cha: str, start: str, end: str, save_as: str = None
+):
     st = download_mseed(net=net, sta=sta, loc=loc, cha=cha, start=start, end=end)
+    if save_as:
+        st.write(filename=save_as)
     df = mseed2pandas(st)
     return df
+
+
+def save_miniseed(
+    net: str, sta: str, loc: str, cha: str, start: str, end: str, filename: str
+):
+    st = download_mseed(net=net, sta=sta, loc=loc, cha=cha, start=start, end=end)
+    st.write(filename)
 
 
 def download_mseed(net: str, sta: str, loc: str, cha: str, start: str, end: str):

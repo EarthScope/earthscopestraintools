@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthscopestraintools"
-version ="0.0.5"
+version ="0.0.8"
 authors = [
   { name="Mike Gottlieb", email="mike.gottlieb@eartscope.org" },
 ]
-description = "A collection of utilities for EarthScope strainmeter data format translation"
+description = "A collection of utilities for working with EarthScope strainmeter data"
 readme = "README.md"
 license = { file="LICENSE" }
 requires-python = ">=3.7"
@@ -28,7 +28,7 @@ mseed = [ "obspy==1.4.0" ]
 tiledb = ["tiledb==0.20.0", "pyarrow==7.0.0"]
 
 [project.urls]
-"Homepage" = "https://gitlab.com/earthscope/gds/strain/es-strain-tools-lib"
+"Homepage" = "https://gitlab.com/earthscope/gds/strain/earthscopestraintools"
 
 
 

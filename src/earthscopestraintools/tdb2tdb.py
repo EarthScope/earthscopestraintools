@@ -5,77 +5,74 @@
 import tiledb
 import numpy as np
 import pandas as pd
+
 # import datetime
 # import sys, os
 import shutil
 import json
 
-from straintiledbarray import StrainTiledbArray
-from edid import find_station_edid
+# from straintiledbarray import StrainTiledbArray
+
+from earthscopestraintools.edid import get_station_edid
+from earthscopestraintools.tiledbtools import (
+    ProcessedStrainReader,
+    ProcessedStrainWriter,
+)
 
 import logging
+
 logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s %(levelname)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+workdir = "arrays"
+
+#
+# def to_date(datetime64):
+#     ts = pd.to_datetime(str(datetime64))
+#     d = ts.strftime("%Y%m%d")
+#     return d
 
 
-def to_date(datetime64):
-    ts = pd.to_datetime(str(datetime64))
-    d = ts.strftime('%Y%m%d')
-    return d
-
-def read_date_range(array: StrainTiledbArray,
-                    start: np.datetime64,
-                    end: np.datetime64
-                    ):
-    with tiledb.open(array.uri, 'r', ctx=array.ctx) as A:
-        start = start.astype('int') * 1000
-        end = end.astype('int') * 1000
-        dims = json.loads(A.meta['dimensions'])
-        data_types = dims['data_types']
-        timeseries_list = dims['timeseries']
-        index_col = ['data_type', 'timeseries', 'time']
-        attrs = ['data', 'quality', 'level', 'version']
-        df = A.query(index_col=index_col, attrs=attrs).df[:, :, start:end]#.sort_index()
-    return df, data_types, timeseries_list
-
-def write_new_tdb(df, array):
-    data_types = list(df.index.get_level_values(0).unique())
-    timeseries_list = list(df.index.get_level_values(1).unique())
-    dimension_dict = {"data_types":data_types, "timeseries":timeseries_list}
-    array.delete()
-    array.create()
-    with tiledb.open(array.uri, 'w', ctx=array.ctx) as A:
-        A.meta["dimensions"] = json.dumps(dimension_dict)
-    tiledb.from_pandas(uri=array.uri,
-                       dataframe=df,
-                       index_dims=['data_type', 'timeseries', 'time'],
-                       mode='append',
-                       ctx=array.ctx
-                       )
-    shutil.make_archive(array.uri, 'zip', array.uri)
-    shutil.rmtree(array.uri)
-    logger.info("Export complete")
-
-if __name__ == '__main__':
-    fcid = "B005"
-    net = "PB"
-    start = np.datetime64("2022-01-01T00:00:00")
-    end = np.datetime64("2022-02-01T00:00:00")
-
-    edid = find_station_edid(net, fcid)
-    workdir = "arrays"
+def read_date_range(network, station, start_str, end_str):
+    edid = get_station_edid(network, station)
     uri = f"{workdir}/{edid}_level2.tdb"
     logger.info(f"Array uri: {uri}")
-    array = StrainTiledbArray(uri, period=300, location='local')
+    reader = ProcessedStrainReader(uri)
+    data_types = reader.array.get_data_types()
+    timeseries = reader.array.get_timeseries()
+    attrs = ["data", "quality", "level", "version"]
+    df = reader.to_df(
+        data_types=data_types,
+        timeseries=timeseries,
+        attrs=attrs,
+        start_str=start_str,
+        end_str=end_str,
+        reindex=False,
+    )
+    return df
 
-    df, data_types, timeseries_list = read_date_range(array, start, end)
-    #logger.info(df)
 
-    uri2 = f"{workdir}/{net}_{fcid}_level2_{start}.tdb"
-    logger.info(f"Array uri: {uri2}")
-    array2 = StrainTiledbArray(uri2, period=300, location='local')
-    write_new_tdb(df, array2)
+def convert_time_to_unix_ms(df):
+    df = df.reset_index()
+    df["time"] = df["time"].astype(int) / 10 ** 6
+    df["time"] = df["time"].astype(np.int64)
+    return df
+
+
+def export_date_range(
+    network, station, start_str, end_str, write_it=True, print_it=False
+):
+    df = read_date_range(network, station, start_str, end_str)
+    df = convert_time_to_unix_ms(df)
+    if print_it:
+        logger.info(f"\n{df}")
+
+    if write_it:
+        uri = f"{workdir}/{network}_{station}_level2_{start_str}_{end_str}.tdb"
+        writer = ProcessedStrainWriter(uri=uri)
+        writer.array.delete()
+        writer.array.create(schema_type="3D", schema_source="s3")
+        writer.write_df_to_tiledb(df)
