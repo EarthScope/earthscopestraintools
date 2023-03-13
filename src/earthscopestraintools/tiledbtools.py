@@ -512,7 +512,7 @@ class RawStrainReader:
             self.check_query_result(df, start_ts, end_ts)
             return df
 
-        except (IndexError, KeyError) as e:  # , tiledb.TileDBError
+        except (IndexError, KeyError, tiledb.TileDBError) as e:  #
             logger.error(f"{type(e)}: {e}")
             logger.error("No data found matching query parameters")
             return pd.DataFrame()

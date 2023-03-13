@@ -234,7 +234,7 @@ class GtsmMetadata:
                     return ch_prelim.astype(float)
             return np.array([])
         except Exception as e:
-            logger.error("Could not load ch_prelim strain matrix")
+            logger.exception("Could not load ch_prelim strain matrix")
             return None
 
     def get_linearization_params(self):
@@ -393,33 +393,6 @@ class GtsmMetadata:
         # pp.pprint(self.tidal_params)
         # print("detrend params:")
         # pp.pprint(self.detrend)
-
-
-# def bottlename2fdsn(bottlename):
-#     '''
-#     convert bottlename to location and channel
-#     :param bottlename: str
-#     :return: location: str, channel: str
-#     '''
-#     codes = {"BatteryVolts": ["T0", "RE1"], "CH0": ["T0", "RS1"], "CH1": ["T0", "RS2"], "CH2": ["T0", "RS3"],
-#              "CH3": ["T0", "RS4"], "CalOffsetCH0G1": ["T1", "RCA"], "CalOffsetCH0G2": ["T2", "RCA"],
-#              "CalOffsetCH0G3": ["T3", "RCA"], "CalOffsetCH1G1": ["T1", "RCB"], "CalOffsetCH1G2": ["T2", "RCB"],
-#              "CalOffsetCH1G3": ["T3", "RCB"], "CalOffsetCH2G1": ["T1", "RCC"], "CalOffsetCH2G2": ["T2", "RCC"],
-#              "CalOffsetCH2G3": ["T3", "RCC"], "CalOffsetCH3G1": ["T1", "RCD"], "CalOffsetCH3G2": ["T2", "RCD"],
-#              "CalOffsetCH3G3": ["T3", "RCD"], "CalStepCH0G1": ["T4", "RCA"], "CalStepCH0G2": ["T5", "RCA"],
-#              "CalStepCH0G3": ["T6", "RCA"], "CalStepCH1G1": ["T4", "RCB"], "CalStepCH1G2": ["T5", "RCB"],
-#              "CalStepCH1G3": ["T6", "RCB"], "CalStepCH2G1": ["T4", "RCC"], "CalStepCH2G2": ["T5", "RCC"],
-#              "CalStepCH2G3": ["T6", "RCC"], "CalStepCH3G1": ["T4", "RCD"], "CalStepCH3G2": ["T5", "RCD"],
-#              "CalStepCH3G3": ["T6", "RCD"], "DownholeDegC": ["T0", "RKD"], "LoggerDegC": ["T0", "RK1"],
-#              "PowerBoxDegC": ["T0", "RK2"], "PressureKPa": ["TS", "RDO"], "RTSettingCH0": ["T0", "RCA"],
-#              "RTSettingCH1": ["T0", "RCB"], "RTSettingCH2": ["T0", "RCC"], "RTSettingCH3": ["T0", "RCD"],
-#              "Rainfallmm": ["TS", "RRO"], "SolarAmps": ["T0", "REO"], "SystemAmps": ["T0", "RE2"],
-#              "CalOffsetCH0G0": ["T7", "RCA"], "CalOffsetCH1G0": ["T7", "RCB"], "CalOffsetCH2G0": ["T7", "RCC"],
-#              "CalOffsetCH3G0": ["T7", "RCD"], "CalStepCH0G0": ["T8", "RCA"], "CalStepCH1G0": ["T8", "RCB"],
-#              "CalStepCH2G0": ["T8", "RCC"], "CalStepCH3G0": ["T8", "RCD"]}
-#     location = codes[bottlename][0]
-#     channel = codes[bottlename][1]
-#     return location, channel
 
 
 def fdsn2bottlename(channel):

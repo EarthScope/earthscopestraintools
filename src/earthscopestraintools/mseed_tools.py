@@ -14,23 +14,60 @@ from requests.exceptions import HTTPError
 
 
 def load_miniseed(
-    net: str, sta: str, loc: str, cha: str, start: str, end: str, save_as: str = None
+    net: str,
+    sta: str,
+    loc: str,
+    cha: str,
+    start: str,
+    end: str,
+    save_as: str = None,
+    print_url: bool = False,
 ):
-    st = download_mseed(net=net, sta=sta, loc=loc, cha=cha, start=start, end=end)
+    """Deprecated but here to avoid breaking changes"""
+    load_mseed_to_df(net, sta, loc, cha, start, end, save_as, print_url)
+
+
+def load_mseed_to_df(
+    net: str,
+    sta: str,
+    loc: str,
+    cha: str,
+    start: str,
+    end: str,
+    save_as: str = None,
+    print_url: bool = False,
+):
+    st = download_mseed(
+        net=net, sta=sta, loc=loc, cha=cha, start=start, end=end, print_url=print_url
+    )
     if save_as:
         st.write(filename=save_as)
     df = mseed2pandas(st)
     return df
 
 
-def save_miniseed(
+def load_mseed_file_to_df(filename: str):
+    st = read(filename)
+    df = mseed2pandas(st)
+    return df
+
+
+def save_mseed_file(
     net: str, sta: str, loc: str, cha: str, start: str, end: str, filename: str
 ):
     st = download_mseed(net=net, sta=sta, loc=loc, cha=cha, start=start, end=end)
     st.write(filename)
 
 
-def download_mseed(net: str, sta: str, loc: str, cha: str, start: str, end: str):
+def download_mseed(
+    net: str,
+    sta: str,
+    loc: str,
+    cha: str,
+    start: str,
+    end: str,
+    print_url: bool = False,
+):
     """
 
     :param loc: FDSN Location code, accepts wildcards
@@ -45,7 +82,8 @@ def download_mseed(net: str, sta: str, loc: str, cha: str, start: str, end: str)
         f"&sta={sta}&loc={loc}&cha={cha}&starttime={start}&endtime={end}"
         f"&format=miniseed&nodata=404"
     )
-    # print(url)
+    if print_url:
+        logger.info(f"Reading from {url}")
     try:
         st = read(url)
     except HTTPError as e:
@@ -55,7 +93,6 @@ def download_mseed(net: str, sta: str, loc: str, cha: str, start: str, end: str)
 
 
 def mseed2pandas(st: Stream):
-    # print(st)
     df = pd.DataFrame()
     dfs = {}
     for i, tr in enumerate(st):

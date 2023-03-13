@@ -8,11 +8,11 @@ It can be installed with
 
 Or with optional dependencies:
 
-> pip install eartschopestraintools'[mseed]'
+> pip install 'earthscopestraintools[mseed]'
 > 
-> pip install eartschopestraintools'[tiledb]'
+> pip install 'earthscopestraintools[tiledb]'
 > 
-> pip install eartschopestraintools'[mseed,tiledb]'
+> pip install 'earthscopestraintools[mseed,tiledb]'
 
 
 ### straintiledbarray.py
