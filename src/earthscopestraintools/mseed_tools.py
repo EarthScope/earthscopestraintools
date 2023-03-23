@@ -137,6 +137,7 @@ def fdsn2bottlename(channel):
         "BS4": "CH3",
         "RDO": "atmp",
         "LDO": "atmp",
+        "RRO": "rain",
     }
 
     return codes[channel]

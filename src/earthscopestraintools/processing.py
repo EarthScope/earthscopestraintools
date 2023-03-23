@@ -1,59 +1,37 @@
 import numpy as np
 import pandas as pd
-from scipy import signal
-from earthscopestraintools.timeseries import Timeseries
+from scipy import signal, stats
+import subprocess
+
+# from earthscopestraintools.timeseries import Timeseries
 from earthscopestraintools.gtsm_metadata import GtsmMetadata
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def linearize(df: pd.DataFrame, metadata: GtsmMetadata):
+def linearize(df: pd.DataFrame, reference_strains: dict, gap: float):
     # build a series of reference strains.  if using metadata from XML the /1e8 is already included.
-    reference_strains = pd.Series(dtype="float64")
+    reference_strain_series = pd.Series(dtype="float64")
     for ch in df.columns:
-        reference_strains[ch] = metadata.linearization[ch]
+        reference_strain_series[ch] = reference_strains[ch]
     linearized_data = (
-            (
-                    ((df / 100000000) / (1 - (df / 100000000)))
-                    - (
-                            (reference_strains / 100000000)
-                            / (1 - (reference_strains / 100000000))
-                    )
+        (
+            ((df / 100000000) / (1 - (df / 100000000)))
+            - (
+                (reference_strain_series / 100000000)
+                / (1 - (reference_strain_series / 100000000))
             )
-            * (metadata.gap / metadata.diameter)
-            * 1000000
+        )
+        * (gap / 0.087)
+        * 1000000
     )
     return linearized_data
 
 
-def linearize_ts(ts: Timeseries, metadata: GtsmMetadata):
-    """
-    Processing step to convert digital counts to microstrain based on geometry of GTSM gauges
-    :param ts: Timeseries object, containing data to convert to microstrain
-    :param step_params: Dict, optional boolean params Plot, Print, Save
-    :return: Timeseries object, in units of microstrain
-    """
-
-    # remove any 999999 values in data, ok to leave as Nan rather than interpolate.
-    if ts.nines:
-        logger.info(f"Found {ts.nines} 999999s, replacing with nans")
-        df = ts.remove_999999s(interpolate=False)
-    else:
-        df = ts.data
-    linearized_data = linearize(df, metadata)
-
-    ts2 = Timeseries(
-        data=linearized_data,
-        quality_df=ts.quality_df,
-        series="microstrain",
-        units="microstrain",
-        level="1",
-        period=ts.period,
-    )
-    return ts2
-
-def apply_calibration_matrix(df: pd.DataFrame, calibration_matrix: np.array, use_channels: list):
+def apply_calibration_matrix(
+    df: pd.DataFrame, calibration_matrix: np.array, use_channels: list
+):
     regional_strain_df = np.matmul(
         calibration_matrix, df[df.columns].transpose()
     ).transpose()
@@ -62,28 +40,6 @@ def apply_calibration_matrix(df: pd.DataFrame, calibration_matrix: np.array, use
     )
     return regional_strain_df
 
-def apply_calibration_matrix_ts(ts: Timeseries, calibration_matrix: np.array, use_channels: list = [1,1,1,1]):
-    """
-    Processing step to convert gauge strains into areal and shear strains
-    :param ts: Timeseries object containing gauge data in microstrain
-    :param calibration_matrix: np.array containing strain matrix
-    :return: Timeseries object, in units of microstrain
-    """
-    # calculate areal and shear strains from gauge strains
-    logger.info(calibration_matrix)
-    # todo: implement UseChannels to arbitrary matrices
-    data = apply_calibration_matrix(ts.data, calibration_matrix, use_channels)
-    quality_df = pd.DataFrame(index=ts.quality_df.index, columns=["Eee+Enn", "Eee-Enn", "2Ene"], data='g')
-    quality_df[ts.quality_df[ts.quality_df == 'm'].any(axis=1)] = 'm'
-    ts2 = Timeseries(
-        data=data,
-        quality_df=quality_df,
-        series=ts.series,
-        units="microstrain",
-        level="2a",
-        period=ts.period,
-    )
-    return ts2
 
 def butterworth_filter(
     df: pd.DataFrame,
@@ -101,35 +57,6 @@ def butterworth_filter(
     return df2
 
 
-def butterworth_filter_ts(
-    ts: Timeseries,
-    filter_type: str,
-    filter_order: int,
-    filter_cutoff_s: float,
-    series: str = "",
-    name: str = None,
-):
-
-    df2 = butterworth_filter(
-        df=ts.data,
-        period=ts.period,
-        filter_type=filter_type,
-        filter_order=filter_order,
-        filter_cutoff_s=filter_cutoff_s,
-    )
-    if not name:
-        name = f"{ts.name}.filtered"
-    return Timeseries(
-        data=df2,
-        quality_df=ts.quality_df,
-        series=series,
-        units=ts.units,
-        period=ts.period,
-        level=ts.level,
-        name=name,
-    )
-
-
 def interpolate(
     df: pd.DataFrame,
     replace: int = 999999,
@@ -144,66 +71,11 @@ def interpolate(
     return df2
 
 
-def interpolate_ts(
-    ts: Timeseries,
-    replace: int = 999999,
-    method: str = "linear",
-    limit: int = 3600,
-    limit_direction="both",
-    name: str = None,
-):
-    # logger.info(f"Interpolating data using method={method} and limit={limit}")
-    data = interpolate(
-        ts.data,
-        replace=replace,
-        method=method,
-        limit=limit,
-        limit_direction=limit_direction,
-    )
-    mask1 = (data != ts.data).any(axis=1)
-    mask2 = ts.data[mask1] == 999999
-    quality_df = ts.quality_df.copy()
-    quality_df[mask2] = "i"
-
-    if not name:
-        name = f"{ts.name}.interpolated"
-    return Timeseries(
-        data=data,
-        quality_df=quality_df,
-        series=ts.series,
-        units=ts.units,
-        level=ts.level,
-        period=ts.period,
-        name=name,
-    )
-
-
 def decimate_to_hourly(df: pd.DataFrame):
     return df[df.index.minute == 0]
 
 
-def decimate_to_hourly_ts(ts: Timeseries, name: str = None):
-    """
-
-        :param ts: Timeseries
-        :return: Timeseries, decimated to hourly
-        """
-    logger.info(f"Decimating {ts.period}s data to hourly using values where minutes=0.")
-    if not name:
-        name = f"{ts.name}.hourly"
-    return Timeseries(
-        data=decimate_to_hourly(ts.data),
-        quality_df=decimate_to_hourly(ts.quality_df),
-        series=ts.series,
-        units=ts.units,
-        level=ts.level,
-        period=3600,
-        name=name,
-    )
-
-
 def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3600):
-
     df2 = interpolate(df, method="linear", limit=3600)
 
     # zero the data to the first value prior to filtering
@@ -347,17 +219,96 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
     return decimated_data
 
 
-def decimate_1s_to_300s_ts(ts: Timeseries, method: str = "linear", limit: int = 3600):
-
-    data = decimate_1s_to_300s(ts.data, method=method, limit=limit)
-    quality_df = ts.quality_df.replace("m", "i")
-    name = f"{ts.name}.decimated"
-    return Timeseries(
-        data=data,
-        quality_df=quality_df.reindex(index=data.index),
-        series=ts.series,
-        units=ts.units,
-        level=ts.level,
-        name=name,
-        period=300,
+def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float = 0.75):
+    logger.info(
+        f"Using cutoff percentile of {cutoff_percentile} and limit multiplier of {limit_multiplier}."
     )
+    first_diffs = df.diff()
+    #  drop a percentage of 1st differences to estimate an offset cutoff
+    drop = round(len(first_diffs) * (1 - cutoff_percentile))
+    offset_limit = []
+    df_offsets = pd.DataFrame(index=first_diffs.index)
+    for ch in df.columns:
+        # Offset limit is a multiplier x the average absolute value of first differences
+        # within 2 st_dev of the first differences
+        offset_limit.append(
+            np.mean(abs(first_diffs[ch].sort_values().iloc[0:-drop])) * limit_multiplier
+        )
+
+        # CH edit. Calculate offsets from the detrended series
+        # Justification: if the offset is calculated from the original series,
+        # there may be an overcorrection that is noticeable, especially with large trends
+        df_offsets[ch] = first_diffs[first_diffs[ch].abs() > offset_limit[-1]][ch]
+
+    # make a dataframe of running total of offsets
+    df_cumsum = df_offsets.fillna(0).cumsum()
+    logger.info(f"Using offset limit of {offset_limit}")
+    return df_cumsum
+
+
+def calculate_pressure_correction(df: pd.DataFrame, response_coefficients: dict):
+    data_df = pd.DataFrame(index=df.index)
+    for key in response_coefficients:
+        data_df[key] = df * float(response_coefficients[key])
+    return data_df
+
+
+def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
+    if not trend_start:
+        trend_start = df.first_valid_index()
+    if not trend_end:
+        trend_end = df.last_valid_index()
+    logger.info(f"Trend Start: {trend_start}")
+    logger.info(f"Trend Start: {trend_end}")
+    df_trend_c = pd.DataFrame(data=df.index)
+    windowed_df = df.copy()[trend_start:trend_end].reset_index()
+    for ch in df.columns:
+        slope, intercept, r_value, p_value, std_err = stats.linregress(
+            windowed_df.index, windowed_df[ch]
+        )
+        df_trend_c[ch] = df_trend_c.index * slope
+    # print("df_trend_c", df_trend_c)
+    return df_trend_c[df.columns].set_index(df_trend_c["time"])
+
+
+def calculate_tide_correction(df, period, tidal_parameters, longitude):
+    hartid = "docker run -i --rm ghcr.io/earthscope/spotl hartid"
+    start = df.first_valid_index()
+    datestring = (
+        str(start.year).zfill(4)
+        + " "
+        + str(start.month).zfill(2)
+        + " "
+        + str(start.day).zfill(2)
+        + " "
+        + str(start.hour).zfill(2)
+        + " "
+        + str(start.minute).zfill(2)
+        + " "
+        + str(start.second).zfill(2)
+    )
+
+    nterms = str(len(df))
+    samp = int(period)
+    cmd = f"{hartid} {datestring} {nterms} {samp}"
+    # cmd = hartid + " " + datestring + " " + nterms + " " + samp
+
+    channels = df.columns
+    tides = set()
+    for key in tidal_parameters:
+        tides.add(key[1])
+    cmds = {}
+    # for i, ch in enumerate(gauges):
+    for ch in channels:
+        inputfile = f"printf 'l\n{longitude}\n"
+        for tide in tides:
+            inputfile += f" {tidal_parameters[(ch, tide, 'doodson')]} {tidal_parameters[(ch, tide, 'amp')].ljust(7, '0')} {tidal_parameters[(ch, tide, 'phz')].ljust(8, '0')}\n"
+        inputfile += "-1'"
+        cmds[ch] = inputfile + " | " + cmd
+
+    df2 = pd.DataFrame(index=df.index)
+    for ch in channels:
+        output = subprocess.check_output(cmds[ch], shell=True).decode("utf-8")
+        df2[ch] = np.fromstring(output, dtype=float, sep="\n")
+    df2 = df2 * 1e-3
+    return df2

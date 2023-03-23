@@ -7,7 +7,8 @@ import pprint
 import shutil
 import urllib.request as request
 from contextlib import closing
-import xmltodict
+
+# import xmltodict
 
 from obspy.clients.fdsn import Client
 
@@ -29,7 +30,7 @@ class GtsmMetadata:
         self.gap = self.get_gap()
         self.diameter = 0.087
         self.orientation = self.get_orientation()
-        self.linearization = self.get_linearization_params()
+        self.reference_strains = self.get_reference_strains()
         matrices = {}
         if not gauge_weights:
             self.gauge_weights = [1, 1, 1, 1]
@@ -44,14 +45,14 @@ class GtsmMetadata:
     #        self.xml = self.get_xml()
     #        self.detrend = self.get_detrend_xml()
 
-    def get_xml(self):
-        metadir = "../xml/"
-        xml_path = "ftp://bsm.unavco.org/pub/bsm/level2/" + self.fcid + "/"
-        xml_file = self.fcid + ".xml"
-        with closing(request.urlopen(xml_path + xml_file)) as r:
-            with open(metadir + xml_file, "wb") as f:
-                shutil.copyfileobj(r, f)
-        return xmltodict.parse(open(metadir + xml_file).read(), process_namespaces=True)
+    # def get_xml(self):
+    #     metadir = "../xml/"
+    #     xml_path = "ftp://bsm.unavco.org/pub/bsm/level2/" + self.fcid + "/"
+    #     xml_file = self.fcid + ".xml"
+    #     with closing(request.urlopen(xml_path + xml_file)) as r:
+    #         with open(metadir + xml_file, "wb") as f:
+    #             shutil.copyfileobj(r, f)
+    #     return xmltodict.parse(open(metadir + xml_file).read(), process_namespaces=True)
 
     def get_meta_table(self):
         url = "https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt"
@@ -99,22 +100,22 @@ class GtsmMetadata:
             logger.error("No orientation found for %s, using 0 deg" % self.fcid)
             return 0
 
-    def get_orientation_xml(self):
-        for i, dic in enumerate(
-            self.xml["strain_xml"]["inst_info"]["sensor_information"]["sensor_response"]
-        ):
-            if dic["sensor_type"] == "Gladwin_BSM_component_1_":
-                orientation = float(
-                    self.xml["strain_xml"]["inst_info"]["sensor_information"][
-                        "sensor_response"
-                    ][i]["orientation"]["#text"]
-                )
-        try:
-            return orientation
-        except Exception as e:
-            logger.error(e)
-            logger.error("No orientation found for %s, using 0 deg" % self.fcid)
-            return 0
+    # def get_orientation_xml(self):
+    #     for i, dic in enumerate(
+    #         self.xml["strain_xml"]["inst_info"]["sensor_information"]["sensor_response"]
+    #     ):
+    #         if dic["sensor_type"] == "Gladwin_BSM_component_1_":
+    #             orientation = float(
+    #                 self.xml["strain_xml"]["inst_info"]["sensor_information"][
+    #                     "sensor_response"
+    #                 ][i]["orientation"]["#text"]
+    #             )
+    #     try:
+    #         return orientation
+    #     except Exception as e:
+    #         logger.error(e)
+    #         logger.error("No orientation found for %s, using 0 deg" % self.fcid)
+    #         return 0
 
     def make_weighted_strain_matrix(self, gauge_weights=[1, 1, 1, 1]):
         # make strain matrix from manufacturers coefficients
@@ -237,68 +238,68 @@ class GtsmMetadata:
             logger.exception("Could not load ch_prelim strain matrix")
             return None
 
-    def get_linearization_params(self):
-        linearization = {}
-        linearization["linear_date"] = self.meta_df.loc[self.fcid]["L_DATE"]
-        linearization["CH0"] = int(self.meta_df.loc[self.fcid]["L0(cnts)"])
-        linearization["CH1"] = int(self.meta_df.loc[self.fcid]["L1(cnts)"])
-        linearization["CH2"] = int(self.meta_df.loc[self.fcid]["L2(cnts)"])
-        linearization["CH3"] = int(self.meta_df.loc[self.fcid]["L3(cnts)"])
-        return linearization
+    def get_reference_strains(self):
+        reference_strains = {}
+        reference_strains["linear_date"] = self.meta_df.loc[self.fcid]["L_DATE"]
+        reference_strains["CH0"] = int(self.meta_df.loc[self.fcid]["L0(cnts)"])
+        reference_strains["CH1"] = int(self.meta_df.loc[self.fcid]["L1(cnts)"])
+        reference_strains["CH2"] = int(self.meta_df.loc[self.fcid]["L2(cnts)"])
+        reference_strains["CH3"] = int(self.meta_df.loc[self.fcid]["L3(cnts)"])
+        return reference_strains
 
-    def get_linearization_params_xml(self):
-        # get reference strains from xml
-        linear_dict = self.xml["strain_xml"]["inst_info"]["processing"][
-            "bsm_processing_history"
-        ][-1]["bsm_processing"]["linearization"]
-        self.linearization = {}
-        for key in linear_dict:
-            # print(key, linear_dict[key])
-            if key == "linear_date":
-                self.linearization["linear_date"] = linear_dict[key]
-            if key == "g0_value":
-                self.linearization["CH0"] = float(linear_dict[key])
-            if key == "g1_value":
-                self.linearization["CH1"] = float(linear_dict[key])
-            if key == "g2_value":
-                self.linearization["CH2"] = float(linear_dict[key])
-            if key == "g3_value":
-                self.linearization["CH3"] = float(linear_dict[key])
-
-    def get_gauge_weightings_xml(self):
-        weight_dict = self.xml["strain_xml"]["inst_info"]["processing"][
-            "bsm_processing_history"
-        ][-1]["bsm_processing"]["gauge_weightings"]
-        self.gauge_weightings = [
-            int(weight_dict["gw0"]),
-            int(weight_dict["gw1"]),
-            int(weight_dict["gw2"]),
-            int(weight_dict["gw3"]),
-        ]
-
-    def get_detrend_xml(self):
-        detrend = {}
-        for channel in [
-            "detrend_start_date",
-            "detrend_g0",
-            "detrend_g1",
-            "detrend_g2",
-            "detrend_g3",
-        ]:
-            if channel == "detrend_start_date":
-                detrend[channel] = self.xml["strain_xml"]["inst_info"]["processing"][
-                    "bsm_processing_history"
-                ][-1]["bsm_processing"]["timeseries_start_date"]
-            else:
-                detrend_dict = {}
-                detrend_params = self.xml["strain_xml"]["inst_info"]["processing"][
-                    "bsm_processing_history"
-                ][-1]["bsm_processing"][channel]
-                for key in detrend_params:
-                    if key[0] != "@":
-                        detrend_dict[key] = float(detrend_params[key])
-                detrend[channel] = detrend_dict
-        return detrend
+    # def get_linearization_params_xml(self):
+    #     # get reference strains from xml
+    #     linear_dict = self.xml["strain_xml"]["inst_info"]["processing"][
+    #         "bsm_processing_history"
+    #     ][-1]["bsm_processing"]["linearization"]
+    #     self.reference_strains = {}
+    #     for key in linear_dict:
+    #         # print(key, linear_dict[key])
+    #         if key == "linear_date":
+    #             self.reference_strains["linear_date"] = linear_dict[key]
+    #         if key == "g0_value":
+    #             self.reference_strains["CH0"] = float(linear_dict[key])
+    #         if key == "g1_value":
+    #             self.reference_strains["CH1"] = float(linear_dict[key])
+    #         if key == "g2_value":
+    #             self.reference_strains["CH2"] = float(linear_dict[key])
+    #         if key == "g3_value":
+    #             self.reference_strains["CH3"] = float(linear_dict[key])
+    #
+    # def get_gauge_weightings_xml(self):
+    #     weight_dict = self.xml["strain_xml"]["inst_info"]["processing"][
+    #         "bsm_processing_history"
+    #     ][-1]["bsm_processing"]["gauge_weightings"]
+    #     self.gauge_weightings = [
+    #         int(weight_dict["gw0"]),
+    #         int(weight_dict["gw1"]),
+    #         int(weight_dict["gw2"]),
+    #         int(weight_dict["gw3"]),
+    #     ]
+    #
+    # def get_detrend_xml(self):
+    #     detrend = {}
+    #     for channel in [
+    #         "detrend_start_date",
+    #         "detrend_g0",
+    #         "detrend_g1",
+    #         "detrend_g2",
+    #         "detrend_g3",
+    #     ]:
+    #         if channel == "detrend_start_date":
+    #             detrend[channel] = self.xml["strain_xml"]["inst_info"]["processing"][
+    #                 "bsm_processing_history"
+    #             ][-1]["bsm_processing"]["timeseries_start_date"]
+    #         else:
+    #             detrend_dict = {}
+    #             detrend_params = self.xml["strain_xml"]["inst_info"]["processing"][
+    #                 "bsm_processing_history"
+    #             ][-1]["bsm_processing"][channel]
+    #             for key in detrend_params:
+    #                 if key[0] != "@":
+    #                     detrend_dict[key] = float(detrend_params[key])
+    #             detrend[channel] = detrend_dict
+    #     return detrend
 
     def get_atmp_response(self):
         url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
@@ -368,7 +369,7 @@ class GtsmMetadata:
         logger.info(f"longitude: {self.longitude}")
         logger.info(f"gap: {self.gap}")
         logger.info(f"orientation (CH0EofN): {self.orientation}")
-        logger.info(f"reference strains:\n {self.linearization}")
+        logger.info(f"reference strains:\n {self.reference_strains}")
         # logger.info(self.linearization)
         if len(self.strain_matrices):
             for key in self.strain_matrices:

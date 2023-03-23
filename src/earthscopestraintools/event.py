@@ -8,7 +8,7 @@ import pytz
 
 def version():
     print("Earthquake metadata module")
-    print("Version 1.2.  M. Gottlieb 3-13-2023")  # split into own file
+    print("Version 1.2.  M. Gottlieb 3-13-2023")
 
 
 class Earthquake:
