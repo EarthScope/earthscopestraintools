@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def linearize(df: pd.DataFrame, reference_strains: dict, gap: float):
+    logger.info(f"Converting raw counts to microstrain")
     # build a series of reference strains.  if using metadata from XML the /1e8 is already included.
     reference_strain_series = pd.Series(dtype="float64")
     for ch in df.columns:
@@ -30,13 +31,25 @@ def linearize(df: pd.DataFrame, reference_strains: dict, gap: float):
 
 
 def apply_calibration_matrix(
-    df: pd.DataFrame, calibration_matrix: np.array, use_channels: list
+    df: pd.DataFrame,
+    calibration_matrix: np.array,
+    calibration_matrix_name: str = None,
+    use_channels: list = [1, 1, 1, 1],
 ):
+    # todo: implement use channels
+    logger.info(f"Applying {calibration_matrix_name} matrix: {calibration_matrix}")
+    areal = "Eee+Enn"
+    differential = "Eee-Enn"
+    shear = "2Ene"
+    if calibration_matrix_name and calibration_matrix_name != "lab":
+        areal += "." + calibration_matrix_name
+        differential += "." + calibration_matrix_name
+        shear += "." + calibration_matrix_name
     regional_strain_df = np.matmul(
         calibration_matrix, df[df.columns].transpose()
     ).transpose()
     regional_strain_df = regional_strain_df.rename(
-        columns={0: "Eee+Enn", 1: "Eee-Enn", 2: "2Ene"}
+        columns={0: areal, 1: differential, 2: shear}
     )
     return regional_strain_df
 
@@ -48,6 +61,7 @@ def butterworth_filter(
     filter_order: int,
     filter_cutoff_s: float,
 ):
+    logger.info(f"Applying Butterworth Filter")
     fc = 1 / filter_cutoff_s
     fs = 1 / period
     [bn, an] = signal.butter(filter_order, fc / (1 / 2 * fs), btype=filter_type)
@@ -72,10 +86,12 @@ def interpolate(
 
 
 def decimate_to_hourly(df: pd.DataFrame):
+    logger.info(f"Decimating to hourly")
     return df[df.index.minute == 0]
 
 
 def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3600):
+    logger.info(f"Decimating to 300s")
     df2 = interpolate(df, method="linear", limit=3600)
 
     # zero the data to the first value prior to filtering
@@ -221,7 +237,7 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
 
 def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float = 0.75):
     logger.info(
-        f"Using cutoff percentile of {cutoff_percentile} and limit multiplier of {limit_multiplier}."
+        f"Calculating offsets using cutoff percentile of {cutoff_percentile} and limit multiplier of {limit_multiplier}."
     )
     first_diffs = df.diff()
     #  drop a percentage of 1st differences to estimate an offset cutoff
@@ -242,11 +258,13 @@ def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float =
 
     # make a dataframe of running total of offsets
     df_cumsum = df_offsets.fillna(0).cumsum()
-    logger.info(f"Using offset limit of {offset_limit}")
+    # us_limits =
+    logger.info(f"Using offset limits of {[round(x,6) for x in offset_limit]}")
     return df_cumsum
 
 
 def calculate_pressure_correction(df: pd.DataFrame, response_coefficients: dict):
+    logger.info(f"Calculating pressure correction")
     data_df = pd.DataFrame(index=df.index)
     for key in response_coefficients:
         data_df[key] = df * float(response_coefficients[key])
@@ -254,14 +272,15 @@ def calculate_pressure_correction(df: pd.DataFrame, response_coefficients: dict)
 
 
 def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
+    logger.info(f"Calculating linear trend correction")
     if not trend_start:
         trend_start = df.first_valid_index()
     if not trend_end:
         trend_end = df.last_valid_index()
-    logger.info(f"Trend Start: {trend_start}")
-    logger.info(f"Trend Start: {trend_end}")
+    logger.info(f"    Trend Start: {trend_start}")
+    logger.info(f"    Trend Start: {trend_end}")
     df_trend_c = pd.DataFrame(data=df.index)
-    windowed_df = df.copy()[trend_start:trend_end].reset_index()
+    windowed_df = df.copy()[trend_start:trend_end].interpolate().reset_index()
     for ch in df.columns:
         slope, intercept, r_value, p_value, std_err = stats.linregress(
             windowed_df.index, windowed_df[ch]
@@ -272,7 +291,13 @@ def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
 
 
 def calculate_tide_correction(df, period, tidal_parameters, longitude):
-    hartid = "docker run -i --rm ghcr.io/earthscope/spotl hartid"
+    logger.info(f"Calculating tide correction")
+    # check if hartid in path, or else use spotl container
+    result = subprocess.run("which hartid", shell=True)
+    if result.returncode == 0:
+        hartid = "hartid"
+    else:
+        hartid = "docker run -i --rm ghcr.io/earthscope/spotl hartid"
     start = df.first_valid_index()
     datestring = (
         str(start.year).zfill(4)

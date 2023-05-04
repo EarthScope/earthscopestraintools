@@ -2,12 +2,76 @@ import numpy as np
 import pandas as pd
 from scipy import stats, signal
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from geopy.distance import distance
 import datetime
+import math
+from earthscopestraintools.gtsm_metadata import get_metadata_df
 
 import logging
 
 logger = logging.getLogger(__name__)
 
+def calc_hypocentral_dist(
+        eq_latitude,
+        eq_longitude,
+        eq_depth,
+        station_latitude,
+        station_longitude):
+    """
+    Function calculates hypocentral distance (km) between lat,long and earthquake
+
+    Parameters
+    ----------
+    :param lat: float
+    :param long: float
+    :param eq: earthquake class object
+        Must include the following attributes
+        :eq.lat: float
+        :eq.long: float
+        :eq.depth: float
+    :return:
+        hypocentral_dist: int
+
+    """
+
+    ed = distance((eq_latitude, eq_longitude), (station_latitude, station_longitude)).km
+    hypocentral_dist = int(math.sqrt(float(ed) ** 2 + float(eq_depth) ** 2))
+    return hypocentral_dist
+
+
+def calculate_p_s_arrival(eq_latitude,
+                          eq_longitude,
+                          eq_time,
+                          station_latitude,
+                          station_longitude):
+    """
+    Function calculates arrival times for P and S waves at a given lat and long
+
+    Parameters
+    ----------
+    :param eq: earthquake class object
+        Must include the following attributes
+        :eq.lat: float
+        :eq.long: float
+        :eq.time: datetime.datetime
+    :param latitude: float, latitude
+    :param longitude: float, longitude
+    :return:
+        :p_arrival: datetime.datetime
+        :s_arrival: datetime.datetime
+    """
+
+    event_loc = "[" + str(eq_latitude) + "," + str(eq_longitude) + "]"
+    station_loc = "[" + str(station_latitude) + "," + str(station_longitude) + "]"
+    url = "https://service.iris.edu/irisws/traveltime/1/query?evloc=" + event_loc + "&staloc=" + station_loc
+    df = pd.read_table(url, sep="\s+", header=1, index_col=2, usecols=[2, 3])
+
+    p_delta = datetime.timedelta(seconds=float(df.iloc[(df.index == 'P').argmax()].Travel))
+    s_delta = datetime.timedelta(seconds=float(df.iloc[(df.index == 'S').argmax()].Travel))
+    p_arrival = eq_time + p_delta
+    s_arrival = eq_time + s_delta
+    return p_arrival, s_arrival
 
 def dynamic_strain(df, gauge_weights=[1, 1, 1, 1]):
     logger.info(f"Calculating dynamic strain using gauge weights: {gauge_weights}")
@@ -37,7 +101,16 @@ def pre_event_trend_correction(df, eq_time):
 
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
-
+def calculate_magnitude(dynamic_strain_df, hypocentral_distance, site_term, longitude_term):
+    logger.info(f"Calculating magnitude from dynamic strain using site term {site_term} "
+                f"and longitude term {longitude_term}")
+    df2 = pd.DataFrame(index=dynamic_strain_df.index)
+    df2['magnitude'] = ((np.log10(dynamic_strain_df['dynamic'].cummax() / 1000000)) +
+                             (0.00072 * hypocentral_distance) +
+                             (1.45 * math.log10(hypocentral_distance)) +
+                             8.52 - longitude_term - site_term
+                             ) / 0.92
+    return df2
 def plot_coseismic_offset(
     df,
     title: str = "",
@@ -119,3 +192,47 @@ def plot_coseismic_offset(
     if save_as:
         print(f"Saving plot to {save_as}")
         plt.savefig(save_as, facecolor="white", transparent=False)
+
+
+
+def magnitude_plot(dynamic_strain_df: pd.DataFrame,
+                   magnitude_df:pd.DataFrame,
+                   eq_time: datetime.datetime,
+                   eq_mag: datetime.datetime,
+                   title: str=None,
+                   save_as: str = None,):
+    num_colors = 4
+    fig, ax = plt.subplots(figsize=(12, 3))
+    colors = [cm.gnuplot(x) for x in np.linspace(0, 0.8, num_colors)]
+    if title:
+        fig.suptitle(title)
+    ax.plot(dynamic_strain_df['dynamic'], color=colors[0], label='microstrain')
+    ax2 = ax.twinx()
+    ax2.plot(magnitude_df['magnitude'], color=colors[1],
+             label=f'est magnitude: {round(magnitude_df["magnitude"].iloc[-1], 2)}')
+    ax.axvline(eq_time, color=colors[2], label='earthquake time')
+    ax2.axhline(eq_mag, color=colors[3], label=f'usgs magnitude: {eq_mag}')
+    ax.set_ylabel('microstrain')
+    ax2.set_ylabel('magnitude')
+    lines, labels = ax.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines + lines2, labels + labels2, loc='right')
+    fig.tight_layout()
+    if save_as:
+        logger.info(f"Saving plot to {save_as}")
+        plt.savefig(save_as)
+
+def get_stations_in_radius(latitude, longitude, depth, radius, print_it=False):
+    meta_df = get_metadata_df()
+    station_list = []
+    for station in meta_df.index:
+        dist = calc_hypocentral_dist(latitude,
+                                     longitude,
+                                     depth,
+                                         meta_df.loc[station]["LAT"],
+                                         meta_df.loc[station]["LONG"])
+        if dist <= radius:
+            if print_it:
+                print(f"{station} at {dist} km")
+            station_list.append(station)
+    return station_list

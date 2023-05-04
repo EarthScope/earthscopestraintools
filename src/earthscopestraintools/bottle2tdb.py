@@ -10,7 +10,6 @@ from earthscopestraintools.tiledbtools import (
 )
 import logging
 
-# from straintiledbarray import StrainTiledbArray, Writer
 logger = logging.getLogger(__name__)
 if logger.hasHandlers():
     logger.setLevel(logging.INFO)
@@ -105,7 +104,6 @@ def bottle2tdb(
     print_it=False,
     check_it=False,
 ):
-
     gbt = GtsmBottleTar(filepath, session)
     strain_buffer = build_strain_buffer(gbt, session)
     if session.casefold() == "Day".casefold():

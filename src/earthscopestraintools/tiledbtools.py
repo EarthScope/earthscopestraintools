@@ -5,6 +5,8 @@ import pandas as pd
 import json
 import logging
 from typing import Union
+from earthscopestraintools.timeseries import Timeseries
+from earthscopestraintools.edid import get_station_edid, get_session_edid
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,8 @@ class StrainArray:
         self.ctx = tiledb.Ctx(config=config)
 
     def get_schema_from_s3(self, schema_type):
-        s3_schema_uri = f"s3://tiledb-strain/STRAIN_SCHEMA_{schema_type}.tdb"
+        bucket = "earthscope-tiledb-schema-dev-us-east-2-ebamji"
+        s3_schema_uri = f"s3://{bucket}/STRAIN_SCHEMA_{schema_type}.tdb"
         logger.info(f"Using schema {s3_schema_uri}")
         config = tiledb.Config()
         config["vfs.s3.region"] = "us-east-2"
@@ -136,6 +139,13 @@ class StrainArray:
         )
 
         return schema
+
+    def exists(self):
+        # may not work with S3 arrays
+        if tiledb.array_exists(self.uri):
+            return True
+        else:
+            return False
 
     def create(self, schema_type: str, schema_source: str = "s3"):
         # schema should be one of 2D_INT, 2D_FLOAT, 3D. case insensitive
@@ -289,13 +299,12 @@ class ProcessedStrainReader:
                     )
                 else:
                     logger.error("No start time provided for read")
-            logger.info(f"Query range {start_ts} to {end_ts}")
             with tiledb.open(self.array.uri, "r", ctx=self.array.ctx) as A:
                 if print_array_range:
-                    print(
-                        "Array date range: %s to %s"
-                        % (A.nonempty_domain()[2][0], A.nonempty_domain()[2][1])
+                    logger.info(
+                        f"Array date range: {A.nonempty_domain()[2][0]} to {A.nonempty_domain()[2][1]}"
                     )
+                    logger.info(f"Query range: {start_ts} to {end_ts}")
                 index_col = ["data_type", "timeseries", "time"]
                 data_types = [data_types] if isinstance(data_types, str) else data_types
                 timeseries = [timeseries] if isinstance(timeseries, str) else timeseries
@@ -306,11 +315,13 @@ class ProcessedStrainReader:
                 df.index = df.index.set_levels(
                     pd.to_datetime(df.index.levels[2], unit="ms"), level=2
                 )
-            if reindex:
-                df = self.reindex_df(df, columns=data_types, attr=attrs[0])
             if not isinstance(df, pd.DataFrame):
                 df = df.to_frame()
-            self.check_query_result(df, start_ts, end_ts)
+            epochs = len(df) / len(data_types)
+            self.check_query_result(epochs, start_ts, end_ts)
+            if reindex:
+                df = self.reindex_df(df, columns=data_types, attr=attrs[0])
+
             return df
 
         except (IndexError, KeyError) as e:  # tiledb.TileDBError
@@ -330,21 +341,84 @@ class ProcessedStrainReader:
                 df2 = pd.concat([df2, df_data_type], axis=1)
         return df2
 
-    def check_query_result(self, df, start, end):
+    def check_query_result(self, epochs, start, end):
         if self.array.period is not None:
-            expected_samples = int((end - start) / 1000 / self.array.period)
-            # expected_samples = int((str_to_unix_ms(end) - str_to_unix_ms(start)) / 1000 / self.array.period)
-            # print("expected samples:", expected_samples)
-            if len(df) >= expected_samples:
+            expected_epochs = (
+                int((end - start) / 1000 / self.array.period) + 1
+            )  # inclusive of last epoch
+            if epochs >= expected_epochs:
                 logger.info(
-                    f"Query complete, expected {expected_samples} and returned {len(df)}"
+                    f"Query complete, expected {expected_epochs} epochs and returned {epochs}"
                 )
             else:
                 logger.info(
-                    f"Query incomplete, expected {expected_samples} and returned {len(df)}"
+                    f"Query incomplete, expected {expected_epochs} epochs and returned {epochs}"
                 )
         else:
             logger.info(f"Cannot check query completess without array period")
+
+    def to_ts(
+        self,
+        data_types: Union[list, str],
+        timeseries: str,
+        attrs: list = None,
+        name: str = "timeseries",
+        units: str = None,
+        start_ts: int = None,
+        end_ts: int = None,
+        start_str: str = None,
+        end_str: str = None,
+        start_dt: datetime.datetime = None,
+        end_dt: datetime.datetime = None,
+        print_array_range=False,
+        to_na=True,
+    ):
+        if attrs is None:
+            attrs = ["data", "quality", "level", "version"]
+        if units is None:
+            if timeseries == "counts":
+                units = "counts"
+            elif isinstance(data_types, str):
+                if data_types == "atmp":
+                    units = "hpa"
+                else:
+                    units = "microstrain"
+            elif isinstance(data_types, list):
+                if "atmp" in data_types:
+                    units = "hpa"
+                else:
+                    units = "microstrain"
+
+        # print(units)
+        df = self.to_df(
+            data_types=data_types,
+            timeseries=timeseries,
+            attrs=attrs,
+            start_ts=start_ts,
+            end_ts=end_ts,
+            start_str=start_str,
+            end_str=end_str,
+            start_dt=start_dt,
+            end_dt=end_dt,
+            reindex=False,
+            print_array_range=print_array_range,
+        )
+        # print(df)
+        data = self.reindex_df(df=df, columns=data_types, attr="data")
+        quality_df = self.reindex_df(df=df, columns=data_types, attr="quality")
+        level = df.iloc[0]["level"]
+        ts = Timeseries(
+            data=data,
+            quality_df=quality_df,
+            series=timeseries,
+            units=units,
+            period=self.array.period,
+            level=level,
+            name=name,
+        )
+        if to_na:
+            ts = ts.remove_999999s(interpolate=False)
+        return ts
 
 
 class ProcessedStrainWriter:
@@ -352,11 +426,16 @@ class ProcessedStrainWriter:
         self.array = StrainArray(uri=uri)
 
     def create(self, schema_type: str = "3D", schema_source: str = "s3"):
-        self.array.create(schema_type=schema_type, schema_source=schema_source)
+        if not self.array.exists():
+            self.array.create(schema_type=schema_type, schema_source=schema_source)
+        else:
+            logger.info(f"Array exists at {self.array.uri}")
 
     def write_df_to_tiledb(self, df: pd.DataFrame):
-
         mode = "append"
+        # make sure there aren't any nans, replace with 999999 if so
+        df = df.replace(np.nan, 999999)
+        logger.debug("writing buffer")
         tiledb.from_pandas(
             uri=self.array.uri,
             dataframe=df,
@@ -364,6 +443,7 @@ class ProcessedStrainWriter:
             mode=mode,
             ctx=self.array.ctx,
         )
+        logger.debug("buffer written")
         # update the string dimension metadata
         data_type = df["data_type"].unique()
         timeseries = df["timeseries"].unique()
@@ -409,6 +489,7 @@ class ProcessedStrainWriter:
         quality_df- dataframe, optional.  if not included, quality flags will be set to 'g'
         print_it - bool, optional.  show the constructed dataframe as it is being written to tiledb.
         """
+        logger.debug("creating buffer")
         df_buffer = pd.DataFrame(
             columns=[
                 "data_type",
@@ -427,7 +508,7 @@ class ProcessedStrainWriter:
         for ch in data_types:
             data = df[ch].values
             # convert datetimeindex to unix ms
-            timestamps = df.index.astype(int) / 10 ** 6
+            timestamps = df.index.astype(int) / 10**6
             version = int(datetime.datetime.now().strftime("%Y%j%H%M%S"))
             quality = quality_df[ch].values
 
@@ -449,7 +530,21 @@ class ProcessedStrainWriter:
 
         if print_it:
             print(df_buffer)
+            print(df_buffer.isna().sum())
         self.write_df_to_tiledb(df_buffer)
+
+    def ts_2_tiledb(self, ts: Timeseries, cleanup: bool = False):
+        self.df_2_tiledb(
+            df=ts.data,
+            data_types=ts.columns,
+            timeseries=ts.series,
+            level=ts.level,
+            quality_df=ts.quality_df,
+            print_it=False,
+        )
+        logger.info(f"Wrote {ts.columns} {ts.series} to {self.array.uri}")
+        if cleanup:
+            self.array.cleanup()
 
 
 class RawStrainReader:
@@ -471,6 +566,7 @@ class RawStrainReader:
         try:
             if not start_ts:
                 if start_str:
+                    logger.info(f"Query start: {start_str}")
                     start_ts = str_to_unix_ms(start_str)
                 elif start_dt:
                     start_ts = int(
@@ -481,6 +577,7 @@ class RawStrainReader:
                     logger.error("No start time provided for read")
             if not end_ts:
                 if end_str:
+                    logger.info(f"Query end: {end_str}")
                     end_ts = str_to_unix_ms(end_str)
                 elif start_dt:
                     end_ts = int(
@@ -531,7 +628,9 @@ class RawStrainReader:
 
     def check_query_result(self, df, start, end):
         if self.array.period is not None:
-            expected_samples = int((end - start) / 1000 / self.array.period)
+            expected_samples = (
+                int((end - start) / 1000 / self.array.period) + 1
+            )  # inclusive of last epoch
             # expected_samples = int((str_to_unix_ms(end) - str_to_unix_ms(start)) / 1000 / self.array.period)
             # print("expected samples:", expected_samples)
             if len(df) >= expected_samples:
@@ -545,6 +644,49 @@ class RawStrainReader:
         else:
             logger.info(f"Cannot check query completess without array period")
 
+    def to_ts(
+        self,
+        channels: list,
+        units: str,
+        start_ts: int = None,
+        end_ts: int = None,
+        start_str: str = None,
+        end_str: str = None,
+        start_dt: datetime.datetime = None,
+        end_dt: datetime.datetime = None,
+        to_nan: bool = True,
+        name: str = "",
+    ):
+        # if not uri:
+        #     uri = lookup_s3_uri(network, station, period)
+        # reader = RawStrainReader(uri, period)
+        df = self.to_df(
+            channels=channels,
+            start_str=start_str,
+            end_str=end_str,
+            start_ts=start_ts,
+            end_ts=end_ts,
+            start_dt=start_dt,
+            end_dt=end_dt,
+        )
+        series = "raw"
+        level = "0"
+        # if name == None:
+        #    name = f"{network}.{station}.{series}.{units}"
+        ts = Timeseries(
+            data=df,
+            series=series,
+            units=units,
+            level=level,
+            period=self.array.period,
+            name=name,
+        )
+        if to_nan:
+            logger.info("Converting missing data from 999999 to nan")
+            return ts.remove_999999s()
+        else:
+            return ts
+
 
 class RawStrainWriter:
     def __init__(self, uri: str, array_type="int"):
@@ -552,7 +694,10 @@ class RawStrainWriter:
         self.array_type = array_type
 
     def create(self, schema_type: str, schema_source: str = "s3"):
-        self.array.create(schema_type=schema_type, schema_source=schema_source)
+        if not self.array.exists():
+            self.array.create(schema_type=schema_type, schema_source=schema_source)
+        else:
+            logger.info(f"Array exists at {self.array.uri}")
 
     def write_df_to_tiledb(self, df: pd.DataFrame):
         mode = "append"
@@ -587,7 +732,9 @@ class RawStrainWriter:
         logger.info("Write complete")
 
     def df_2_tiledb(
-        self, df: pd.DataFrame, print_it: bool = False,
+        self,
+        df: pd.DataFrame,
+        print_it: bool = False,
     ):
         """
         prepares a dataframe to write to array schema
@@ -598,7 +745,7 @@ class RawStrainWriter:
         for ch in df.columns:
             data = df[ch].values
             # convert datetimeindex to unix ms
-            timestamps = df.index.astype(int) / 10 ** 6
+            timestamps = df.index.astype(int) / 10**6
 
             d = {"channel": ch, "time": timestamps, "data": data}
             ch_df = pd.DataFrame(data=d)
@@ -612,3 +759,261 @@ class RawStrainWriter:
             print(df_buffer)
         self.write_df_to_tiledb(df_buffer)
         self.array.cleanup_meta()
+
+    def ts_2_tiledb(self, ts: Timeseries, cleanup: bool = False):
+        self.df_2_tiledb(
+            df=ts.data,
+            print_it=False,
+        )
+        logger.info(f"Wrote {ts.columns} to {self.array.uri}")
+        if cleanup:
+            self.array.cleanup()
+
+
+# def ts_from_tiledb_raw(
+
+
+# def ts_from_tiledb_processed(
+#     network: str,
+#     station: str,
+#     channels: list,
+#     series: str,
+#     units: str = "",
+#     period: int = 300,
+#     uri: str = None,
+#     start_ts: int = None,
+#     end_ts: int = None,
+#     start_str: str = None,
+#     end_str: str = None,
+#     start_dt: datetime.datetime = None,
+#     end_dt: datetime.datetime = None,
+#     name: str = None,
+# ):
+#     reader = ProcessedStrainReader(uri, period)
+#     df = reader.to_df(
+#         data_types=channels,
+#         timeseries=series,
+#         start_str=start_str,
+#         end_str=end_str,
+#         start_ts=start_ts,
+#         end_ts=end_ts,
+#         start_dt=start_dt,
+#         end_dt=end_dt,
+#     )
+#     if name == None:
+#         name = f"{network}.{station}.{series}.{units}"
+#     ts = Timeseries(
+#         data=df, series=series, units=units, level=level, period=period, name=name
+#     )
+#     logger.info("Converting missing data from 999999 to nan")
+#     return ts.remove_999999s()
+#
+
+
+def lookup_s3_uri(network, station, period):
+    bucket = "tiledb-strain"
+    if period == 600:
+        session = "Day"
+    elif period == 1:
+        session = "Hour"
+    elif period == 0.05:
+        session = "Min"
+    edid = get_session_edid(network, station, session)
+    uri = f"s3://{bucket}/{edid}.tdb"
+    return uri
+
+
+class OffsetArray:
+    def __init__(self, uri: str):
+        self.set_default_ctx()
+        self.uri = uri
+
+    def set_default_ctx(self):
+        config = self.default_config()
+        self.ctx = tiledb.Ctx(config=config)
+
+    def default_config(self):
+        # return a tiledb config
+        config = tiledb.Config()
+        config["vfs.s3.region"] = "us-east-2"
+        config["vfs.s3.scheme"] = "https"
+        config["vfs.s3.endpoint_override"] = ""
+        config["vfs.s3.use_virtual_addressing"] = "true"
+        config["sm.consolidation.mode"] = "fragment_meta"
+        config["sm.vacuum.mode"] = "fragment_meta"
+        return config
+
+    def get_schema_from_s3(self):
+        bucket = "earthscope-tiledb-schema-dev-us-east-2-ebamji"
+        s3_schema_uri = f"s3://{bucket}/STRAIN_SCHEMA_2D_INT.tdb"
+        logger.info(f"Using schema {s3_schema_uri}")
+        config = tiledb.Config()
+        config["vfs.s3.region"] = "us-east-2"
+        config["vfs.s3.scheme"] = "https"
+        config["vfs.s3.endpoint_override"] = ""
+        config["vfs.s3.use_virtual_addressing"] = "true"
+        config["sm.consolidation.mode"] = "fragment_meta"
+        config["sm.vacuum.mode"] = "fragment_meta"
+
+        with tiledb.open(s3_schema_uri, "r", config=config) as A:
+            schema = A.schema
+        return schema
+
+    def get_schema(self):
+        filters1 = tiledb.FilterList([tiledb.ZstdFilter(level=7)])
+        filters2 = tiledb.FilterList(
+            [tiledb.ByteShuffleFilter(), tiledb.ZstdFilter(level=7)]
+        )
+        filters3 = tiledb.FilterList(
+            [tiledb.BitWidthReductionFilter(), tiledb.ZstdFilter(level=7)]
+        )
+        filters4 = tiledb.FilterList(
+            [tiledb.DoubleDeltaFilter(), tiledb.ZstdFilter(level=7)]
+        )
+        filters5 = tiledb.FilterList(
+            [tiledb.FloatScaleFilter(1e-6, 0, bytewidth=8), tiledb.ZstdFilter(level=7)]
+        )
+        filters6 = tiledb.FilterList(
+            [
+                tiledb.PositiveDeltaFilter(),
+                tiledb.BitWidthReductionFilter(),
+                tiledb.ZstdFilter(level=7),
+            ]
+        )
+
+        ## time dimension with micro-second precision and 24 hour tiles, domain 1970 to 2100
+        d0 = tiledb.Dim(name="channel", dtype="ascii", filters=filters1)
+        d1 = tiledb.Dim(
+            name="time",
+            domain=(0, 4102444800000),
+            tile=86400000,
+            dtype=np.int64,
+            filters=filters4,
+        )
+        dom = tiledb.Domain(d0, d1)
+
+        a0 = tiledb.Attr(name="data", dtype=np.int32, filters=filters4)
+        attrs = [a0]
+
+        schema = tiledb.ArraySchema(
+            domain=dom,
+            sparse=True,
+            attrs=attrs,
+            cell_order="row-major",
+            tile_order="row-major",
+            capacity=100000,
+            offsets_filters=filters6,
+        )
+
+        return schema
+
+    def exists(self):
+        # may not work with S3 arrays
+        if tiledb.array_exists(self.uri):
+            return True
+        else:
+            return False
+
+    def create(self, schema_source: str = "s3"):
+        # schema should be one of 2D_INT, 2D_FLOAT, 3D. case insensitive
+        if schema_source == "s3":
+            self.schema = self.get_schema_from_s3()
+        else:
+            self.schema = self.get_schema()
+
+        try:
+            tiledb.Array.create(self.uri, self.schema, ctx=self.ctx)
+            logger.info(f"Created array at {self.uri}")
+        except tiledb.TileDBError as e:
+            logger.warning(e)
+
+    def delete(self):
+        try:
+            tiledb.remove(self.uri, ctx=self.ctx)
+            print("Deleted ", self.uri)
+        except tiledb.TileDBError as e:
+            print(e)
+
+    def consolidate_fragment_meta(self, print_it=True):
+        config = self.ctx.config()
+        config["sm.consolidation.mode"] = "fragment_meta"
+        ctx = tiledb.Ctx(config=config)
+        tiledb.consolidate(self.uri, ctx=ctx)
+        if print_it:
+            logger.info("consolidated fragment_meta")
+
+    def consolidate_array_meta(self, print_it=True):
+        config = self.ctx.config()
+        config["sm.consolidation.mode"] = "array_meta"
+        ctx = tiledb.Ctx(config=config)
+        tiledb.consolidate(self.uri, ctx=ctx)
+        if print_it:
+            logger.info("consolidated array_meta")
+
+    def consolidate_fragments(self, print_it=True):
+        config = self.ctx.config()
+        config["sm.consolidation.mode"] = "fragments"
+        ctx = tiledb.Ctx(config=config)
+        tiledb.consolidate(self.uri, ctx=ctx)
+        if print_it:
+            logger.info("consolidated fragments")
+
+    def vacuum_fragment_meta(self, print_it=True):
+        config = self.ctx.config()
+        config["sm.vacuum.mode"] = "fragment_meta"
+        ctx = tiledb.Ctx(config=config)
+        tiledb.vacuum(self.uri, ctx=ctx)
+        if print_it:
+            logger.info("vacuumed fragment_meta")
+
+    def vacuum_array_meta(self, print_it=True):
+        config = self.ctx.config()
+        config["sm.vacuum.mode"] = "array_meta"
+        ctx = tiledb.Ctx(config=config)
+        tiledb.vacuum(self.uri, ctx=ctx)
+        if print_it:
+            logger.info("vacuumed array_meta")
+
+    def vacuum_fragments(self, print_it=True):
+        config = self.ctx.config()
+        config["sm.vacuum.mode"] = "fragments"
+        ctx = tiledb.Ctx(config=config)
+        tiledb.vacuum(self.uri, ctx=ctx)
+        if print_it:
+            logger.info("vacuumed fragments")
+
+    def cleanup_meta(self):
+        self.consolidate_array_meta(print_it=False)
+        self.vacuum_array_meta(print_it=False)
+        self.consolidate_fragment_meta(print_it=False)
+        self.vacuum_fragment_meta(print_it=False)
+        logger.info("Consolidated and vacuumed metadata")
+
+    def cleanup(self):
+        self.consolidate_array_meta(print_it=False)
+        self.vacuum_array_meta(print_it=False)
+        self.consolidate_fragment_meta(print_it=False)
+        self.vacuum_fragment_meta(print_it=False)
+        self.consolidate_fragments(print_it=False)
+        self.vacuum_fragments(print_it=False)
+        logger.info("Consolidated and vacuumed fragments and metadata")
+
+    def get_nonempty_domain(self):
+        with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+            return A.nonempty_domain()[-1][0], A.nonempty_domain()[-1][1]
+
+    # def get_data_types(self):
+    #     with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+    #         return json.loads(A.meta["dimensions"])["data_types"]
+    #
+    # def get_timeseries(self):
+    #     with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+    #         return json.loads(A.meta["dimensions"])["timeseries"]
+    #
+    # def get_channels(self):
+    #     with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+    #         return json.loads(A.meta["channels"])["channels"]
+
+    def print_schema(self):
+        with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+            print(A.schema)

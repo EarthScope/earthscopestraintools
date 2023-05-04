@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 if __name__ == '__main__':
-    network = 'IV'
-    station = 'TSM6'
+    network = 'PB'
+    station = 'B005'
     meta = GtsmMetadata(network, station)
     meta.show()

@@ -1,14 +1,12 @@
 import os
 import numpy as np
 import pandas as pd
-import tiledb
 import datetime
-from earthscopestraintools.gtsm_metadata import GtsmMetadata
-from earthscopestraintools.mseed_tools import load_mseed_to_df
-from earthscopestraintools.edid import get_station_edid, get_session_edid
+
 from earthscopestraintools.processing import (
     linearize,
     interpolate,
+    decimate_1s_to_300s,
     butterworth_filter,
     apply_calibration_matrix,
     calculate_offsets,
@@ -16,14 +14,7 @@ from earthscopestraintools.processing import (
     calculate_tide_correction,
     calculate_linear_trend_correction,
 )
-from earthscopestraintools.event_processing import dynamic_strain
-from earthscopestraintools.tiledbtools import (
-    StrainArray,
-    RawStrainWriter,
-    RawStrainReader,
-    ProcessedStrainWriter,
-    ProcessedStrainReader,
-)
+from earthscopestraintools.event_processing import dynamic_strain, calculate_magnitude
 from scipy import signal, stats
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -46,6 +37,8 @@ class Timeseries:
         level: str = "",
         period: float = 0,
         name: str = None,
+        network: str = "",
+        station: str = "",
     ):
         if data is not None:
             self.data = data
@@ -63,10 +56,12 @@ class Timeseries:
         self.units = units
         self.level = level
         self.period = period
+        self.network = network
+        self.station = station
         if name:
             self.name = name
         else:
-            self.name = ""
+            self.name = f"{self.network}.{self.station}"
         self.check_for_gaps()
 
     def set_data(self, df):
@@ -116,16 +111,14 @@ class Timeseries:
             self.nines = round(
                 self.data[self.data == 999999].count().sum() / len(self.data.columns), 2
             )
-            expected_samples = int((days * 86400 + seconds) / self.period) + 1
-            self.samples = len(self.data) - self.nans - self.nines
-            # print(self.nans, self.nines, self.samples, expected_samples)
-            self.gap_percentage = round(
-                (1 - (self.samples / expected_samples)) * 100, 2
-            )
+            expected_epochs = int((days * 86400 + seconds) / self.period) + 1
+            self.epochs = len(self.data) - self.nans - self.nines
+            # print(self.nans, self.nines, self.epochs, expected_epochs)
+            self.gap_percentage = round((1 - (self.epochs / expected_epochs)) * 100, 2)
 
             logger.info(
-                f"Found {self.nans} nans, {self.nines} 999999s, and "
-                f"{expected_samples - len(self.data)} gaps.  Total missing data is "
+                f"    Found {self.nans} epochs with nans, {self.nines} epochs with 999999s, and "
+                f"{expected_epochs - len(self.data)} missing epochs.\n    Total missing data is "
                 f"{self.gap_percentage}%"
             )
         else:
@@ -134,32 +127,63 @@ class Timeseries:
 
     def stats(self):
         if len(self.data):
-            outputstring = f"{self.name}\n{'':6} | Channels: {str(self.columns):40} "
-            outputstring += (
-                f"\n{'':6} | TimeRange: {self.data.index[0]} - {self.data.index[-1]} "
-            )
-            outputstring += f"\n{'':6} | Period: {self.period:9}s | Epochs: {len(self.data):10} | Gaps: {self.gap_percentage:4}% "
-            outputstring += f"\n{'':6} | Series: {self.series:10} | Units: {self.units:12} | Level: {self.level:4}\n"
+            outputstring = f"{self.name}\n{'':4}| Channels: {str(self.columns):40} "
+            outputstring += f"\n{'':4}| TimeRange: {self.data.index[0]} - {self.data.index[-1]}        | Period: {self.period:>13}s"
+            outputstring += f"\n{'':4}| Series: {self.series:>11}| Units: {self.units:>13}| Level: {self.level:>10}| Gaps: {self.gap_percentage:>15}% "
+            if len(self.quality_df):
+                cols = len(self.quality_df.columns)
+                outputstring += f"\n{'':4}| Epochs: {len(self.quality_df):11}"
+                outputstring += (
+                    f"| Good: {(self.quality_df == 'g').sum().sum() / cols:14}"
+                )
+                outputstring += (
+                    f"| Missing: {(self.quality_df == 'm').sum().sum() / cols:8}"
+                )
+                outputstring += (
+                    f"| Interpolated: {(self.quality_df == 'i').sum().sum() / cols:8}"
+                )
+                outputstring += f"\n{'':4}| Samples: {len(self.quality_df) * cols:10}"
+                outputstring += f"| Good: {(self.quality_df == 'g').sum().sum():14}"
+                outputstring += f"| Missing: {(self.quality_df == 'm').sum().sum():8}"
+                outputstring += (
+                    f"| Interpolated: {(self.quality_df == 'i').sum().sum():8}"
+                )
             logger.info(f"{outputstring}")
 
-    def quality_stats(self):
-        if len(self.quality_df):
-            outputstring = f"{self.name}\n{'':6} | Channels: {str(self.columns):43} "
-            cols = len(self.quality_df.columns)
-            outputstring += f"\n{'':6} | Epochs: {len(self.quality_df):9}"
-            outputstring += f"| Good: {(self.quality_df == 'g').sum().sum() / cols:10}"
-            outputstring += (
-                f"| Missing: {(self.quality_df == 'm').sum().sum() / cols:8}"
-            )
-            outputstring += (
-                f"| Interpolated: {(self.quality_df == 'i').sum().sum() / cols:8}"
-            )
+    def show_flags(self):
+        return self.quality_df[self.quality_df[self.quality_df != "g"].any(axis=1)]
 
-            outputstring += f"\n{'':6} | Samples: {len(self.quality_df) * cols:8}"
-            outputstring += f"| Good: {(self.quality_df == 'g').sum().sum():10}"
-            outputstring += f"| Missing: {(self.quality_df == 'm').sum().sum():8}"
-            outputstring += f"| Interpolated: {(self.quality_df == 'i').sum().sum():8}"
-            logger.info(f"{outputstring}")
+    def show_flagged_data(self):
+        return self.data[self.quality_df[self.quality_df != "g"].any(axis=1)]
+
+    # def stats_old(self):
+    #     if len(self.data):
+    #         outputstring = f"{self.name}\n{'':6} | Channels: {str(self.columns):40} "
+    #         outputstring += (
+    #             f"\n{'':6} | TimeRange: {self.data.index[0]} - {self.data.index[-1]} "
+    #         )
+    #         outputstring += f"\n{'':6} | Period: {self.period:9}s | Epochs: {len(self.data):10} | Gaps: {self.gap_percentage:4}% "
+    #         outputstring += f"\n{'':6} | Series: {self.series:10} | Units: {self.units:12} | Level: {self.level:4}\n"
+    #         logger.info(f"{outputstring}")
+    #
+    # def quality_stats(self):
+    #     if len(self.quality_df):
+    #         outputstring = f"{self.name}\n{'':6} | Channels: {str(self.columns):43} "
+    #         cols = len(self.quality_df.columns)
+    #         outputstring += f"\n{'':6} | Epochs: {len(self.quality_df):9}"
+    #         outputstring += f"| Good: {(self.quality_df == 'g').sum().sum() / cols:10}"
+    #         outputstring += (
+    #             f"| Missing: {(self.quality_df == 'm').sum().sum() / cols:8}"
+    #         )
+    #         outputstring += (
+    #             f"| Interpolated: {(self.quality_df == 'i').sum().sum() / cols:8}"
+    #         )
+    #
+    #         outputstring += f"\n{'':6} | Samples: {len(self.quality_df) * cols:8}"
+    #         outputstring += f"| Good: {(self.quality_df == 'g').sum().sum():10}"
+    #         outputstring += f"| Missing: {(self.quality_df == 'm').sum().sum():8}"
+    #         outputstring += f"| Interpolated: {(self.quality_df == 'i').sum().sum():8}"
+    #         logger.info(f"{outputstring}")
 
     def save_csv(self, filename: str, datadir: str = "./", sep=",", compression=None):
         filepath = os.path.join(datadir, filename)
@@ -169,27 +193,27 @@ class Timeseries:
         else:
             self.data.to_csv(filepath, sep=sep)
 
-    def save_tdb(self, uri):
-        # TODO: update, handle quality fields
-        if self.local_tdb_uri:
-            logger.info(f"saving to {self.local_tdb_uri}")
-            self.array = StrainArray(uri=self.local_tdb_uri, period=self.period)
-            if not tiledb.array_exists(self.array.uri):
-                logger.info(f"Creating array {self.array.uri}")
-                self.array.create()
-            self.array.df_2_tiledb(
-                df=self.data,
-                data_types=self.columns,
-                timeseries=self.series,
-                level=self.level,
-                quality_df=self.quality_df,
-            )
-            self.array.consolidate_fragments()
-            self.array.vacuum_fragments()
-        else:
-            logger.error(
-                "Error, no local array specified.  Set with Timeseries.set_local_tdb_uri()"
-            )
+    # def save_tdb(self):
+    # TODO: update, handle quality fields
+    # if self.local_tdb_uri:
+    #     logger.info(f"saving to {self.local_tdb_uri}")
+    #     self.array = StrainArray(uri=self.local_tdb_uri, period=self.period)
+    #     if not tiledb.array_exists(self.array.uri):
+    #         logger.info(f"Creating array {self.array.uri}")
+    #         self.array.create()
+    #     self.array.df_2_tiledb(
+    #         df=self.data,
+    #         data_types=self.columns,
+    #         timeseries=self.series,
+    #         level=self.level,
+    #         quality_df=self.quality_df,
+    #     )
+    #     self.array.consolidate_fragments()
+    #     self.array.vacuum_fragments()
+    # else:
+    #     logger.error(
+    #         "Error, no local array specified.  Set with Timeseries.set_local_tdb_uri()"
+    #     )
 
     def remove_999999s(
         self,
@@ -198,6 +222,7 @@ class Timeseries:
         limit_direction: str = "both",
         limit: any = None,
     ):
+        logger.info("  Converting 999999 values to nan")
         if interpolate:
             df = self.data.replace(999999, np.nan).interpolate(
                 method=method, limit_direction=limit_direction, limit=limit
@@ -216,6 +241,36 @@ class Timeseries:
             level=self.level,
             name=self.name,
         )
+
+    def decimate_1s_to_300s(
+        self, method: str = "linear", limit: int = 3600, name: str = None
+    ):
+        data = decimate_1s_to_300s(self.data, method=method, limit=limit)
+        quality_df = self.quality_df.copy().reindex(data.index)
+        quality_df[quality_df.isna()] = "i"
+        # find any differences using the original data index
+        mask1 = (data.reindex(self.data.index) != self.data).any(axis=1)
+
+        # any nans from the original index
+        mask2 = self.data[mask1].isna()
+        quality_df[mask2] = "i"
+
+        # any 999999s from the original index
+        mask3 = self.data[mask1] == 999999
+        quality_df[mask3] = "i"
+        # quality_df = self.quality_df.reindex(data.index)
+        if not name:
+            name = f"{self.name}.decimated"
+        ts2 = Timeseries(
+            data=data,
+            quality_df=quality_df,
+            series=self.series,
+            units=self.units,
+            level="1",
+            period=300,
+            name=name,
+        )
+        return ts2
 
     def linearize(self, reference_strains: dict, gap: float, name: str = None):
         """
@@ -347,33 +402,10 @@ class Timeseries:
         )
         return ts
 
-    def dynamic_strain(
-        self,
-        gauge_weights: list = [1, 1, 1, 1],
-        series="dynamic",
-        name=None,
-    ):
-        df2 = dynamic_strain(self.data, gauge_weights)
-        quality_df = pd.DataFrame(index=self.data.index)
-        quality_df["dynamic"] = "g"
-        quality_df[self.quality_df[(self.quality_df == "m")].any(axis=1)] = "m"
-        quality_df[self.quality_df[(self.quality_df == "i")].any(axis=1)] = "i"
-
-        if not name:
-            name = f"{self.name}.dynamic"
-        return Timeseries(
-            data=df2,
-            quality_df=quality_df,
-            series=series,
-            units=self.units,
-            period=self.period,
-            level=self.level,
-            name=name,
-        )
-
     def apply_calibration_matrix(
         self,
         calibration_matrix: np.array,
+        calibration_matrix_name: str = None,
         use_channels: list = [1, 1, 1, 1],
         name: str = None,
     ):
@@ -381,15 +413,17 @@ class Timeseries:
         Processing step to convert gauge strains into areal and shear strains
         :param ts: Timeseries object containing gauge data in microstrain
         :param calibration_matrix: np.array containing strain matrix
+        :param calibration_matrix_name: str describing which calibration matrix is used
         :return: Timeseries object, in units of microstrain
         """
         # calculate areal and shear strains from gauge strains
-        logger.info(f"Applying matrix: {calibration_matrix}")
         # todo: implement UseChannels to arbitrary matrices
-        data = apply_calibration_matrix(self.data, calibration_matrix, use_channels)
+        data = apply_calibration_matrix(
+            self.data, calibration_matrix, calibration_matrix_name, use_channels
+        )
         quality_df = pd.DataFrame(
             index=self.quality_df.index,
-            columns=["Eee+Enn", "Eee-Enn", "2Ene"],
+            columns=data.columns,
             data="g",
         )
         quality_df[self.quality_df[self.quality_df == "m"].any(axis=1)] = "m"
@@ -461,6 +495,7 @@ class Timeseries:
         return ts
 
     def apply_corrections(self, corrections: list = [], name: str = None):
+        logger.info(f"Applying corrections")
         if len(corrections):
             data = self.data.copy()
             for ts in corrections:
@@ -477,6 +512,51 @@ class Timeseries:
             name=name,
         )
         return ts2
+
+    def dynamic_strain(
+        self,
+        gauge_weights: list = [1, 1, 1, 1],
+        series="dynamic",
+        name=None,
+    ):
+        df2 = dynamic_strain(self.data, gauge_weights)
+        quality_df = pd.DataFrame(index=self.data.index)
+        quality_df["dynamic"] = "g"
+        quality_df[self.quality_df[(self.quality_df == "m")].any(axis=1)] = "m"
+        quality_df[self.quality_df[(self.quality_df == "i")].any(axis=1)] = "i"
+        if not name:
+            name = f"{self.name}.dynamic"
+        return Timeseries(
+            data=df2,
+            quality_df=quality_df,
+            series=series,
+            units=self.units,
+            period=self.period,
+            level=self.level,
+            name=name,
+        )
+
+    def calculate_magnitude(
+        self,
+        hypocentral_distance,
+        site_term: float = 0,
+        longitude_term=0,
+        name: str = None,
+    ):
+        data = calculate_magnitude(
+            self.data, hypocentral_distance, site_term, longitude_term
+        )
+        if not name:
+            name = f"{self.name}.magnitude"
+        return Timeseries(
+            data=data,
+            quality_df=self.quality_df,
+            series="magnitude",
+            units="magnitude",
+            period=self.period,
+            level=self.level,
+            name=name,
+        )
 
     def plot(
         self,
@@ -660,105 +740,3 @@ def plot_timeseries_comparison(
         if save_as:
             logger.info(f"Saving plot to {save_as}")
             plt.savefig(save_as)
-
-
-def ts_from_mseed(
-    network: str,
-    station: str,
-    location: str,
-    channel: str,
-    start: str,
-    end: str,
-    name: str = None,
-    period: float = None,
-    series: str = "raw",
-    units: str = "",
-    to_nan: bool = True,
-    scale_factor: float = None,
-):
-    df = load_mseed_to_df(
-        net=network,
-        sta=station,
-        loc=location,
-        cha=channel,
-        start=start,
-        end=end,
-    )
-    level = "0"
-    if channel.startswith("RS"):
-        period = 600
-        series = series
-        units = "counts"
-    elif channel.startswith("LS"):
-        period = 1
-        series = series
-        units = "counts"
-    elif channel.startswith("BS"):
-        period = 0.05
-        series = series
-        units = "counts"
-    else:
-        period = period
-        series = series
-    if name is None:
-        name = f"{network}.{station}.{location}.{channel}"
-    ts = Timeseries(
-        data=df, series=series, units=units, level=level, period=period, name=name
-    )
-    if to_nan:
-        logger.info("Converting missing data from 999999 to nan")
-        ts = ts.remove_999999s()
-    if scale_factor:
-        ts.data = ts.data * scale_factor
-    return ts
-
-
-def ts_from_tiledb_raw(
-    network: str,
-    station: str,
-    channels: list,
-    period: float,
-    uri: str = None,
-    start_ts: int = None,
-    end_ts: int = None,
-    start_str: str = None,
-    end_str: str = None,
-    start_dt: datetime.datetime = None,
-    end_dt: datetime.datetime = None,
-    name: str = None,
-):
-    if not uri:
-        uri = lookup_s3_uri(network, station, period)
-    reader = RawStrainReader(uri, period)
-    df = reader.to_df(
-        channels=channels,
-        start_str=start_str,
-        end_str=end_str,
-        start_ts=start_ts,
-        end_ts=end_ts,
-        start_dt=start_dt,
-        end_dt=end_dt,
-    )
-    series = "raw"
-    units = "counts"
-    level = "0"
-    if name == None:
-        name = f"{network}.{station}.{series}.{units}"
-    ts = Timeseries(
-        data=df, series=series, units=units, level=level, period=period, name=name
-    )
-    logger.info("Converting missing data from 999999 to nan")
-    return ts.remove_999999s()
-
-
-def lookup_s3_uri(network, station, period):
-    bucket = "tiledb-strain"
-    if period == 600:
-        session = "Day"
-    elif period == 1:
-        session = "Hour"
-    elif period == 0.05:
-        session = "Min"
-    edid = get_session_edid(network, station, session)
-    uri = f"s3://{bucket}/{edid}.tdb"
-    return uri

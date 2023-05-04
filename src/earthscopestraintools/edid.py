@@ -199,3 +199,36 @@ def get_network_edids(
             return dict2
     else:
         return None
+
+def get_network_name(station: str):
+
+    parameters = {
+    "station_name": f"BNUM:{station}",
+    "with_parents": True,
+    }
+    try:
+        r = requests.get(STATION_EDID_PATH, params=parameters, timeout=10)
+        # print(r.url)
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as errh:
+        logger.error(f'Http error: {station} {json.loads(r.content)["detail"]}')
+        raise
+    except requests.exceptions.ConnectionError as errc:
+        logger.error(f"Error Connecting: {station} {errc}")
+        raise
+    except requests.exceptions.Timeout as errt:
+        logger.error(f"Timeout Error: {station} {errt}")
+        raise
+    except requests.exceptions.RequestException as err:
+        logger.error(f"Oops: Something Else: {station} {err}")
+        raise
+    if len(r.json()):
+        networks = r.json()[0]['networks']
+        for network in networks:
+            for name in network['names']:
+                if 'FDSN' in name:
+                    fdsn_name = name.split(':')[-1]
+                    return fdsn_name
+        return None
+    else:
+        return None

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthscopestraintools"
-version ="0.1.2"
+version ="0.1.7"
 authors = [
   { name="Mike Gottlieb", email="mike.gottlieb@eartscope.org" },
 ]
@@ -31,5 +31,9 @@ tiledb = ["tiledb>=0.20.0", "pyarrow>=7.0.0"]
 [project.urls]
 "Homepage" = "https://gitlab.com/earthscope/gds/strain/earthscopestraintools"
 
+[tool.setuptools.packages.find]
+where = ["src"]
 
+[tool.setuptools.package-data]
+earthscopestraintools = ["*.txt", "*.rst"]
 

@@ -87,7 +87,7 @@ def loop_through_ts(filebase, file, writer):
     # display(df)
     cols = ["data_type", "timeseries", "time", "data", "quality", "level", "version"]
     # convert time string to unix ms
-    df["time"] = (pd.to_datetime(df["time"]).astype(int) / 10 ** 6).astype(int)
+    df["time"] = (pd.to_datetime(df["time"]).astype(int) / 10**6).astype(int)
 
     timeseries = "microstrain"
     tmp_df = df[["data_type", "time", timeseries, "strain_quality", "level", "version"]]
@@ -146,9 +146,10 @@ def loop_through_ts(filebase, file, writer):
 def etl_yearly_ascii_file(
     network, fcid, year, delete_array=False, workdir="", print_it=False
 ):
-    edid = get_station_edid(network, fcid)
     os.makedirs(workdir, exist_ok=True)
-    uri = f"{workdir}/{edid}_level2.tdb"
+    # edid = get_station_edid(fcid)
+    # uri = f"{workdir}/{edid}_level2.tdb"
+    uri = f"{workdir}/{network}_{fcid}_l2_etl.tdb"
     logger.info(f"Array uri: {uri}")
     writer = ProcessedStrainWriter(uri)
     if delete_array:

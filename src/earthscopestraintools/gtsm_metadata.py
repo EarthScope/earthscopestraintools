@@ -1,18 +1,15 @@
 import numpy as np
 import pandas as pd
 import math
-
-import pprint
-
-import shutil
 import urllib.request as request
-from contextlib import closing
 
-# import xmltodict
+# from obspy.clients.fdsn import Client
+from importlib.resources import files
+from datetime import datetime
+from earthscopestraintools.edid import get_network_name
+import requests
 
-from obspy.clients.fdsn import Client
-
-inv_client = Client("IRIS")
+# inv_client = Client("IRIS")
 
 import logging
 
@@ -22,7 +19,7 @@ logger = logging.getLogger(__name__)
 class GtsmMetadata:
     def __init__(self, network, fcid, gauge_weights=None):
         self.network = network
-        self.fcid = fcid
+        self.fcid = fcid  # todo: change to 'station' and fix usages
         self.meta_df = self.get_meta_table()
         self.latitude = self.get_latitude()
         self.longitude = self.get_longitude()
@@ -31,14 +28,15 @@ class GtsmMetadata:
         self.diameter = 0.087
         self.orientation = self.get_orientation()
         self.reference_strains = self.get_reference_strains()
+        self.start_date = self.get_start_date()
         matrices = {}
         if not gauge_weights:
             self.gauge_weights = [1, 1, 1, 1]
         # matrices['weighted_strain_matrix'] = self.make_weighted_strain_matrix(gauge_weights=gauge_weights)
-        matrices["lab_strain_matrix"] = self.get_lab_strain_matrix()
-        matrices["er2010_strain_matrix"] = self.get_er2010_strain_matrix()
-        matrices["ch_prelim_strain_matrix"] = self.get_ch_prelim_strain_matrix()
-        self.strain_matrices = {k: v for k, v in matrices.items() if v is not None}
+        matrices["lab"] = self.get_lab_strain_matrix()
+        matrices["ER2010"] = self.get_er2010_strain_matrix()
+        matrices["CH_prelim"] = self.get_ch_prelim_strain_matrix()
+        self.strain_matrices = {k: v for k, v in matrices.items()}
         self.atmp_response = self.get_atmp_response()
         self.tidal_params = self.get_tidal_params()
 
@@ -99,6 +97,16 @@ class GtsmMetadata:
             logger.error(e)
             logger.error("No orientation found for %s, using 0 deg" % self.fcid)
             return 0
+
+    def get_start_date(self):
+        try:
+            start_date = self.meta_df.loc[self.fcid]["DATA_START"]
+            return datetime.strptime(start_date, "%Y:%j").strftime("%Y-%m-%d")
+
+        except Exception as e:
+            logger.error(e)
+            logger.error("No orientation found for %s, using 0 deg" % self.fcid)
+            return None
 
     # def get_orientation_xml(self):
     #     for i, dic in enumerate(
@@ -213,6 +221,7 @@ class GtsmMetadata:
                         ]
                     )
                     return er2010.astype(float)
+            return None
         except Exception as e:
             logger.error("Could not load ER2010 strain matrix")
             return None
@@ -233,7 +242,7 @@ class GtsmMetadata:
                         ]
                     )
                     return ch_prelim.astype(float)
-            return np.array([])
+            return None
         except Exception as e:
             logger.exception("Could not load ch_prelim strain matrix")
             return None
@@ -361,6 +370,22 @@ class GtsmMetadata:
             logger.error("Could not load tidal parameters")
             return None
 
+    def load_site_terms(self):
+        terms_file = files("earthscopestraintools").joinpath("event_site_terms.txt")
+        site_terms = pd.read_csv(terms_file, sep=" ", header=0).fillna(0)
+        return site_terms
+
+    def get_event_terms(self):
+        site_terms = self.load_site_terms()
+        if self.fcid in site_terms.Station.values:
+            self.site_term = site_terms[site_terms.Station == self.fcid].delta_s.item()
+        else:
+            self.site_term = 0
+        if self.longitude < -124:
+            self.longitude_term = -0.41
+        else:
+            self.longitude_term = 0
+
     def show(self):
         # pp = pprint.PrettyPrinter()
         logger.info(f"network: {self.network}")
@@ -420,3 +445,30 @@ def fdsn2bottlename(channel):
     }
 
     return codes[channel]
+
+
+def get_metadata_df():
+    """
+    Function loads strainmeter metadata into pandas dataframe
+
+    Parameters
+    ----------
+    :return: metadata: pandas DataFrame
+
+    """
+    url = (
+        "https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt"
+    )
+    metadata = pd.read_csv(url, index_col="BNUM", sep="\s+", on_bad_lines="skip")
+    return metadata
+
+
+def get_fdsn_network(station):
+    # depends on es-datasources-id api, requires VPN
+    try:
+        return get_network_name(station)
+    except requests.exceptions.ConnectionError:
+        logger.error(
+            "Error: Unable to connect to datasources-api to lookup FDSN network code"
+        )
+        return None
