@@ -165,6 +165,45 @@ class StrainArray:
         except tiledb.TileDBError as e:
             logger.warning(e)
 
+    def set_array_meta(
+        self,
+        network: str = None,
+        station: str = None,
+        period: float = None,
+    ):
+        # don't overwrite existing metadata
+        with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+            keys = A.meta.keys()
+            if "network" not in keys:
+                if network:
+                    with tiledb.open(self.uri, "w", ctx=self.ctx) as B:
+                        B.meta["network"] = network
+            if "station" not in keys:
+                if station:
+                    with tiledb.open(self.uri, "w", ctx=self.ctx) as B:
+                        B.meta["station"] = station
+            if "period" not in keys:
+                if period:
+                    with tiledb.open(self.uri, "w", ctx=self.ctx) as B:
+                        B.meta["period"] = period
+
+    def update_array_meta(
+        self,
+        network: str = None,
+        station: str = None,
+        period: float = None,
+    ):
+        # overwrite existing metadata
+        if network:
+            with tiledb.open(self.uri, "w", ctx=self.ctx) as A:
+                A.meta["network"] = network
+        if station:
+            with tiledb.open(self.uri, "w", ctx=self.ctx) as A:
+                A.meta["station"] = station
+        if period:
+            with tiledb.open(self.uri, "w", ctx=self.ctx) as A:
+                A.meta["period"] = period
+
     def delete(self):
         try:
             tiledb.remove(self.uri, ctx=self.ctx)
@@ -251,6 +290,27 @@ class StrainArray:
     def get_channels(self):
         with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
             return json.loads(A.meta["channels"])["channels"]
+
+    def get_network(self):
+        with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+            try:
+                return A.meta["network"]
+            except KeyError:
+                return None
+
+    def get_station(self):
+        with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+            try:
+                return A.meta["station"]
+            except KeyError:
+                return None
+
+    def get_period(self):
+        with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
+            try:
+                return A.meta["period"]
+            except KeyError:
+                return None
 
     def print_schema(self):
         with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
@@ -770,9 +830,6 @@ class RawStrainWriter:
             self.array.cleanup()
 
 
-# def ts_from_tiledb_raw(
-
-
 # def ts_from_tiledb_processed(
 #     network: str,
 #     station: str,
@@ -821,199 +878,3 @@ def lookup_s3_uri(network, station, period):
     edid = get_session_edid(network, station, session)
     uri = f"s3://{bucket}/{edid}.tdb"
     return uri
-
-
-class OffsetArray:
-    def __init__(self, uri: str):
-        self.set_default_ctx()
-        self.uri = uri
-
-    def set_default_ctx(self):
-        config = self.default_config()
-        self.ctx = tiledb.Ctx(config=config)
-
-    def default_config(self):
-        # return a tiledb config
-        config = tiledb.Config()
-        config["vfs.s3.region"] = "us-east-2"
-        config["vfs.s3.scheme"] = "https"
-        config["vfs.s3.endpoint_override"] = ""
-        config["vfs.s3.use_virtual_addressing"] = "true"
-        config["sm.consolidation.mode"] = "fragment_meta"
-        config["sm.vacuum.mode"] = "fragment_meta"
-        return config
-
-    def get_schema_from_s3(self):
-        bucket = "earthscope-tiledb-schema-dev-us-east-2-ebamji"
-        s3_schema_uri = f"s3://{bucket}/STRAIN_SCHEMA_2D_INT.tdb"
-        logger.info(f"Using schema {s3_schema_uri}")
-        config = tiledb.Config()
-        config["vfs.s3.region"] = "us-east-2"
-        config["vfs.s3.scheme"] = "https"
-        config["vfs.s3.endpoint_override"] = ""
-        config["vfs.s3.use_virtual_addressing"] = "true"
-        config["sm.consolidation.mode"] = "fragment_meta"
-        config["sm.vacuum.mode"] = "fragment_meta"
-
-        with tiledb.open(s3_schema_uri, "r", config=config) as A:
-            schema = A.schema
-        return schema
-
-    def get_schema(self):
-        filters1 = tiledb.FilterList([tiledb.ZstdFilter(level=7)])
-        filters2 = tiledb.FilterList(
-            [tiledb.ByteShuffleFilter(), tiledb.ZstdFilter(level=7)]
-        )
-        filters3 = tiledb.FilterList(
-            [tiledb.BitWidthReductionFilter(), tiledb.ZstdFilter(level=7)]
-        )
-        filters4 = tiledb.FilterList(
-            [tiledb.DoubleDeltaFilter(), tiledb.ZstdFilter(level=7)]
-        )
-        filters5 = tiledb.FilterList(
-            [tiledb.FloatScaleFilter(1e-6, 0, bytewidth=8), tiledb.ZstdFilter(level=7)]
-        )
-        filters6 = tiledb.FilterList(
-            [
-                tiledb.PositiveDeltaFilter(),
-                tiledb.BitWidthReductionFilter(),
-                tiledb.ZstdFilter(level=7),
-            ]
-        )
-
-        ## time dimension with micro-second precision and 24 hour tiles, domain 1970 to 2100
-        d0 = tiledb.Dim(name="channel", dtype="ascii", filters=filters1)
-        d1 = tiledb.Dim(
-            name="time",
-            domain=(0, 4102444800000),
-            tile=86400000,
-            dtype=np.int64,
-            filters=filters4,
-        )
-        dom = tiledb.Domain(d0, d1)
-
-        a0 = tiledb.Attr(name="data", dtype=np.int32, filters=filters4)
-        attrs = [a0]
-
-        schema = tiledb.ArraySchema(
-            domain=dom,
-            sparse=True,
-            attrs=attrs,
-            cell_order="row-major",
-            tile_order="row-major",
-            capacity=100000,
-            offsets_filters=filters6,
-        )
-
-        return schema
-
-    def exists(self):
-        # may not work with S3 arrays
-        if tiledb.array_exists(self.uri):
-            return True
-        else:
-            return False
-
-    def create(self, schema_source: str = "s3"):
-        # schema should be one of 2D_INT, 2D_FLOAT, 3D. case insensitive
-        if schema_source == "s3":
-            self.schema = self.get_schema_from_s3()
-        else:
-            self.schema = self.get_schema()
-
-        try:
-            tiledb.Array.create(self.uri, self.schema, ctx=self.ctx)
-            logger.info(f"Created array at {self.uri}")
-        except tiledb.TileDBError as e:
-            logger.warning(e)
-
-    def delete(self):
-        try:
-            tiledb.remove(self.uri, ctx=self.ctx)
-            print("Deleted ", self.uri)
-        except tiledb.TileDBError as e:
-            print(e)
-
-    def consolidate_fragment_meta(self, print_it=True):
-        config = self.ctx.config()
-        config["sm.consolidation.mode"] = "fragment_meta"
-        ctx = tiledb.Ctx(config=config)
-        tiledb.consolidate(self.uri, ctx=ctx)
-        if print_it:
-            logger.info("consolidated fragment_meta")
-
-    def consolidate_array_meta(self, print_it=True):
-        config = self.ctx.config()
-        config["sm.consolidation.mode"] = "array_meta"
-        ctx = tiledb.Ctx(config=config)
-        tiledb.consolidate(self.uri, ctx=ctx)
-        if print_it:
-            logger.info("consolidated array_meta")
-
-    def consolidate_fragments(self, print_it=True):
-        config = self.ctx.config()
-        config["sm.consolidation.mode"] = "fragments"
-        ctx = tiledb.Ctx(config=config)
-        tiledb.consolidate(self.uri, ctx=ctx)
-        if print_it:
-            logger.info("consolidated fragments")
-
-    def vacuum_fragment_meta(self, print_it=True):
-        config = self.ctx.config()
-        config["sm.vacuum.mode"] = "fragment_meta"
-        ctx = tiledb.Ctx(config=config)
-        tiledb.vacuum(self.uri, ctx=ctx)
-        if print_it:
-            logger.info("vacuumed fragment_meta")
-
-    def vacuum_array_meta(self, print_it=True):
-        config = self.ctx.config()
-        config["sm.vacuum.mode"] = "array_meta"
-        ctx = tiledb.Ctx(config=config)
-        tiledb.vacuum(self.uri, ctx=ctx)
-        if print_it:
-            logger.info("vacuumed array_meta")
-
-    def vacuum_fragments(self, print_it=True):
-        config = self.ctx.config()
-        config["sm.vacuum.mode"] = "fragments"
-        ctx = tiledb.Ctx(config=config)
-        tiledb.vacuum(self.uri, ctx=ctx)
-        if print_it:
-            logger.info("vacuumed fragments")
-
-    def cleanup_meta(self):
-        self.consolidate_array_meta(print_it=False)
-        self.vacuum_array_meta(print_it=False)
-        self.consolidate_fragment_meta(print_it=False)
-        self.vacuum_fragment_meta(print_it=False)
-        logger.info("Consolidated and vacuumed metadata")
-
-    def cleanup(self):
-        self.consolidate_array_meta(print_it=False)
-        self.vacuum_array_meta(print_it=False)
-        self.consolidate_fragment_meta(print_it=False)
-        self.vacuum_fragment_meta(print_it=False)
-        self.consolidate_fragments(print_it=False)
-        self.vacuum_fragments(print_it=False)
-        logger.info("Consolidated and vacuumed fragments and metadata")
-
-    def get_nonempty_domain(self):
-        with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
-            return A.nonempty_domain()[-1][0], A.nonempty_domain()[-1][1]
-
-    # def get_data_types(self):
-    #     with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
-    #         return json.loads(A.meta["dimensions"])["data_types"]
-    #
-    # def get_timeseries(self):
-    #     with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
-    #         return json.loads(A.meta["dimensions"])["timeseries"]
-    #
-    # def get_channels(self):
-    #     with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
-    #         return json.loads(A.meta["channels"])["channels"]
-
-    def print_schema(self):
-        with tiledb.open(self.uri, "r", ctx=self.ctx) as A:
-            print(A.schema)

@@ -1,19 +1,9 @@
 # write tarred tiledb arrays from tiledb arrays
 # slice by start and end time
 # use in lambda with web service to deliver data in tiledb
+# only works for processed strain data currently
 
-import tiledb
 import numpy as np
-import pandas as pd
-
-# import datetime
-# import sys, os
-import shutil
-import json
-
-# from straintiledbarray import StrainTiledbArray
-
-from earthscopestraintools.edid import get_station_edid
 from earthscopestraintools.tiledbtools import (
     ProcessedStrainReader,
     ProcessedStrainWriter,
@@ -36,9 +26,7 @@ workdir = "arrays"
 #     return d
 
 
-def read_date_range(network, station, start_str, end_str):
-    edid = get_station_edid(network, station)
-    uri = f"{workdir}/{edid}_level2.tdb"
+def read_date_range(uri, start_str, end_str):
     logger.info(f"Array uri: {uri}")
     reader = ProcessedStrainReader(uri)
     data_types = reader.array.get_data_types()
@@ -57,22 +45,42 @@ def read_date_range(network, station, start_str, end_str):
 
 def convert_time_to_unix_ms(df):
     df = df.reset_index()
-    df["time"] = df["time"].astype(int) / 10 ** 6
+    df["time"] = df["time"].astype(int) / 10**6
     df["time"] = df["time"].astype(np.int64)
     return df
 
 
-def export_date_range(
-    network, station, start_str, end_str, write_it=True, print_it=False
-):
-    df = read_date_range(network, station, start_str, end_str)
+def export_date_range(uri, start_str, end_str, write_it=True, print_it=False):
+    reader = ProcessedStrainReader(uri=uri)
+    network = reader.array.get_network()
+    station = reader.array.get_station()
+    period = reader.array.get_period()
+
+    df = read_date_range(uri, start_str, end_str)
     df = convert_time_to_unix_ms(df)
-    if print_it:
-        logger.info(f"\n{df}")
 
     if write_it:
-        uri = f"{workdir}/{network}_{station}_level2_{start_str}_{end_str}.tdb"
-        writer = ProcessedStrainWriter(uri=uri)
+        uri2 = f"{workdir}/{network}_{station}_level2_{start_str}_{end_str}.tdb"
+        writer = ProcessedStrainWriter(uri=uri2)
         writer.array.delete()
         writer.array.create(schema_type="3D", schema_source="s3")
+        writer.array.set_array_meta(network=network, station=station, period=period)
         writer.write_df_to_tiledb(df)
+
+    if print_it:
+        reader = ProcessedStrainReader(uri=uri2)
+        logger.info(f"Network: {reader.array.get_network()}")
+        logger.info(f"Station: {reader.array.get_station()}")
+        logger.info(f"Period: {reader.array.get_period()}")
+        data_types = reader.array.get_data_types()
+        timeseries = reader.array.get_timeseries()
+        attrs = ["data", "quality", "level", "version"]
+        df = reader.to_df(
+            data_types=data_types,
+            timeseries=timeseries,
+            attrs=attrs,
+            start_str=start_str,
+            end_str=end_str,
+            reindex=False,
+        )
+        logger.info(f"\n{df}")

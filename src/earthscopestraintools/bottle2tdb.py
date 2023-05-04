@@ -118,6 +118,19 @@ def bottle2tdb(
             logger.error(e)
             array = StrainArray(uri=strain_uri)
             array.create(schema_type="2D_INT", schema_source="s3")
+            if session.casefold() == "Min".casefold():
+                period = 0.05
+            elif session.casefold() == "Hour".casefold():
+                period = 1
+            elif session.casefold() == "Day".casefold():
+                period = 600
+            else:
+                logger.error(
+                    f"Invalid session {session}, cannot determine period for array metadata"
+                )
+            array.set_array_meta(
+                station=gbt.file_metadata["fcid"], period=period
+            )  # todo: set network meta?
             logger.info(f"{filepath}: Writing to {strain_uri}")
             write_buffer(strain_uri, strain_buffer)
 
@@ -127,8 +140,11 @@ def bottle2tdb(
                 write_buffer(ancillary_uri, ancillary_buffer)
             except tiledb.TileDBError as e:
                 logger.error(e)
-                array = StrainArray(uri=ancillary_uri)
-                array.create(schema_type="2D_FLOAT", schema_source="s3")
+                ancillary_array = StrainArray(uri=ancillary_uri)
+                ancillary_array.create(schema_type="2D_FLOAT", schema_source="s3")
+                ancillary_array.set_array_meta(
+                    station=gbt.file_metadata["fcid"], period=1800
+                )  # todo: set network meta?
                 logger.info(f"{filepath}: Writing to {ancillary_uri}")
                 write_buffer(ancillary_uri, ancillary_buffer)
 
@@ -139,6 +155,12 @@ def bottle2tdb(
 
     if check_it:
         logger.info(f"Reading data back from array")
+        logger.info(f"Network: {array.get_network()}")
+        logger.info(f"Station: {array.get_station()}")
+        logger.info(f"Period: {array.get_period()}")
         check_result(strain_buffer, strain_uri)
         if session.casefold() == "Day".casefold():
+            logger.info(f"Network: {ancillary_array.get_network()}")
+            logger.info(f"Station: {ancillary_array.get_station()}")
+            logger.info(f"Period: {ancillary_array.get_period()}")
             check_result(ancillary_buffer, ancillary_uri)

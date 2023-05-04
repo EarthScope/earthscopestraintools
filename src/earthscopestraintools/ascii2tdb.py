@@ -144,12 +144,12 @@ def loop_through_ts(filebase, file, writer):
 
 
 def etl_yearly_ascii_file(
-    network, fcid, year, delete_array=False, workdir="", print_it=False
+    network, station, year, delete_array=False, workdir="", print_it=False
 ):
     os.makedirs(workdir, exist_ok=True)
-    # edid = get_station_edid(fcid)
+    # edid = get_station_edid(station)
     # uri = f"{workdir}/{edid}_level2.tdb"
-    uri = f"{workdir}/{network}_{fcid}_l2_etl.tdb"
+    uri = f"{workdir}/{network}_{station}_l2_etl.tdb"
     logger.info(f"Array uri: {uri}")
     writer = ProcessedStrainWriter(uri)
     if delete_array:
@@ -158,9 +158,10 @@ def etl_yearly_ascii_file(
     # create new array if needed.  note: array_exists only works locally not in s3.
     if not tiledb.array_exists(writer.array.uri):
         writer.array.create(schema_type="3d", schema_source="s3")
+        writer.array.set_array_meta(network=network, station=station, period=300)
 
-    filebase = fcid + "." + year + ".bsm.level2"
-    url = "http://bsm.unavco.org/bsm/level2/" + fcid + "/" + filebase + ".tar"
+    filebase = station + "." + year + ".bsm.level2"
+    url = "http://bsm.unavco.org/bsm/level2/" + station + "/" + filebase + ".tar"
     response = requests.get(url, stream=True)
     print(url)
     tar = tarfile.open(fileobj=BytesIO(response.raw.read()), mode="r")
@@ -179,6 +180,9 @@ def etl_yearly_ascii_file(
     writer.array.vacuum_fragments()
     if print_it:
         reader = ProcessedStrainReader(uri)
+        logger.info(f"Network: {reader.array.get_network()}")
+        logger.info(f"Station: {reader.array.get_station()}")
+        logger.info(f"Period: {reader.array.get_period()}")
         start_str = f"{year}-01-01T00:00:00"
         end_str = f"{int(year)+1}-01-01T00:00:00"
         df = reader.to_df(
@@ -194,12 +198,12 @@ def etl_yearly_ascii_file(
 # if __name__ == "__main__":
 #     workdir = "arrays"
 #     network = sys.argv[1]
-#     fcid = sys.argv[2]
+#     station = sys.argv[2]
 #     year = sys.argv[3]
-#     etl_yearly_ascii_file(network, fcid, year, workdir=workdir)
+#     etl_yearly_ascii_file(network, station, year, workdir=workdir)
 # years = ["2005","2006","2007","2008","2009",
 #          "2010","2011","2012","2013","2014","2015","2016","2017","2018","2019",
 #          "2020","2021","2022"]
 # for year in years:
-#     etl_yearly_ascii_file(network, fcid, year)
+#     etl_yearly_ascii_file(network, station, year)
 #

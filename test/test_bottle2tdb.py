@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     network = "PB"
     station = "B001"
-    station_edid = get_station_edid(network, station)
+    station_edid = get_station_edid(station)
     ancillary_uri = f"arrays/{station_edid}_ancillary.tdb"
     write_it = True
     print_it = True
@@ -27,19 +27,19 @@ if __name__ == '__main__':
 
     filepath = 'bottles/B001.2022001Day.tgz'  #24 hr Day session (archive and logger format)
     session = "Day"
-    session_edid = get_session_edid(network, station, session)
+    session_edid = get_session_edid(station, session)
     strain_uri = f"arrays/{session_edid}.tdb"
     bottle2tdb(filepath, strain_uri, ancillary_uri, session, write_it=write_it, print_it=print_it, check_it=check_it)
 
     filepath = 'bottles/B0012200100.tgz'  # 1 Hour, Hour Session (logger format)
     session = "Hour"
-    session_edid = get_session_edid(network, station, session)
+    session_edid = get_session_edid(station, session)
     strain_uri = f"arrays/{session_edid}.tdb"
     bottle2tdb(filepath, strain_uri, ancillary_uri, session, write_it=write_it, print_it=print_it, check_it=check_it)
 
     filepath = 'bottles/B0012200100_20.tar'  # 1 Hour, Min Session (logger format)
     session = "Min"
-    session_edid = get_session_edid(network, station, session)
+    session_edid = get_session_edid(station, session)
     strain_uri = f"arrays/{session_edid}.tdb"
     bottle2tdb(filepath, strain_uri, ancillary_uri, session, write_it=write_it, print_it=print_it, check_it=check_it)
 
