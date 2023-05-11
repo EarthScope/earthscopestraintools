@@ -50,7 +50,9 @@ def convert_time_to_unix_ms(df):
     return df
 
 
-def export_date_range(uri, start_str, end_str, write_it=True, print_it=False):
+def export_date_range(
+    uri, start_str, end_str, save_as=None, write_it=True, print_it=False
+):
     reader = ProcessedStrainReader(uri=uri)
     network = reader.array.get_network()
     station = reader.array.get_station()
@@ -60,7 +62,10 @@ def export_date_range(uri, start_str, end_str, write_it=True, print_it=False):
     df = convert_time_to_unix_ms(df)
 
     if write_it:
-        uri2 = f"{workdir}/{network}_{station}_level2_{start_str}_{end_str}.tdb"
+        if save_as:
+            uri2 = save_as
+        else:
+            uri2 = f"{workdir}/{network}_{station}_level2_{start_str}_{end_str}.tdb"
         writer = ProcessedStrainWriter(uri=uri2)
         writer.array.delete()
         writer.array.create(schema_type="3D", schema_source="s3")

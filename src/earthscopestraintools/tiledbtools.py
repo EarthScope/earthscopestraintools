@@ -176,14 +176,17 @@ class StrainArray:
             keys = A.meta.keys()
             if "network" not in keys:
                 if network:
+                    logger.info(f"Setting array metadata network={network}")
                     with tiledb.open(self.uri, "w", ctx=self.ctx) as B:
                         B.meta["network"] = network
             if "station" not in keys:
                 if station:
+                    logger.info(f"Setting array metadata station={station}")
                     with tiledb.open(self.uri, "w", ctx=self.ctx) as B:
                         B.meta["station"] = station
             if "period" not in keys:
                 if period:
+                    logger.info(f"Setting array metadata period={period}")
                     with tiledb.open(self.uri, "w", ctx=self.ctx) as B:
                         B.meta["period"] = period
 
