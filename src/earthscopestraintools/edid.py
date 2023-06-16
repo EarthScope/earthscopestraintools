@@ -200,11 +200,20 @@ def get_network_edids(
     else:
         return None
 
-def get_network_name(station: str):
 
+def get_bnum_list(namespace="BSM", network="NOTA"):
+    response = get_network_edids(namespace=namespace, network=network)
+    try:
+        return sorted(list(response.keys()))
+    except:
+        logger.error("No stations found")
+        return []
+
+
+def get_network_name(station: str):
     parameters = {
-    "station_name": f"BNUM:{station}",
-    "with_parents": True,
+        "station_name": f"BNUM:{station}",
+        "with_parents": True,
     }
     try:
         r = requests.get(STATION_EDID_PATH, params=parameters, timeout=10)
@@ -223,11 +232,11 @@ def get_network_name(station: str):
         logger.error(f"Oops: Something Else: {station} {err}")
         raise
     if len(r.json()):
-        networks = r.json()[0]['networks']
+        networks = r.json()[0]["networks"]
         for network in networks:
-            for name in network['names']:
-                if 'FDSN' in name:
-                    fdsn_name = name.split(':')[-1]
+            for name in network["names"]:
+                if "FDSN" in name:
+                    fdsn_name = name.split(":")[-1]
                     return fdsn_name
         return None
     else:
