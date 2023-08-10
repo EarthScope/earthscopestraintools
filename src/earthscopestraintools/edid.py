@@ -21,8 +21,6 @@ def get_network_edid(
     with_edid_only=True,
     with_parents=False,
     with_slugs=False,
-    id_map=False,
-    name_map=False,
 ):
     """Returns a single network edid"""
 
@@ -32,8 +30,6 @@ def get_network_edid(
         "with_edid_only": with_edid_only,
         "with_parents": with_parents,
         "with_slugs": with_slugs,
-        "id_map": id_map,
-        "name_map": name_map,
     }
     try:
         r = requests.get(NETWORK_EDID_PATH, params=parameters, timeout=10)
@@ -52,7 +48,7 @@ def get_network_edid(
         logger.error(f"Oops: Something Else: {network} {err}")
         raise
     if len(r.json()):
-        return r.json()[0]
+        return r.json()['items'][0]
     else:
         return None
 
@@ -63,8 +59,6 @@ def get_station_edid(
     with_edid_only=True,
     with_parents=False,
     with_slugs=False,
-    id_map=False,
-    name_map=False,
 ):
     """Returns a station edid in the BNUM station namespace"""
 
@@ -75,8 +69,6 @@ def get_station_edid(
         "with_edid_only": with_edid_only,
         "with_parents": with_parents,
         "with_slugs": with_slugs,
-        "id_map": id_map,
-        "name_map": name_map,
     }
     try:
         r = requests.get(STATION_EDID_PATH, params=parameters, timeout=10)
@@ -95,7 +87,7 @@ def get_station_edid(
         logger.error(f"Oops: Something Else: {station} {err}")
         raise
     if len(r.json()):
-        return r.json()[0]  # ["edid"]
+        return r.json()['items'][0] 
     else:
         return None
 
@@ -107,8 +99,6 @@ def get_session_edid(
     with_edid_only=True,
     with_parents=False,
     with_slugs=False,
-    id_map=False,
-    name_map=False,
 ):
     """Returns a session edid in the BNUM station namespace"""
 
@@ -119,8 +109,6 @@ def get_session_edid(
         "with_edid_only": with_edid_only,
         "with_parents": with_parents,
         "with_slugs": with_slugs,
-        "id_map": id_map,
-        "name_map": name_map,
     }
     try:
         r = requests.get(SESSION_EDID_PATH, params=parameters, timeout=10)
@@ -138,20 +126,19 @@ def get_session_edid(
         logger.error(f"Oops: Something Else: {station} {err}")
         raise
     if len(r.json()):
-        return r.json()[0]  # ["edid"]
+        return r.json()['items'][0]  # ["edid"]
     else:
         return None
 
 
-def get_network_edids(
+def get_all_stations_in_network(
     namespace: str,
     network: str,
     with_children_count=False,
     with_edid_only=False,
     with_parents=False,
     with_slugs=False,
-    id_map=False,
-    name_map=True,
+    limit=50
 ):
     """Returns a dictionary of station:edid for a given namespace:network"""
 
@@ -161,8 +148,7 @@ def get_network_edids(
         "with_edid_only": with_edid_only,
         "with_parents": with_parents,
         "with_slugs": with_slugs,
-        "id_map": id_map,
-        "name_map": name_map,
+        "limit": limit
     }
     try:
         r = requests.get(STATION_EDID_PATH, params=parameters, timeout=10)
@@ -181,28 +167,97 @@ def get_network_edids(
         logger.error(f"Oops: Something Else: {network} {err}")
         raise
     if len(r.json()):
-        if namespace == "FDSN":
-            dict1 = {k: v for k, v in r.json().items() if f"{namespace}:{network}" in k}
-            dict2 = {
-                k.split(":")[-1].split("_")[-1]: v
-                for k, v in dict1[f"{namespace}:{network}"].items()
-                if namespace in k
-            }
-            return dict2
-        elif namespace == "BSM":
-            dict1 = {k: v for k, v in r.json().items() if f"{namespace}:{network}" in k}
-            dict2 = {
-                k.split(":")[-1]: v
-                for k, v in dict1[f"{namespace}:{network}"].items()
-                if "BNUM" in k
-            }
-            return dict2
+        stations = {}
+        more_pages = True
+        while more_pages:
+            more_pages = r.json()['has_next']
+            #print(r.url)
+            #print(r.json())
+            for item in r.json()['items']:
+                for name in item['names']:
+                    if namespace == "BSM":
+                        if "BNUM" in name:
+                            stations[name.split(':')[-1].split("_")[-1]] = item['edid']
+                    elif namespace == "FDSN":
+                        if "FDSN" in name:
+                            stations[name.split(':')[-1].split("_")[-1]] = item['edid']
+            parameters['offset']=r.json()['offset'] + r.json()['limit']
+            r = requests.get(STATION_EDID_PATH, params=parameters, timeout=10)
+            r.raise_for_status()
+        return dict(sorted(stations.items()))
     else:
         return None
+    
+def get_all_sessions_in_network(
+    namespace: str,
+    network: str,
+    with_children_count=False,
+    with_edid_only=False,
+    with_parents=True,
+    with_slugs=False,
+    limit=1000
+):
+    """Returns a nested dictionary of each session and its parent station/network for a given namespace:network"""
 
-
+    parameters = {
+        "network_name": f"{namespace}:{network}",
+        "with_children_count": with_children_count,
+        "with_edid_only": with_edid_only,
+        "with_parents": with_parents,
+        "with_slugs": with_slugs,
+        "limit": limit
+    }
+    try:
+        stations = {}
+        #sessions = {}
+        more_pages = True
+        while more_pages:
+            r = requests.get(SESSION_EDID_PATH, params=parameters, timeout=10)
+            #print(r.url)
+            r.raise_for_status()
+            more_pages = r.json()['has_next']
+            if more_pages:
+                logger.error(f'get_all_sessions_in_network request exceeded {limit} responses, returned only partial results')
+            #print(r.json()['has_next'])
+            for item in r.json()['items']:
+                session_edid = item['edid']
+                session_name = item['names'][0].split(':')[-1]
+                for name in item['station']['names']:
+                    if namespace == "BSM":
+                        if "BNUM" in name:
+                            station_name = name.split(':')[-1]
+                            station_edid = item['station']['edid']
+                            if station_name not in stations:
+                                stations[station_name] = {"edid": station_edid}
+                    elif namespace == "FDSN":
+                        if "FDSN" in name:
+                            station_name = name.split(':')[-1].split("_")[-1]
+                            station_edid = item['station']['edid']
+                            if station_name not in stations:
+                                stations[station_name] = {"edid": station_edid}
+                stations[station_name][session_name] = session_edid
+            parameters['offset']=r.json()['offset'] + r.json()['limit']
+            
+        #print(stations)
+        return dict(sorted(stations.items()))
+        # r = requests.get(SESSION_EDID_PATH, params=parameters, timeout=10)
+        # # print(r.url)
+        # r.raise_for_status()
+    except requests.exceptions.HTTPError as errh:
+        logger.error(f'Http error: {network} {json.loads(r.content)["detail"]}')
+        raise
+    except requests.exceptions.ConnectionError as errc:
+        logger.error(f"Error Connecting: {network} {errc}")
+        raise
+    except requests.exceptions.Timeout as errt:
+        logger.error(f"Timeout Error: {network} {errt}")
+        raise
+    except requests.exceptions.RequestException as err:
+        logger.error(f"Oops: Something Else: {network} {err}")
+        raise
+        
 def get_bnum_list(namespace="BSM", network="NOTA"):
-    response = get_network_edids(namespace=namespace, network=network)
+    response = get_all_stations_in_network(namespace=namespace, network=network)
     try:
         return sorted(list(response.keys()))
     except:
@@ -232,7 +287,7 @@ def get_network_name(station: str):
         logger.error(f"Oops: Something Else: {station} {err}")
         raise
     if len(r.json()):
-        networks = r.json()[0]["networks"]
+        networks = r.json()['items'][0]["networks"]
         for network in networks:
             for name in network["names"]:
                 if "FDSN" in name:
