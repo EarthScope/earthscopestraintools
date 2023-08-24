@@ -55,30 +55,38 @@ class GtsmBottleTar:
                 names = tar.getnames()
                 tar.extractall(path=path1)
                 for name in names:
-                    if name.endswith(
-                        "tar"
-                    ):  # contains more tars or tgzs. Min_Archive session
-                        with tarfile.open(f"{path1}/{name}", "r") as tar2:
-                            names2 = tar2.getnames()
-                            tar2.extractall(path=path2)
-                            for name2 in names2:
-                                if name2.endswith(
-                                    "tgz"
-                                ):  # only contains bottles. Min_Archive session
-                                    with tarfile.open(
-                                        f"{path2}/{name2}", "r:gz"
-                                    ) as tgz2:
-                                        tgz2.extractall(path=self.bottle_path)
-                                else:
-                                    logger.error(
-                                        f"{name2} expected to be a tgz but is not."
-                                    )
-                            shutil.rmtree(path2)
-                    elif name.endswith(
-                        "tgz"
-                    ):  # only contains bottles.  Min or Hour_Archive session
-                        with tarfile.open(f"{path1}/{name}", "r:gz") as tgz:
-                            tgz.extractall(path=self.bottle_path)
+                    try:
+                        if name.endswith(
+                            "tar"
+                        ):  # contains more tars or tgzs. Min_Archive session
+                            with tarfile.open(f"{path1}/{name}", "r") as tar2:
+                                names2 = tar2.getnames()
+                                tar2.extractall(path=path2)
+                                for name2 in names2:
+                                    print(name2)
+                                    if name2.endswith(
+                                        "tgz"
+                                    ):  # only contains bottles. Min_Archive session
+                                        with tarfile.open(
+                                            f"{path2}/{name2}", "r:gz"
+                                        ) as tgz2:
+                                            tgz2.extractall(path=self.bottle_path)
+                                    else:
+                                        logger.error(
+                                            f"{name2} expected to be a tgz but is not."
+                                        )
+                                shutil.rmtree(path2)
+                        elif name.endswith(
+                            "tgz"
+                        ):  # only contains bottles.  Min or Hour_Archive session
+                            #logger.info(name)
+                            try:
+                                with tarfile.open(f"{path1}/{name}", "r:gz") as tgz:
+                                    tgz.extractall(path=self.bottle_path)
+                            except Exception as e:
+                                logger.error(f"{self.file_metadata['filename']}: {type(e)} on {name}, skipping")
+                    except Exception as e:
+                            logger.error(f"{self.file_metadata['filename']}: {type(e)} on {name}, skipping")
                 shutil.rmtree(path1)
 
         elif self.file_metadata["filename"].endswith(
@@ -96,9 +104,13 @@ class GtsmBottleTar:
         bottle_list = self.list_bottle_dir()
         bottle_list.sort()
         for bottlename in bottle_list:
-            btl = Bottle(f"{self.bottle_path}/{bottlename}")
-            btl.read_header()
-            self.bottles.append(btl)
+            try:
+                #logger.info(bottlename)
+                btl = Bottle(f"{self.bottle_path}/{bottlename}")
+                btl.read_header()
+                self.bottles.append(btl)
+            except Exception as e:
+                logger.error(f"{self.file_metadata['filename']}: {type(e)} on {bottlename}, skipping")
 
     def load_bottle(self, bottlename):
         # open and returns a bottle

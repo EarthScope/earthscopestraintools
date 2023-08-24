@@ -18,49 +18,56 @@ if __name__ == '__main__':
     
     print_traces=True
     
-    network = "GF"
-    station = "BUY1"
-    filename = 'BUY12322201.tgz' #Hour Session
-    session = "Hour"
-    bottle2mseed(network, station, filename, session, print_traces)
+    # network = "GF"
+    # station = "BUY1"
+    # filename = 'BUY12322201.tgz' #Hour Session
+    # session = "Hour"
+    # bottle2mseed(network, station, filename, session, print_traces)
 
     network = "PB"
-    station = "B001"
+    station = "B900"
 
-    filename = 'B001.2022001Day.tgz'  #24 hr Day session (archive and logger format)
-    session = "Day"
-    bottle2mseed(network, station, filename, session, print_traces)
-
-    filename = 'B0012200100.tgz'  # 1 Hour, Hour Session (logger format)
-    session = "Hour"
-    bottle2mseed(network, station, filename, session, print_traces)
-
-    filename = 'B0012200100_20.tar'  # 1 Hour, Min Session (logger format)
+    filename = 'B9002323517_20.tar'  
     session = "Min"
     bottle2mseed(network, station, filename, session, print_traces)
 
-    filename = 'B001.2022001_01.tar' #24 Hour, Hour Session (archive format)
-    session = "Hour"
-    bottle2mseed(network, station, filename, session, print_traces)
+    # network = "PB"
+    # station = "B072"
 
-    filename = 'B001.2022001_20.tar' #24 Hour, Min session (archive format)
-    session = "Min"
-    bottle2mseed(network, station, filename, session, print_traces)
+    # filename = 'B07223196Day.tgz'  #24 hr Day session (archive and logger format)
+    # session = "Day"
+    # bottle2mseed(network, station, filename, session, print_traces)
 
-    network = "PB"
-    station = "B012"
-    filename = 'B0122136319_20.tar' #Min Session
-    session = "Min"
-    bottle2mseed(network, station, filename, session, print_traces)
+    # filename = 'B0012200100.tgz'  # 1 Hour, Hour Session (logger format)
+    # session = "Hour"
+    # bottle2mseed(network, station, filename, session, print_traces)
 
-    network = "IV"
-    station = "TSM2"
-    filename = 'TSM22130619_20.tar' #Min Session
-    session = "Min"
-    bottle2mseed(network, station, filename, session, print_traces)
+    # filename = 'B0012200100_20.tar'  # 1 Hour, Min Session (logger format)
+    # session = "Min"
+    # bottle2mseed(network, station, filename, session, print_traces)
+
+    # filename = 'B001.2022001_01.tar' #24 Hour, Hour Session (archive format)
+    # session = "Hour"
+    # bottle2mseed(network, station, filename, session, print_traces)
+
+    # filename = 'B001.2022001_20.tar' #24 Hour, Min session (archive format)
+    # session = "Min"
+    # bottle2mseed(network, station, filename, session, print_traces)
+
+    # network = "PB"
+    # station = "B012"
+    # filename = 'B0122136319_20.tar' #Min Session
+    # session = "Min"
+    # bottle2mseed(network, station, filename, session, print_traces)
+
+    # network = "IV"
+    # station = "TSM2"
+    # filename = 'TSM22130619_20.tar' #Min Session
+    # session = "Min"
+    # bottle2mseed(network, station, filename, session, print_traces)
 
     
 
-    t2 = datetime.now()
-    elapsed_time = t2 - t1
-    logger.info(f'{filename}: Elapsed time {elapsed_time} seconds')
+    # t2 = datetime.now()
+    # elapsed_time = t2 - t1
+    # logger.info(f'{filename}: Elapsed time {elapsed_time} seconds')
