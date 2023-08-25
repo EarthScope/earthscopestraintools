@@ -29,7 +29,11 @@ if __name__ == '__main__':
 
     filename = 'B9002323517_20.tar'  
     session = "Min"
-    bottle2mseed(network, station, filename, session, print_traces)
+    
+    try:
+        bottle2mseed(network, station, filename, session, verbose=False, print_traces=print_traces)
+    except Exception as e:
+        logger.error(e)
 
     # network = "PB"
     # station = "B072"

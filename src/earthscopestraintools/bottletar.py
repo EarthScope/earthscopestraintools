@@ -27,7 +27,7 @@ class GtsmBottleTar:
 
     """
 
-    def __init__(self, filename, session=None, fileobj=None):
+    def __init__(self, filename, session=None, fileobj=None, verbose=False):
         # requires filename, which is path to local object or original filename of fileobj
         self.file_metadata = {}
         self.file_metadata["filename"] = filename
@@ -38,16 +38,17 @@ class GtsmBottleTar:
             self.fileobj = fileobj
         else:
             self.fileobj = None
-        self.untar_files()
+        self.untar_files(verbose=verbose)
         self.bottle_list = self.list_bottle_dir()
         self.bottle_list.sort()
 
-    def untar_files(self):
+    def untar_files(self, verbose=False):
         # unpack tars as complex as  tar(tar(tgz(bottle)))
         logger.info(f"{self.file_metadata['filename']}: unpacking tar file")
         path1 = f"{self.file_metadata['filebase']}/level1"
         path2 = f"{self.file_metadata['filebase']}/level2"
         self.bottle_path = f"{self.file_metadata['filebase']}/bottles"
+        bad_files = []
         if self.file_metadata["filename"].endswith(
             "tar"
         ):  # contains more tars or tgzs.  Min, Min_Archive, Hour_Archive session
@@ -63,7 +64,7 @@ class GtsmBottleTar:
                                 names2 = tar2.getnames()
                                 tar2.extractall(path=path2)
                                 for name2 in names2:
-                                    print(name2)
+                                    #print(name2)
                                     if name2.endswith(
                                         "tgz"
                                     ):  # only contains bottles. Min_Archive session
@@ -72,6 +73,7 @@ class GtsmBottleTar:
                                         ) as tgz2:
                                             tgz2.extractall(path=self.bottle_path)
                                     else:
+                                        bad_files.append(name2)
                                         logger.error(
                                             f"{name2} expected to be a tgz but is not."
                                         )
@@ -84,33 +86,50 @@ class GtsmBottleTar:
                                 with tarfile.open(f"{path1}/{name}", "r:gz") as tgz:
                                     tgz.extractall(path=self.bottle_path)
                             except Exception as e:
-                                logger.error(f"{self.file_metadata['filename']}: {type(e)} on {name}, skipping")
+                                bad_files.append(name)
+                                if verbose:
+                                    logger.error(f"{self.file_metadata['filename']}: {type(e)} on {name}, skipping")
                     except Exception as e:
+                        bad_files.append(name)
+                        if verbose:
                             logger.error(f"{self.file_metadata['filename']}: {type(e)} on {name}, skipping")
+                if len(bad_files):
+                    logger.warning(f"{self.file_metadata['filename']}: Failed to open {len(bad_files)} tar/tgzs")
                 shutil.rmtree(path1)
 
         elif self.file_metadata["filename"].endswith(
             "tgz"
         ):  # only contains bottles.  Day or Hour session
-            with tarfile.open(self.file_metadata["filename"], "r:gz") as tgz:
-                tgz.extractall(path=self.bottle_path)
+            try:
+                with tarfile.open(self.file_metadata["filename"], "r:gz") as tgz:
+                    tgz.extractall(path=self.bottle_path)
+            except Exception as e:
+                logger.error(f"{self.file_metadata['filename']}: {type(e)} cannot open tgz")
+                raise
 
     def list_bottle_dir(self):
         return os.listdir(self.bottle_path)
 
-    def load_bottles(self):
+    def load_bottles(self, verbose=False):
         # opens and adds bottlefiles to self.bottles
         self.bottles = []
         bottle_list = self.list_bottle_dir()
         bottle_list.sort()
+        failed = []
         for bottlename in bottle_list:
             try:
-                #logger.info(bottlename)
                 btl = Bottle(f"{self.bottle_path}/{bottlename}")
                 btl.read_header()
                 self.bottles.append(btl)
             except Exception as e:
-                logger.error(f"{self.file_metadata['filename']}: {type(e)} on {bottlename}, skipping")
+                failed.append(bottlename)
+                if verbose:
+                    print(verbose)
+                    logger.error(f"{self.file_metadata['filename']}: {type(e)} on {bottlename}, skipping")
+        if len(failed):
+            logger.warning(f"{self.file_metadata['filename']}: Failed to load {len(failed)} of {len(bottle_list)} bottles")
+        if len(self.bottles) == 0:  
+            raise 
 
     def load_bottle(self, bottlename):
         # open and returns a bottle
