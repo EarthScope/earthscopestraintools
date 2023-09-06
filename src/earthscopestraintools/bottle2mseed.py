@@ -60,7 +60,7 @@ def build_stream(network: str, station: str, gbt: GtsmBottleTar, verbose=False, 
                     stats.npts = len(tracedata)
                     if stats.npts > 0:
                         stats.starttime = start_times[i]
-                        tr = obspy.core.trace.Trace(data=data, header=stats)
+                        tr = obspy.core.trace.Trace(data=tracedata, header=stats)
                         st.append(tr)
             if print_traces:
                 print(st.__str__(extended=True))
@@ -101,10 +101,12 @@ def build_stream(network: str, station: str, gbt: GtsmBottleTar, verbose=False, 
 #     return st
 
 
-def bottle2mseed(network, station, filename, session, verbose=False, print_traces=True):
+def bottle2mseed(network, station, filename, session, verbose=False, print_traces=True, plot_traces=False):
     gbt = GtsmBottleTar(f"bottles/{filename}", session, verbose=verbose)
     try:
         st = build_stream(network, station, gbt, verbose=verbose, print_traces=print_traces)
+        if plot_traces:
+            st.plot()
         miniseed_filename = f"miniseed/{gbt.file_metadata['filebase']}.ms"
         st.write(miniseed_filename, format="MSEED", reclen=512)
     except Exception as e:
