@@ -26,11 +26,22 @@ def build_stream(network: str, station: str, gbt: GtsmBottleTar, verbose=False, 
                 stats.delta = bottle.file_metadata["interval"]
                 bottle_num_pts = bottle.file_metadata["num_pts"]
                 bottle_starttime = stats.starttime + timedelta(seconds=bottle.file_metadata["start"])
-
-                data = np.array(bottle.read_data(), dtype=np.int32)
                 #print(bottle.file_metadata["filename"])
+                if bottle.file_metadata['seed_scale_factor'] == 10000:
+                    #print("float", bottle.file_metadata['data_type'])
+                    float_data = np.array(bottle.read_data(), dtype=np.float32) * bottle.file_metadata['seed_scale_factor']
+                    int_data = np.array(bottle.read_data(), dtype=np.int32)
+                    gap_indicies = np.where(int_data==999999)[0] 
+                    np.put(float_data, gap_indicies, 999999)
+                    data = np.int32(float_data)
+
+                else:
+                    #print("int", bottle.file_metadata['data_type'])
+                    data = np.array(bottle.read_data(), dtype=np.int32)
+                    gap_indicies = np.where(data==999999)[0] 
+                
+                
                 #print(data)
-                gap_indicies = np.where(data==999999)[0] #= np.nan
                 #print(f"{len(gap_indicies)} fill values at {gap_indicies}")
                 start_indicies = []
                 num_gaps = len(gap_indicies)
@@ -109,5 +120,6 @@ def bottle2mseed(network, station, filename, session, verbose=False, print_trace
             st.plot()
         miniseed_filename = f"miniseed/{gbt.file_metadata['filebase']}.ms"
         st.write(miniseed_filename, format="MSEED", reclen=512)
+        return st
     except Exception as e:
         logger.error(f"{gbt.file_metadata['filename']}: unable to translate to miniseed \n{e}")

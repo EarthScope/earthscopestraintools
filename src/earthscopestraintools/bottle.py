@@ -114,6 +114,7 @@ class Bottle:
 
         self.file_metadata['seed_loc'] = codes[self.file_metadata['channel']][0]
         self.file_metadata['seed_ch'] = codes[self.file_metadata['channel']][1]
+        
         if self.file_metadata['channel'].startswith("CH"):
             if self.file_metadata['session'] == "Min":
                 self.file_metadata['seed_ch'] = self.file_metadata['seed_ch'].replace("R","B")
@@ -141,7 +142,10 @@ class Bottle:
          ) = struct.unpack(format, data)
         self.file_metadata['start_timestamp'] = datetime.datetime.isoformat(
             BTL_EPOCH + datetime.timedelta(0, self.file_metadata['start']), ' ')
-
+        if self.file_metadata['data_type'] == 2:
+            self.file_metadata['seed_scale_factor'] = 10000
+        else:
+            self.file_metadata['seed_scale_factor'] = 1
         if print_it:
             print("")
             print("file:        %s" % self.file_metadata['filename'])

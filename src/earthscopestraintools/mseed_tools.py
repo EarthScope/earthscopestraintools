@@ -129,6 +129,15 @@ def fdsn2bottlename(channel):
         "RDO": "atmp",
         "LDO": "atmp",
         "RRO": "rain",
+        "RK1": "LoggerDegC",
+        "RKD": "DownholeDegC",
+        "RE1": "BatteryVolts",
+        "REO": "SolarAmps",
+        "RE2": "SystemAmps",
+        "RK2": "PowerBoxDegC",
+        "LDD": "PorePressure",
+        "LKD": "PoreDegC",
+        "VEP": "Q330Volts"
     }
 
     return codes[channel]
