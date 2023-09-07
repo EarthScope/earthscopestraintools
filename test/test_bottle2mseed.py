@@ -24,27 +24,28 @@ if __name__ == '__main__':
     # session = "Hour"
     # bottle2mseed(network, station, filename, session, print_traces)
 
-    network = "PB"
-    station = "B900"
-
-    filename = 'B9002323517_20.tar'  
-    session = "Min"
-    
-    try:
-        bottle2mseed(network, station, filename, session, verbose=False, print_traces=print_traces)
-    except Exception as e:
-        logger.error(e)
-
     # network = "PB"
-    # station = "B072"
+    # station = "B900"
 
-    # filename = 'B07223196Day.tgz'  #24 hr Day session (archive and logger format)
-    # session = "Day"
-    # bottle2mseed(network, station, filename, session, print_traces)
+    # filename = 'B9002323517_20.tar'  
+    # session = "Min"
+    
+    # try:
+    #     bottle2mseed(network, station, filename, session, verbose=False, print_traces=print_traces, plot_traces=True)
+    # except Exception as e:
+    #     logger.error(e)
 
+    network = "PB"
+    station = "B072"
+
+    filename = 'B07223196Day.tgz'  #24 hr Day session (archive and logger format)
+    session = "Day"
+    st = bottle2mseed(network, station, filename, session, print_traces, plot_traces=False)
+    #for tr in st:
+    #    print(tr.stats.channel, tr.data)
     # filename = 'B0012200100.tgz'  # 1 Hour, Hour Session (logger format)
     # session = "Hour"
-    # bottle2mseed(network, station, filename, session, print_traces)
+    # bottle2mseed(network, station, filename, session, print_traces, plot_traces=True)
 
     # filename = 'B0012200100_20.tar'  # 1 Hour, Min Session (logger format)
     # session = "Min"
@@ -68,7 +69,7 @@ if __name__ == '__main__':
     # station = "TSM2"
     # filename = 'TSM22130619_20.tar' #Min Session
     # session = "Min"
-    # bottle2mseed(network, station, filename, session, print_traces)
+    # bottle2mseed(network, station, filename, session, print_traces, plot_traces=True)
 
     
 
