@@ -66,7 +66,7 @@ def download_mseed(
     :return:
     """
     logger.info(
-        f"Loading {loc} {cha} from {start} to {end} from Earthscope DMC miniseed"
+        f"{net} {sta} Loading {loc} {cha} from {start} to {end} from Earthscope DMC miniseed"
     )
     url = (
         f"https://service.iris.edu/fdsnws/dataselect/1/query?net={net}"
@@ -74,16 +74,16 @@ def download_mseed(
         f"&format=miniseed&nodata=404"
     )
     if print_url:
-        logger.info(f"Reading from {url}")
+        logger.info(f"{net} {sta} Reading from {url}")
     try:
         st = read(url)
     except HTTPError as e:
-        logger.error(f"No data found for specified query {url}")
+        logger.error(f"{net} {sta} No data found for specified query {url}")
         st = Stream()
     return st
 
 
-def mseed2pandas(st: Stream):
+def mseed2pandas(st: Stream, print_traces=True):
     df = pd.DataFrame()
     dfs = {}
     for i, tr in enumerate(st):
@@ -91,9 +91,10 @@ def mseed2pandas(st: Stream):
         start = tr.stats["starttime"]
         stop = tr.stats["endtime"]
         step = datetime.timedelta(seconds=tr.stats["delta"])
-        logger.info(
-            f"    Trace {i + 1}. {start}:{stop} mapping {tr.stats.channel} to {channel}"
-        )
+        if print_traces:
+            logger.info(
+                f"    Trace {i + 1}. {start}:{stop} mapping {tr.stats.channel} to {channel}"
+            )
         time_buffer = np.arange(start, stop + step, step, dtype=np.datetime64)
         df2 = pd.DataFrame(index=time_buffer)
         df2[channel] = tr.data
