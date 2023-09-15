@@ -25,13 +25,14 @@ def load_mseed_to_df(
     end: str,
     save_as: str = None,
     print_url: bool = False,
+    print_traces: bool = True
 ):
     st = download_mseed(
         net=net, sta=sta, loc=loc, cha=cha, start=start, end=end, print_url=print_url
     )
     if save_as:
         st.write(filename=save_as)
-    df = mseed2pandas(st)
+    df = mseed2pandas(st, print_traces=print_traces)
     return df
 
 
