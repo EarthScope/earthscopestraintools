@@ -6,10 +6,10 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'earthscopestraintools'
+project = 'Earthscope Strain Tools'
 copyright = '2023, Mike Gottlieb, Catherine Hanagan'
 author = 'Mike Gottlieb, Catherine Hanagan'
-release = '[0.1.20]'
+release = '1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

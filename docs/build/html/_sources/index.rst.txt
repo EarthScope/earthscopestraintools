@@ -1,10 +1,10 @@
-.. earthscopestraintools documentation master file, created by
-   sphinx-quickstart on Fri Sep 15 13:23:49 2023.
+.. Earthscope Strain Tools documentation master file, created by
+   sphinx-quickstart on Fri Sep 15 15:50:43 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to earthscopestraintools's documentation!
-=================================================
+Welcome to Earthscope Strain Tools's documentation!
+===================================================
 
 .. toctree::
    :maxdepth: 2
