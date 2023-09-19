@@ -11,11 +11,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -33,7 +33,6 @@
           
           <a href="../index.html" class="icon icon-home">
             Earthscope Strain Tools
-              <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -76,7 +75,32 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.gtsm_metadata module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.gtsm_metadata module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_atmp_response"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_atmp_response()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_ch_prelim_strain_matrix"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_ch_prelim_strain_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_elevation"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_elevation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_er2010_strain_matrix"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_er2010_strain_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_event_terms"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_event_terms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_gap"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_gap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_lab_strain_matrix"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_lab_strain_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_latitude"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_latitude()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_longitude"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_longitude()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_meta_table"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_meta_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_orientation"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_orientation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_reference_strains"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_reference_strains()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_start_date"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_start_date()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_tidal_params"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.get_tidal_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.load_site_terms"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.load_site_terms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.make_weighted_strain_matrix"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.make_weighted_strain_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.show"><code class="docutils literal notranslate"><span class="pre">GtsmMetadata.show()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.fdsn2bottlename"><code class="docutils literal notranslate"><span class="pre">fdsn2bottlename()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.get_fdsn_network"><code class="docutils literal notranslate"><span class="pre">get_fdsn_network()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.gtsm_metadata.get_metadata_df"><code class="docutils literal notranslate"><span class="pre">get_metadata_df()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a></li>
@@ -113,8 +137,126 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="earthscopestraintools-gtsm-metadata-module">
-<h1>earthscopestraintools.gtsm_metadata module<a class="headerlink" href="#earthscopestraintools-gtsm-metadata-module" title="Permalink to this heading"></a></h1>
+  <section id="module-earthscopestraintools.gtsm_metadata">
+<span id="earthscopestraintools-gtsm-metadata-module"></span><h1>earthscopestraintools.gtsm_metadata module<a class="headerlink" href="#module-earthscopestraintools.gtsm_metadata" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.gtsm_metadata.</span></span><span class="sig-name descname"><span class="pre">GtsmMetadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gauge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_atmp_response">
+<span class="sig-name descname"><span class="pre">get_atmp_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_atmp_response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_ch_prelim_strain_matrix">
+<span class="sig-name descname"><span class="pre">get_ch_prelim_strain_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_ch_prelim_strain_matrix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_elevation">
+<span class="sig-name descname"><span class="pre">get_elevation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_elevation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_er2010_strain_matrix">
+<span class="sig-name descname"><span class="pre">get_er2010_strain_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_er2010_strain_matrix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_event_terms">
+<span class="sig-name descname"><span class="pre">get_event_terms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_event_terms" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_gap">
+<span class="sig-name descname"><span class="pre">get_gap</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_gap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_lab_strain_matrix">
+<span class="sig-name descname"><span class="pre">get_lab_strain_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_lab_strain_matrix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_latitude">
+<span class="sig-name descname"><span class="pre">get_latitude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_latitude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_longitude">
+<span class="sig-name descname"><span class="pre">get_longitude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_longitude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_meta_table">
+<span class="sig-name descname"><span class="pre">get_meta_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_meta_table" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_orientation">
+<span class="sig-name descname"><span class="pre">get_orientation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_orientation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_reference_strains">
+<span class="sig-name descname"><span class="pre">get_reference_strains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_reference_strains" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_start_date">
+<span class="sig-name descname"><span class="pre">get_start_date</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_start_date" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_tidal_params">
+<span class="sig-name descname"><span class="pre">get_tidal_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_tidal_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.load_site_terms">
+<span class="sig-name descname"><span class="pre">load_site_terms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.load_site_terms" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.make_weighted_strain_matrix">
+<span class="sig-name descname"><span class="pre">make_weighted_strain_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gauge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.make_weighted_strain_matrix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.show" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.fdsn2bottlename">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.gtsm_metadata.</span></span><span class="sig-name descname"><span class="pre">fdsn2bottlename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.fdsn2bottlename" title="Link to this definition"></a></dt>
+<dd><p>convert location and channel into bottlename
+:param channel: str
+:return: str</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.get_fdsn_network">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.gtsm_metadata.</span></span><span class="sig-name descname"><span class="pre">get_fdsn_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.get_fdsn_network" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.get_metadata_df">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.gtsm_metadata.</span></span><span class="sig-name descname"><span class="pre">get_metadata_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.get_metadata_df" title="Link to this definition"></a></dt>
+<dd><p>Function loads strainmeter metadata into pandas dataframe</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">return<span class="colon">:</span></dt>
+<dd class="field-odd"><p>metadata: pandas DataFrame</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 </section>
 
 

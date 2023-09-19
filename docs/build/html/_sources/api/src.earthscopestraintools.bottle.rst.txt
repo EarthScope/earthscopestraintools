@@ -1,7 +1,0 @@
-src.earthscopestraintools.bottle module
-=======================================
-
-.. automodule:: src.earthscopestraintools.bottle
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -11,11 +11,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -33,7 +33,6 @@
           
           <a href="../index.html" class="icon icon-home">
             Earthscope Strain Tools
-              <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -127,10 +126,10 @@
            <div itemprop="articleBody">
              
   <section id="module-earthscopestraintools.bottletar">
-<span id="earthscopestraintools-bottletar-module"></span><h1>earthscopestraintools.bottletar module<a class="headerlink" href="#module-earthscopestraintools.bottletar" title="Permalink to this heading"></a></h1>
+<span id="earthscopestraintools-bottletar-module"></span><h1>earthscopestraintools.bottletar module<a class="headerlink" href="#module-earthscopestraintools.bottletar" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.bottletar.</span></span><span class="sig-name descname"><span class="pre">GtsmBottleTar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileobj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.bottletar.</span></span><span class="sig-name descname"><span class="pre">GtsmBottleTar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileobj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class is designed to unpack the following 5 cases of GTSM tar file.
 1. ‘Day’ session.  24hrs, low rate data.  tgz of bottles.  Logger and DMC Archive format.
@@ -141,42 +140,42 @@
 <p>Bottles are unpacked and temporarily written to filebase/bottles.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar.delete_bottles_from_disk">
-<span class="sig-name descname"><span class="pre">delete_bottles_from_disk</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.delete_bottles_from_disk" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_bottles_from_disk</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.delete_bottles_from_disk" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar.get_bottle_names">
-<span class="sig-name descname"><span class="pre">get_bottle_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.get_bottle_names" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_bottle_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.get_bottle_names" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar.list_bottle_dir">
-<span class="sig-name descname"><span class="pre">list_bottle_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.list_bottle_dir" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">list_bottle_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.list_bottle_dir" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar.list_bottles">
-<span class="sig-name descname"><span class="pre">list_bottles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.list_bottles" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">list_bottles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.list_bottles" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar.load_bottle">
-<span class="sig-name descname"><span class="pre">load_bottle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bottlename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.load_bottle" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">load_bottle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bottlename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.load_bottle" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar.load_bottles">
-<span class="sig-name descname"><span class="pre">load_bottles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.load_bottles" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">load_bottles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.load_bottles" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar.test">
-<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.test" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.test" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.bottletar.GtsmBottleTar.untar_files">
-<span class="sig-name descname"><span class="pre">untar_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.untar_files" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">untar_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottletar.GtsmBottleTar.untar_files" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

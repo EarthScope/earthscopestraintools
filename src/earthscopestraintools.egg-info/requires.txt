@@ -1,0 +1,12 @@
+scipy>=1.10.1
+numpy>=1.24.1
+pandas>=1.5.3
+requests>=2.28.2
+geopy>=2.3.0
+
+[mseed]
+obspy>=1.4.0
+
+[tiledb]
+tiledb==0.21.4
+pyarrow==13.0.0

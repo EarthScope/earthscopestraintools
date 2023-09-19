@@ -1,7 +1,0 @@
-src.earthscopestraintools.edid module
-=====================================
-
-.. automodule:: src.earthscopestraintools.edid
-   :members:
-   :undoc-members:
-   :show-inheritance:

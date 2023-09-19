@@ -1,7 +1,0 @@
-src.earthscopestraintools.bottle2mseed module
-=============================================
-
-.. automodule:: src.earthscopestraintools.bottle2mseed
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -11,11 +11,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -33,7 +33,6 @@
           
           <a href="../index.html" class="icon icon-home">
             Earthscope Strain Tools
-              <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -70,11 +69,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.ascii2tdb.html">earthscopestraintools.ascii2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle.html">earthscopestraintools.bottle module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.bottle2mseed module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.bottle2mseed.bottle2mseed"><code class="docutils literal notranslate"><span class="pre">bottle2mseed()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.bottle2mseed.build_stream"><code class="docutils literal notranslate"><span class="pre">build_stream()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
@@ -117,18 +112,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-earthscopestraintools.bottle2mseed">
-<span id="earthscopestraintools-bottle2mseed-module"></span><h1>earthscopestraintools.bottle2mseed module<a class="headerlink" href="#module-earthscopestraintools.bottle2mseed" title="Permalink to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.bottle2mseed.bottle2mseed">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.bottle2mseed.</span></span><span class="sig-name descname"><span class="pre">bottle2mseed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_traces</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_traces</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottle2mseed.bottle2mseed" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.bottle2mseed.build_stream">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.bottle2mseed.</span></span><span class="sig-name descname"><span class="pre">build_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gbt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar" title="earthscopestraintools.bottletar.GtsmBottleTar"><span class="pre">GtsmBottleTar</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_traces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.bottle2mseed.build_stream" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+  <section id="earthscopestraintools-bottle2mseed-module">
+<h1>earthscopestraintools.bottle2mseed module<a class="headerlink" href="#earthscopestraintools-bottle2mseed-module" title="Link to this heading"></a></h1>
 </section>
 
 
