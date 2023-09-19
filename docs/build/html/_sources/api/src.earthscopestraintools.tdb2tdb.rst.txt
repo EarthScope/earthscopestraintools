@@ -1,0 +1,7 @@
+src.earthscopestraintools.tdb2tdb module
+========================================
+
+.. automodule:: src.earthscopestraintools.tdb2tdb
+   :members:
+   :undoc-members:
+   :show-inheritance:

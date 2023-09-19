@@ -1,0 +1,7 @@
+src.earthscopestraintools.event\_processing module
+==================================================
+
+.. automodule:: src.earthscopestraintools.event_processing
+   :members:
+   :undoc-members:
+   :show-inheritance:

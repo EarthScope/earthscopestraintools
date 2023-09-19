@@ -1,0 +1,7 @@
+src.earthscopestraintools.ascii2tdb module
+==========================================
+
+.. automodule:: src.earthscopestraintools.ascii2tdb
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+src.earthscopestraintools.timeseries module
+===========================================
+
+.. automodule:: src.earthscopestraintools.timeseries
+   :members:
+   :undoc-members:
+   :show-inheritance:

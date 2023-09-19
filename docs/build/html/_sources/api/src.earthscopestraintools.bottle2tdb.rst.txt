@@ -1,0 +1,7 @@
+src.earthscopestraintools.bottle2tdb module
+===========================================
+
+.. automodule:: src.earthscopestraintools.bottle2tdb
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+src.earthscopestraintools.event module
+======================================
+
+.. automodule:: src.earthscopestraintools.event
+   :members:
+   :undoc-members:
+   :show-inheritance:

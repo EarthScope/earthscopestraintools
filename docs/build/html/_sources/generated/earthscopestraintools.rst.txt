@@ -1,0 +1,23 @@
+﻿earthscopestraintools
+=====================
+
+.. automodule:: earthscopestraintools
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

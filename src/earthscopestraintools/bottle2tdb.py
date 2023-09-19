@@ -20,6 +20,9 @@ else:
 
 
 def build_strain_buffer(gbt: GtsmBottleTar, session: str):
+    '''
+    Testing the doc?
+    '''
     logger.info(
         f"{gbt.file_metadata['filename']}: loading strain bottles into dataframe"
     )

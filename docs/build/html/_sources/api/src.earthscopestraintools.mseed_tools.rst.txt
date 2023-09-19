@@ -1,0 +1,7 @@
+src.earthscopestraintools.mseed\_tools module
+=============================================
+
+.. automodule:: src.earthscopestraintools.mseed_tools
+   :members:
+   :undoc-members:
+   :show-inheritance:

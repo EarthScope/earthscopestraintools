@@ -1,0 +1,7 @@
+src.earthscopestraintools.gtsm\_metadata module
+===============================================
+
+.. automodule:: src.earthscopestraintools.gtsm_metadata
+   :members:
+   :undoc-members:
+   :show-inheritance:
