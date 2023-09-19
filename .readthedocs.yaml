@@ -3,20 +3,22 @@ version: 2
 # Set the OS, Python version and other tools you might need
 build:
   os: "ubuntu-20.04"
+  tools:
+    python: "3.9"
+      
 
 #python:
 #  install:
 #    - requirements: requirements.txt
 
-# Pip install requirements for docs dependencies
-python:
-  version: "3.9"
-  install:
-    - requirements: docs/requirements.txt
-
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
    configuration: docs/source/conf.py
+
+# Pip install requirements for docs dependencies
+python:
+  install:
+    - requirements: docs/requirements.txt
 
 # By default readthedocs does not checkout git submodules
 submodules:
