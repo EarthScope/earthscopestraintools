@@ -33,6 +33,7 @@
           
           <a href="../index.html" class="icon icon-home">
             Earthscope Strain Tools
+              <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -76,16 +77,7 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.mseed_tools module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.mseed_tools.download_mseed"><code class="docutils literal notranslate"><span class="pre">download_mseed()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.mseed_tools.fdsn2bottlename"><code class="docutils literal notranslate"><span class="pre">fdsn2bottlename()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.mseed_tools.load_mseed_file_to_df"><code class="docutils literal notranslate"><span class="pre">load_mseed_file_to_df()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.mseed_tools.load_mseed_to_df"><code class="docutils literal notranslate"><span class="pre">load_mseed_to_df()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.mseed_tools.mseed2pandas"><code class="docutils literal notranslate"><span class="pre">mseed2pandas()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.mseed_tools.save_mseed_file"><code class="docutils literal notranslate"><span class="pre">save_mseed_file()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.mseed_tools.ts_from_mseed"><code class="docutils literal notranslate"><span class="pre">ts_from_mseed()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.mseed_tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a></li>
@@ -121,59 +113,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-earthscopestraintools.mseed_tools">
-<span id="earthscopestraintools-mseed-tools-module"></span><h1>earthscopestraintools.mseed_tools module<a class="headerlink" href="#module-earthscopestraintools.mseed_tools" title="Link to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.mseed_tools.download_mseed">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.mseed_tools.</span></span><span class="sig-name descname"><span class="pre">download_mseed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.mseed_tools.download_mseed" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>loc</strong> – FDSN Location code, accepts wildcards</p></li>
-<li><p><strong>cha</strong> – FDSN Channel code, accepts wildcards</p></li>
-<li><p><strong>start</strong> – </p></li>
-<li><p><strong>end</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.mseed_tools.fdsn2bottlename">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.mseed_tools.</span></span><span class="sig-name descname"><span class="pre">fdsn2bottlename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.mseed_tools.fdsn2bottlename" title="Link to this definition"></a></dt>
-<dd><p>convert location and channel into bottlename
-:param channel: str
-:return: str</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.mseed_tools.load_mseed_file_to_df">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.mseed_tools.</span></span><span class="sig-name descname"><span class="pre">load_mseed_file_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.mseed_tools.load_mseed_file_to_df" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.mseed_tools.load_mseed_to_df">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.mseed_tools.</span></span><span class="sig-name descname"><span class="pre">load_mseed_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_as</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_traces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.mseed_tools.load_mseed_to_df" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.mseed_tools.mseed2pandas">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.mseed_tools.</span></span><span class="sig-name descname"><span class="pre">mseed2pandas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">st</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_traces</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.mseed_tools.mseed2pandas" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.mseed_tools.save_mseed_file">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.mseed_tools.</span></span><span class="sig-name descname"><span class="pre">save_mseed_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.mseed_tools.save_mseed_file" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="earthscopestraintools.mseed_tools.ts_from_mseed">
-<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.mseed_tools.</span></span><span class="sig-name descname"><span class="pre">ts_from_mseed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'raw'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_nan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.mseed_tools.ts_from_mseed" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
+  <section id="earthscopestraintools-mseed-tools-module">
+<h1>earthscopestraintools.mseed_tools module<a class="headerlink" href="#earthscopestraintools-mseed-tools-module" title="Link to this heading"></a></h1>
 </section>
 
 

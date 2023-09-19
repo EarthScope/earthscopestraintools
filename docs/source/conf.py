@@ -17,6 +17,7 @@ release = '1'
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../../src'))
 sys.path.insert(0, os.path.abspath('../../src/earthscopestraintools'))
 
 # -- General configuration ---------------------------------------------------
@@ -29,6 +30,7 @@ extensions = ['sphinx.ext.autodoc',
     'sphinxcontrib.apidoc',
     'sphinx.ext.napoleon',
     'myst_parser'] # myst will allow document building in markdown syntax
+
 
 # APIDOC configuration 
 apidoc_module_dir = "../../src/earthscopestraintools"
@@ -46,6 +48,6 @@ exclude_patterns = []
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
-html_logo = "../build/html/_static/EarthScope_Logo-color.png"
+html_logo = "./_static/EarthScope_Logo-color.png"
 
 
