@@ -74,7 +74,17 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.event_processing module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.event_processing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.event_processing.calc_hypocentral_dist"><code class="docutils literal notranslate"><span class="pre">calc_hypocentral_dist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.event_processing.calculate_magnitude"><code class="docutils literal notranslate"><span class="pre">calculate_magnitude()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.event_processing.calculate_p_s_arrival"><code class="docutils literal notranslate"><span class="pre">calculate_p_s_arrival()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.event_processing.dynamic_strain"><code class="docutils literal notranslate"><span class="pre">dynamic_strain()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.event_processing.get_stations_in_radius"><code class="docutils literal notranslate"><span class="pre">get_stations_in_radius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.event_processing.magnitude_plot"><code class="docutils literal notranslate"><span class="pre">magnitude_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.event_processing.plot_coseismic_offset"><code class="docutils literal notranslate"><span class="pre">plot_coseismic_offset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.event_processing.pre_event_trend_correction"><code class="docutils literal notranslate"><span class="pre">pre_event_trend_correction()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
@@ -112,8 +122,99 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="earthscopestraintools-event-processing-module">
-<h1>earthscopestraintools.event_processing module<a class="headerlink" href="#earthscopestraintools-event-processing-module" title="Link to this heading"></a></h1>
+  <section id="module-earthscopestraintools.event_processing">
+<span id="earthscopestraintools-event-processing-module"></span><h1>earthscopestraintools.event_processing module<a class="headerlink" href="#module-earthscopestraintools.event_processing" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.event_processing.calc_hypocentral_dist">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">calc_hypocentral_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq_latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_longitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_longitude</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.calc_hypocentral_dist" title="Link to this definition"></a></dt>
+<dd><p>Function calculates hypocentral distance (km) between lat,long and earthquake</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">param lat<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+<dt class="field-even">param long<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+<dt class="field-odd">param eq<span class="colon">:</span></dt>
+<dd class="field-odd"><p>earthquake class object
+Must include the following attributes
+:eq.lat: float
+:eq.long: float
+:eq.depth: float</p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><p>hypocentral_dist: int</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.event_processing.calculate_magnitude">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">calculate_magnitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dynamic_strain_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hypocentral_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude_term</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.calculate_magnitude" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.event_processing.calculate_p_s_arrival">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">calculate_p_s_arrival</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq_latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_longitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_longitude</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.calculate_p_s_arrival" title="Link to this definition"></a></dt>
+<dd><p>Function calculates arrival times for P and S waves at a given lat and long</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">param eq<span class="colon">:</span></dt>
+<dd class="field-odd"><p>earthquake class object
+Must include the following attributes
+:eq.lat: float
+:eq.long: float
+:eq.time: datetime.datetime</p>
+</dd>
+<dt class="field-even">param latitude<span class="colon">:</span></dt>
+<dd class="field-even"><p>float, latitude</p>
+</dd>
+<dt class="field-odd">param longitude<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float, longitude</p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="field-list simple">
+<dt class="field-odd">p_arrival<span class="colon">:</span></dt>
+<dd class="field-odd"><p>datetime.datetime</p>
+</dd>
+<dt class="field-even">s_arrival<span class="colon">:</span></dt>
+<dd class="field-even"><p>datetime.datetime</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.event_processing.dynamic_strain">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">dynamic_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gauge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.dynamic_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.event_processing.get_stations_in_radius">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">get_stations_in_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.get_stations_in_radius" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.event_processing.magnitude_plot">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">magnitude_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dynamic_strain_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitude_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_mag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_as</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.magnitude_plot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.event_processing.plot_coseismic_offset">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">plot_coseismic_offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_9s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'scatter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coseismic_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_as</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.plot_coseismic_offset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.event_processing.pre_event_trend_correction">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">pre_event_trend_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.pre_event_trend_correction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 
 
