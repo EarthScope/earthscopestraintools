@@ -27,6 +27,7 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.duration',
     'sphinx.ext.doctest',
     'sphinxcontrib.apidoc',
+    'sphinx.ext.napoleon',
     'myst_parser'] # myst will allow document building in markdown syntax
 
 # APIDOC configuration 

@@ -128,27 +128,27 @@
 <dt class="sig sig-object py" id="earthscopestraintools.event_processing.calc_hypocentral_dist">
 <span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">calc_hypocentral_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq_latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_longitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_longitude</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.calc_hypocentral_dist" title="Link to this definition"></a></dt>
 <dd><p>Function calculates hypocentral distance (km) between lat,long and earthquake</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">param lat<span class="colon">:</span></dt>
+<p>:param :
+:type : param lat: float
+:param :
+:type : param long: float
+:param : Must include the following attributes</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">eq.lat<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
-<dt class="field-even">param long<span class="colon">:</span></dt>
+<dt class="field-even">eq.long<span class="colon">:</span></dt>
 <dd class="field-even"><p>float</p>
 </dd>
-<dt class="field-odd">param eq<span class="colon">:</span></dt>
-<dd class="field-odd"><p>earthquake class object
-Must include the following attributes
-:eq.lat: float
-:eq.long: float
-:eq.depth: float</p>
-</dd>
-<dt class="field-even">return<span class="colon">:</span></dt>
-<dd class="field-even"><p>hypocentral_dist: int</p>
+<dt class="field-odd">eq.depth<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
-</section>
+</div></blockquote>
+<p>:type : param eq: earthquake class object
+:param : hypocentral_dist: int
+:type : return:</p>
 </dd></dl>
 
 <dl class="py function">
@@ -160,34 +160,34 @@ Must include the following attributes
 <dt class="sig sig-object py" id="earthscopestraintools.event_processing.calculate_p_s_arrival">
 <span class="sig-prename descclassname"><span class="pre">earthscopestraintools.event_processing.</span></span><span class="sig-name descname"><span class="pre">calculate_p_s_arrival</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq_latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_longitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_longitude</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.event_processing.calculate_p_s_arrival" title="Link to this definition"></a></dt>
 <dd><p>Function calculates arrival times for P and S waves at a given lat and long</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">param eq<span class="colon">:</span></dt>
-<dd class="field-odd"><p>earthquake class object
-Must include the following attributes
-:eq.lat: float
-:eq.long: float
-:eq.time: datetime.datetime</p>
+<dl class="simple">
+<dt>:param<span class="classifier">Must include the following attributes</span></dt><dd><dl class="field-list simple">
+<dt class="field-odd">eq.lat<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
 </dd>
-<dt class="field-even">param latitude<span class="colon">:</span></dt>
-<dd class="field-even"><p>float, latitude</p>
+<dt class="field-even">eq.long<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
 </dd>
-<dt class="field-odd">param longitude<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float, longitude</p>
-</dd>
-<dt class="field-even">return<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="field-list simple">
-<dt class="field-odd">p_arrival<span class="colon">:</span></dt>
+<dt class="field-odd">eq.time<span class="colon">:</span></dt>
 <dd class="field-odd"><p>datetime.datetime</p>
 </dd>
-<dt class="field-even">s_arrival<span class="colon">:</span></dt>
-<dd class="field-even"><p>datetime.datetime</p>
-</dd>
 </dl>
 </dd>
 </dl>
-</section>
+<p>:type : param eq: earthquake class object
+:param :
+:type : param latitude: float, latitude
+:param :
+:type : param longitude: float, longitude
+:param : :p_arrival: datetime.datetime</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">s_arrival<span class="colon">:</span></dt>
+<dd class="field-odd"><p>datetime.datetime</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>:type : return:</p>
 </dd></dl>
 
 <dl class="py function">

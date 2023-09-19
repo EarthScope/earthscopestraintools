@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 def linearize(df: pd.DataFrame, reference_strains: dict, gap: float):
     """
     Linearize raw gauge strain.
+    
     Parameters
     ----------
     df : pd.DataFrame
