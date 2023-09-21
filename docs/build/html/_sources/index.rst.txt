@@ -13,6 +13,8 @@ Welcome to the Earthscope Strain Tools documentation!
    :caption: Contents:
 
    pages/IntroductoryMaterial.md
+   pages/DataAvailability.md
+   https://github.com/EarthScope/strain-processing-notebooks/blob/main/notebooks/level2.ipynb
    api
 
 .. note:: 

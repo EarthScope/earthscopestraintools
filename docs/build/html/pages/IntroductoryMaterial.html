@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Borehole Strainmeter Basics &mdash; Earthscope Strain Tools 1 documentation</title>
+  <title>Borehole Strainmeter Overview &mdash; Earthscope Strain Tools 1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,10 +16,12 @@
         <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API documentation" href="../api.html" />
+    <link rel="next" title="Data Availability" href="DataAvailability.html" />
     <link rel="prev" title="Welcome to the Earthscope Strain Tools documentation!" href="../index.html" /> 
 </head>
 
@@ -45,7 +47,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Borehole Strainmeter Basics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Borehole Strainmeter Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#background"><em>Background</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#instrumentation"><em>Instrumentation</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#linearization-and-calibration"><em>Linearization and Calibration</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common-signals-for-correction"><em>Common Signals for Correction</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/EarthScope/strain-processing-notebooks/blob/main/notebooks/level2.ipynb">https://github.com/EarthScope/strain-processing-notebooks/blob/main/notebooks/level2.ipynb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
 </ul>
 
@@ -63,7 +74,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Borehole Strainmeter Basics</li>
+      <li class="breadcrumb-item active">Borehole Strainmeter Overview</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/pages/IntroductoryMaterial.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -73,8 +84,98 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="borehole-strainmeter-basics">
-<h1>Borehole Strainmeter Basics<a class="headerlink" href="#borehole-strainmeter-basics" title="Link to this heading"></a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="borehole-strainmeter-overview">
+<h1>Borehole Strainmeter Overview<a class="headerlink" href="#borehole-strainmeter-overview" title="Link to this heading"></a></h1>
+<section id="background">
+<h2><em>Background</em><a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<p>Borehole strainmeters (BSM) are extremely sensitive to change in the earth around them, capturing a rate of deformation that bridges a measurement gap between seismometers and high precision GPS (e.g., GPS; Figure 1 - frequency of deformation). This makes BSMs ideal for measuring deformation spanning seconds to weeks. Examples of signals the instruments excel in measuring include earth tides, volcano deformation, postseismic earthquake deformation, and slow fault slip events. A few cool papers that explore such phenomena can be found <a class="reference external" href="https://www.unavco.org/borehole-instruments/publications/">here</a>.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/BSMFrequencyGap.png"><img alt="../_images/BSMFrequencyGap.png" src="../_images/BSMFrequencyGap.png" style="width: 50%;" /></a>
+<figcaption>
+<p><span class="caption-text">FIgure 1. Created by John Langbein, USGS, showing the rate sensitivity of seismometers, strainmeters, high rate GPS, and SAR.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The global distribution of stations supported by Earthscope is plotted up in Figure 2 for reference. All are located near active plate boundaries or volcanic regions, and most were established as part of the Plate Boundary Observatory (PBO) project from 2005 to 2008 (Hodgkinson et al., 2013). Other collaborative project regions include the Geophysical Observatory at the North Anatolian Fault (GONAF) in Turkey and the Alto Tiberina Near Fault Observatory (TABOO-NFO) in Italy. The go-to spot for BSM information, documentation, etc. is this <a class="reference external" href="https://www.unavco.org/borehole-instruments/">page</a> and associated sub-pages.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/GlobalBSMMap.png"><img alt="../_images/GlobalBSMMap.png" src="../_images/GlobalBSMMap.png" style="width: 50%;" /></a>
+<figcaption>
+<p><span class="caption-text">Figure 2. Map of BSMs supported by Earthscope.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<div class="admonition-strain-review admonition">
+<p class="admonition-title"><em><strong>Strain Review:</strong></em></p>
+<p>The strainmeters measure a change in length. As such, they measure the spatial derivative of displacement. In contrast, seismometers measure the time derivative of displacement and GPS measure displacement. Strain itself is dimensionless, for example:</p>
+<ul class="simple">
+<li><p>10<sup>-6</sup> = 1 microstrain (ms) = 1 ppm = 1 mm lengthening of a 1 km baseline</p></li>
+<li><p>10<sup>-9</sup> = 1 nanostrain (ns) = 1 ppb = 1 mm lengthening of a 1000 km baseline</p></li>
+</ul>
+<p>The sign convention for us will be:</p>
+<ul class="simple">
+<li><p>Increased length → extension = positive strain</p></li>
+<li><p>Decreased length → contraction = negative strain</p></li>
+</ul>
+<p>Likewise,</p>
+<ul class="simple">
+<li><p>Increased area → expansion = positive strain</p></li>
+</ul>
+<p>Assuming small strains, we can apply “infinitesimal strain theory” in a state of plain strain, with assumed deformation only in the East(x)/North(y) plane. Therefore, only strain components <span class="math notranslate nohighlight">\(e_{xx}\)</span>, <span class="math notranslate nohighlight">\(e_{yy}\)</span>, and <span class="math notranslate nohighlight">\(e_{xy}\)</span> are considered, with <span class="math notranslate nohighlight">\(e_{zz}=e_{zx}=e_{zy}=0\)</span>. The normal strains, <span class="math notranslate nohighlight">\(e_{xx}\)</span> and <span class="math notranslate nohighlight">\(e_{yy}\)</span>, act perpendicular to the plane, and the shear strains act along it.</p>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/straincube.png"><img alt="../_images/straincube.png" src="../_images/straincube.png" style="width: 25%;" /></a>
+<figcaption>
+<p><span class="caption-text">Cube showing the directions of strain, with strain in the z direction = 0.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>In terms of displacement (u), the strain is expressed as:
+<span class="math notranslate nohighlight">\( e_{ij}= \large \frac{1}{2} \left[\frac{\partial u_i}{\partial x_j}+\frac{\partial u_j}{\partial x_i}\right]\)</span>   <span class="math notranslate nohighlight">\(i,j = x,y = E,N\)</span></p>
+<p>For plain strain in the x/y plane, <span class="math notranslate nohighlight">\(e_{xx}\)</span> and <span class="math notranslate nohighlight">\(e_{yy}\)</span> represent contraction or extension, and <span class="math notranslate nohighlight">\(e_{xy}\)</span> shear strain (as pictured in the image below) measures change in the angle of the body. The engineering shear strain (commonly <span class="math notranslate nohighlight">\(\gamma_2\)</span> or <span class="math notranslate nohighlight">\(2e_{xy}\)</span>) is defined as (<span class="math notranslate nohighlight">\(\alpha + \beta\)</span>), or, the change in angle of <span class="math notranslate nohighlight">\(\overline{AC}\)</span> and <span class="math notranslate nohighlight">\(\overline{AB}\)</span>; equivalently, <span class="math notranslate nohighlight">\((\alpha + \beta)=\frac{du_x}{dy}+\frac{du_y}{dx}=2e_{xy}\)</span>.</p>
+<figure class="align-center" id="id4">
+<a class="reference internal image-reference" href="../_images/planestrain.png"><img alt="../_images/planestrain.png" src="../_images/planestrain.png" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-text">Plane strain.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="instrumentation">
+<h2><em>Instrumentation</em><a class="headerlink" href="#instrumentation" title="Link to this heading"></a></h2>
+<p>The Gladwin Tensor Strainmeter (GTSM; Gladwin, 1984) is the common type of borehole strainmeter managed by Earthscope, so we focus much of this package on that specific design. The instrument, precise to nanostrain levels (the equivalent of shortening a 1 km long baseline by 1 mm!), is typically installed at a depth of ~100 m in a ~10 cm diameter borehole to minimize surface noise. The 2 m-long instrument consists of 4 stacked gauges that measure horizontal linear strain at different angles (Figure 3). The actual unit of measure is a change in capacitance between a fixed plate and a mobile plate that moves with the borehole wall, which is converted to a linear change in distance (Figure 4). Typically, BSMs are collocated with several instruments, including possible pore pressure sensors, thermometers, barometers, rain gauges, tiltmeters, seismometers, and GPS/GNSS stations.</p>
+<figure class="align-center" id="id5">
+<a class="reference internal image-reference" href="../_images/BSMandBoreholeSchematic.png"><img alt="../_images/BSMandBoreholeSchematic.png" src="../_images/BSMandBoreholeSchematic.png" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-text">Figure 3. GTSM-type BSM and an example of a station schematic, with multiple instrument types.</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="linearization-and-calibration">
+<h2><em>Linearization and Calibration</em><a class="headerlink" href="#linearization-and-calibration" title="Link to this heading"></a></h2>
+<p>Prior to use in geophysical applications, the raw BSM gauge data must be converted to a unit of linear strain, scaled, and oriented to resolve the full horizontal strain tensor in the east-north reference system. Unit conversion is achieved through linearization, a simple calculation from the 4 raw gauge strains in counts to microstrain (Figure 4).</p>
+<figure class="align-center" id="id6">
+<a class="reference internal image-reference" href="../_images/GaugeLinearization.png"><img alt="../_images/GaugeLinearization.png" src="../_images/GaugeLinearization.png" style="width: 75%;" /></a>
+<figcaption>
+<p><span class="caption-text">Figure 4. BSM cross-section depicting the orientation of each gauge, with a drawing of a single gauge. The linearization equation printed below the figure converts raw gauge strain to counts.</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>On a single gauge, positive change is associated with extension. Calibration scales and orients the four gauge strains to regional areal (east+north strain), differential shear (east-north strain), and engineering shear (east/north strain) strains. Because of their proximity to the surface, vertical strains are assumed to be zero. In practice, some contamination from vertical strain may occur that requires additional consideration in analyses (see Roeloff’s, 2010; Hanagan et al., In Prep for more detail). Figure 5 depicts the regional strain conventions associated with positive change.</p>
+<figure class="align-center" id="id7">
+<a class="reference internal image-reference" href="../_images/RegionalStrainConventions.png"><img alt="../_images/RegionalStrainConventions.png" src="../_images/RegionalStrainConventions.png" style="width: 75%;" /></a>
+<figcaption>
+<p><span class="caption-text">Figure 5. Regional strain conventions in the East/North reference system for plane strain. The solid lined polygons represent the undeformed state, and the dashed polygons represent the deformed state associated with positive changes in strain.</span><a class="headerlink" href="#id7" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>Calibration is achieved through application of an orientation matrix (A) to the gauge strains (E<sub>Gauge</sub>):</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/OrientationEquation.png"><img alt="../_images/OrientationEquation.png" src="../_images/OrientationEquation.png" style="width: 50%;" /></a>
+</figure>
+<p>The matrix can be calculated through various methods, two of which are the most common: (1) the manufacturer’s or lab Calibration, and (2) tidal calibration. The lab calibration contains information on the gauge orientation at install, and coupling coefficients derrived from several assumptions (e.g. Hodgkinson et al., 2013). Often, the lab calibration assumptions fail, so alternative calibration is desired. BSMs are ideal at measuring deformation related to tidal forcings. The solid earth tides are well-known, so, often the instruments are calibrated by comparing the predicted and observed earth tides, provided that the instruments are far inland from the coast where ocean loads do not comlicate the predicted tidal strain. More information can be found in the <strong>calibration notebooks</strong> (need to make these available, with refs to lit).</p>
+</section>
+<section id="common-signals-for-correction">
+<h2><em>Common Signals for Correction</em><a class="headerlink" href="#common-signals-for-correction" title="Link to this heading"></a></h2>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>Gladwin, 1984
+Hodgkinson et al., 2013</p>
+</section>
 </section>
 
 
@@ -82,7 +183,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to the Earthscope Strain Tools documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../api.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="DataAvailability.html" class="btn btn-neutral float-right" title="Data Availability" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

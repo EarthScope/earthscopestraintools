@@ -13,6 +13,7 @@ Welcome to the Earthscope Strain Tools documentation!
    :caption: Contents:
 
    pages/IntroductoryMaterial.md
+   pages/DataAvailability.md
    api
 
 .. note:: 

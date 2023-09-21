@@ -30,7 +30,9 @@ extensions = ['sphinx.ext.autodoc',
     'sphinxcontrib.apidoc',
     'sphinx.ext.napoleon',
     'myst_parser'] # myst will allow document building in markdown syntax
-
+myst_enable_extensions = [ "amsmath",
+    "dollarmath",
+    "colon_fence"]
 
 # APIDOC configuration 
 apidoc_module_dir = "../../src/earthscopestraintools"
