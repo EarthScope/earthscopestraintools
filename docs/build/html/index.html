@@ -16,6 +16,7 @@
         <script src="_static/documentation_options.js?v=29a6c3e3"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -34,6 +35,9 @@
             Earthscope Strain Tools
               <img src="_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
+              <div class="version">
+                0.1.19c
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -46,7 +50,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pages/DataAvailability.html">Data Availability</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/EarthScope/strain-processing-notebooks/blob/main/notebooks/level2.ipynb">https://github.com/EarthScope/strain-processing-notebooks/blob/main/notebooks/level2.ipynb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/level2.html">Example of running level 2 processing steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 </ul>
 
@@ -89,7 +93,17 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pages/DataAvailability.html">Data Availability</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/EarthScope/strain-processing-notebooks/blob/main/notebooks/level2.ipynb">https://github.com/EarthScope/strain-processing-notebooks/blob/main/notebooks/level2.ipynb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/level2.html">Example of running level 2 processing steps</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Download-1hz-counts,-downsample-to-300s-and-convert-to-microstrain">Download 1hz counts, downsample to 300s and convert to microstrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Trend-correction">Trend correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Tidal-correction">Tidal correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Pressure-correction">Pressure correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Offset-correction">Offset correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Plot-corrections">Plot corrections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Convert-to-regional-strain,-apply-corrections">Convert to regional strain, apply corrections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Plot-corrected-data-against-rainfall-data">Plot corrected data against rainfall data</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.html">earthscopestraintools package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.ascii2tdb.html">earthscopestraintools.ascii2tdb module</a></li>

@@ -14,7 +14,7 @@ Welcome to the Earthscope Strain Tools documentation!
 
    pages/IntroductoryMaterial.md
    pages/DataAvailability.md
-   https://github.com/EarthScope/strain-processing-notebooks/blob/main/notebooks/level2.ipynb
+   notebooks/level2.ipynb
    api
 
 .. note:: 

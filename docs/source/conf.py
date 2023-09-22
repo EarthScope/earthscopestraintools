@@ -20,6 +20,11 @@ sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../../src'))
 sys.path.insert(0, os.path.abspath('../../src/earthscopestraintools'))
 
+# follow same env as the main project, will allow notebooks in the docs
+# by downloading appropriate packages
+from sphinx_pyproject import SphinxConfig
+config = SphinxConfig("../../pyproject.toml", globalns=globals())
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -29,15 +34,18 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinxcontrib.apidoc',
     'sphinx.ext.napoleon',
+    'nbsphinx',
     'myst_parser'] # myst will allow document building in markdown syntax
 myst_enable_extensions = [ "amsmath",
     "dollarmath",
     "colon_fence"]
 
+nbsphinx_kernel_name = 'python'
+nbsphinx_allow_errors = True
+
 # APIDOC configuration 
 apidoc_module_dir = "../../src/earthscopestraintools"
 apidoc_output_dir = "api"
-#apidoc_excluded_paths = ['../../src']
 apidoc_separate_modules = True
 apidoc_toc_file = False
 apidoc_module_first = True
