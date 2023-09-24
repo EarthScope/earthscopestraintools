@@ -43,10 +43,6 @@ myst_enable_extensions = [ "amsmath",
 nbsphinx_kernel_name = 'python'
 nbsphinx_allow_errors = True
 
-# initiate docker for running example notebooks
-import docker
-client = docker.from_env()
-
 # APIDOC configuration 
 apidoc_module_dir = "../../src/earthscopestraintools"
 apidoc_output_dir = "api"
