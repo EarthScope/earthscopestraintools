@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../../src'))
 sys.path.insert(0, os.path.abspath('../../src/earthscopestraintools'))
 
-# follow same env as the main project, will allow notebooks in the docs
+# To keep same env as the main project, will allow notebooks in the docs
 # by downloading appropriate packages
 from sphinx_pyproject import SphinxConfig
 config = SphinxConfig("../../pyproject.toml", globalns=globals())
@@ -42,6 +42,10 @@ myst_enable_extensions = [ "amsmath",
 
 nbsphinx_kernel_name = 'python'
 nbsphinx_allow_errors = True
+
+# initiate docker for running example notebooks
+import docker
+client = docker.from_env()
 
 # APIDOC configuration 
 apidoc_module_dir = "../../src/earthscopestraintools"
