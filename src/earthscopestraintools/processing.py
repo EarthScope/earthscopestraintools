@@ -3,7 +3,7 @@ import pandas as pd
 from scipy import signal, stats
 import subprocess
 
-# from earthscopestraintools.timeseries import Timeseries
+from earthscopestraintools.timeseries import Timeseries
 from earthscopestraintools.gtsm_metadata import GtsmMetadata
 import logging
 
@@ -11,6 +11,18 @@ logger = logging.getLogger(__name__)
 
 
 def linearize(df: pd.DataFrame, reference_strains: dict, gap: float):
+    """
+    Linearize raw gauge strain.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Dataframe with four columns corresponding to raw gauge data in units of counts.
+    reference_strains : dict
+        Dictionary with four entries noting the reference count value on each gauge to zero the timeseries against in the conversion to gauge strain (in microstrain). 
+    gap : float
+        Instrument measurement gap. For most PBO strainmeters, the reference gap is 0.0001 m.
+    """
     logger.info(f"Converting raw counts to microstrain")
     # build a series of reference strains.  if using metadata from XML the /1e8 is already included.
     reference_strain_series = pd.Series(dtype="float64")

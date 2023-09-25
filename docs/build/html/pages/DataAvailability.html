@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Availability &mdash; Earthscope Strain Tools 1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Example of running level 2 processing steps" href="../notebooks/level2.html" />
+    <link rel="prev" title="Borehole Strainmeter Overview" href="IntroductoryMaterial.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Earthscope Strain Tools
+              <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.1.19c
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Earthscope Strain Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data Availability</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pages/DataAvailability.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="data-availability">
+<h1>Data Availability<a class="headerlink" href="#data-availability" title="Link to this heading"></a></h1>
+<p>Data at various levels of processing are defined as follows:</p>
+<ul class="simple">
+<li><p>Level 0: Raw data in digital units with associated metadata.</p></li>
+<li><p>Level 1: Raw data in geophysical units.</p></li>
+<li><p>Level 2: 5 min processed data and associated metadata.</p></li>
+</ul>
+<p>A complete description of data processing strategies for level 0, 1, and 2 data is in the
+<a class="reference external" href="https://www.unavco.org/projects/past-projects/pbo/lib/docs/dms_cdr.pdf">PBO Data Management System Critical Design Review</a>. Level 0 and 2 data are available through <a class="reference external" href="https://www.unavco.org/data/strain-seismic/bsm-data/bsm-data.html">Earthscope Data Services</a> and the <a class="reference external" href="http://service.iris.edu/">IRIS Data Management Center Web Services</a>.</p>
+<p>Raw data are stored in bottle and ASCII format at UNAVCO, and SEED format at IRIS. We will primarily be accessing raw data in miniSEED format. Here is a brief description of the format with links for more info:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://ds.iris.edu/ds/nodes/dmc/data/formats/#seed">SEED</a>: Standard for the Exchange of Earthquake Data. Archive data format used by IRIS.</p></li>
+<li><p><a class="reference external" href="http://ds.iris.edu/ds/nodes/dmc/data/formats/miniseed/">miniSEED</a>: How the borehole strainmeter data is stored at the IRIS Data Management Center. This is a stripped-down version of SEED containing only the time and data value, and does not include metadata - the miniSEED metadata contains this information. A station’s miniSEED data and metadata compose a larger “SEED volume.”</p></li>
+</ul>
+<p>Level 2 data are available from UNAVCO in XML and ASCII format. This includes gauge measurements in units of linearized strain, areal and shear strains, Earth tide and ocean load corrections, barometric pressure corrections, flagged bad data, and offset estimates. Generally, the raw data is decimated to 5 minute intervals to produce 5 minute Level 2 data products, but special high rate geophysical event data (e.g. data during an earthquake) is available separately at 1 sps.</p>
+<p>We will primarily use the raw miniSEED data from IRIS and metadata associated with the Level 2 data products from UNAVCO.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="IntroductoryMaterial.html" class="btn btn-neutral float-left" title="Borehole Strainmeter Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../notebooks/level2.html" class="btn btn-neutral float-right" title="Example of running level 2 processing steps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Earthscope Consortium.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

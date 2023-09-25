@@ -1,0 +1,329 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "8a3a0211-6411-4541-8a55-7ecfa41ed70c",
+   "metadata": {},
+   "source": [
+    "# Example of running level 2 processing steps\n",
+    "\n",
+    "starts with 10 min RS* data to speed things up, but could use LS* and ts.decimate_1s_to_300s()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a70c599f",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "from earthscopestraintools.mseed_tools import ts_from_mseed\n",
+    "from earthscopestraintools.gtsm_metadata import GtsmMetadata\n",
+    "from earthscopestraintools.timeseries import Timeseries, plot_timeseries_comparison\n",
+    "\n",
+    "import logging\n",
+    "logger = logging.getLogger()\n",
+    "logging.basicConfig(\n",
+    "        format=\"%(message)s\", level=logging.INFO\n",
+    "    )"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a990a0d4-191e-435a-aac0-68c58d561f22",
+   "metadata": {},
+   "source": [
+    "### Download 1hz counts, downsample to 300s and convert to microstrain"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b8f18a2f",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "network = 'PB'\n",
+    "station = 'B004'\n",
+    "meta = GtsmMetadata(network,station)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "af731164",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "start=\"2023-01-01T00:00:00\"\n",
+    "end = \"2023-02-01T00:00:00\"\n",
+    "strain_raw = ts_from_mseed(network=network, station=station, location='T0', channel='LS*', start=start, end=end)\n",
+    "strain_raw.stats()\n",
+    "strain_raw.plot(type='line')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a00acc02-2edc-4600-93e8-536253a36c75",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "decimated_counts = strain_raw.decimate_1s_to_300s()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9b4a9c77-f233-46ad-aa7c-fae1bf0ffc21",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "name = f\"{network}.{station}.gauge.microstrain\"\n",
+    "gauge_microstrain = decimated_counts.linearize(reference_strains=meta.reference_strains, gap=meta.gap, name=name)\n",
+    "gauge_microstrain.stats()\n",
+    "gauge_microstrain.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d5a91535-842d-4145-a35b-5eb06334411f",
+   "metadata": {},
+   "source": [
+    "### Trend correction"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "23e7b908-a510-4676-b906-f15954730444",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "name = f\"{network}.{station}.gauge.trend_c\"\n",
+    "trend_c = gauge_microstrain.linear_trend_correction(name=name)\n",
+    "#trend_c.plot()\n",
+    "corrected = gauge_microstrain.apply_corrections([trend_c])\n",
+    "plot_timeseries_comparison([gauge_microstrain, trend_c, corrected], names=['uncorrected', 'trend', 'corrected'], zero=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0c51413f-e511-40bb-af80-1117903f3e05",
+   "metadata": {},
+   "source": [
+    "### Tidal correction"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6046a394-b493-4056-9441-d094f794b977",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "name = f\"{network}.{station}.gauge.tide_c\"\n",
+    "tide_c = gauge_microstrain.calculate_tide_correction(tidal_parameters=meta.tidal_params, longitude=meta.longitude, name=name)\n",
+    "tide_c.plot()\n",
+    "#tide_corrected = gauge_microstrain.apply_corrections([tide_c])\n",
+    "#plot_timeseries_comparison([gauge_microstrain, tide_corrected], names=['uncorrected', 'atmp_corrected'], zero=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f9ba1036-1106-402b-9f3a-3b1d174d3977",
+   "metadata": {},
+   "source": [
+    "### Pressure correction"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "64754d92",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "atmp_raw = ts_from_mseed(network=network, station=station, location='*', channel='RDO', \n",
+    "                        start=start, end=end, period=60*30, scale_factor=0.001, units='hpa')\n",
+    "# atmp_raw.stats()\n",
+    "# atmp_raw.quality_stats()\n",
+    "# atmp_raw.plot()\n",
+    "atmp = atmp_raw.interpolate(new_index=strain_raw.data.index, series='hpa')\n",
+    "# atmp.stats()\n",
+    "# atmp.quality_stats()\n",
+    "# atmp.plot()\n",
+    "\n",
+    "name = f\"{network}.{station}.gauge.atmp_c\"\n",
+    "atmp_c = atmp.calculate_pressure_correction(meta.atmp_response, name=name)\n",
+    "atmp_c.plot(atmp=atmp)\n",
+    "#atmp_corrected = gauge_microstrain.apply_corrections([atmp_c])\n",
+    "#atmp_corrected.plot()\n",
+    "#plot_timeseries_comparison([gauge_microstrain, atmp_corrected], names=['uncorrected', 'atmp_corrected'], zero=True)\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7517bd7b-cc94-4c80-b9ac-58999ddbda1d",
+   "metadata": {},
+   "source": [
+    "### Offset correction"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b6e64025-3ed7-4fa0-9ace-3e322198fed5",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "name = f\"{network}.{station}.gauge.offset_c\"\n",
+    "offset_c = gauge_microstrain.calculate_offsets(name=name)\n",
+    "offset_c.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "45f27a20-b83f-439f-a62f-0812c27fe223",
+   "metadata": {},
+   "source": [
+    "### Plot corrections"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "de8fc3f2-d1cc-4915-b254-8bc86eeb880b",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "title=f\"{network}.{station}\"\n",
+    "gauge_corrected = gauge_microstrain.apply_corrections([tide_c, atmp_c, offset_c, trend_c])\n",
+    "plot_timeseries_comparison([gauge_microstrain, gauge_corrected], title=title, names=['uncorrected', 'corrected'], zero=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "063063f9-a950-4121-aceb-d94e6365f010",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "### Convert to regional strain, apply corrections"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "dd6dc0cc",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "calibration_matrix = meta.strain_matrices['lab_strain_matrix']\n",
+    "regional_microstrain = gauge_microstrain.apply_calibration_matrix(calibration_matrix)\n",
+    "regional_microstrain.stats()\n",
+    "regional_microstrain.plot()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5dfdf4f3-3665-4ba8-a878-811502699767",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "regional_tide_c = tide_c.apply_calibration_matrix(calibration_matrix)\n",
+    "regional_trend_c = trend_c.apply_calibration_matrix(calibration_matrix)\n",
+    "regional_atmp_c = atmp_c.apply_calibration_matrix(calibration_matrix)\n",
+    "regional_offset_c = offset_c.apply_calibration_matrix(calibration_matrix)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "349898e7-1338-45f7-b397-875bcd2713e1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "title=f\"{network}.{station}\"\n",
+    "regional_corrected = regional_microstrain.apply_corrections([regional_tide_c, regional_atmp_c, regional_offset_c, regional_trend_c])\n",
+    "plot_timeseries_comparison([regional_microstrain, regional_corrected], title=title, names=['uncorrected', 'corrected'], zero=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a9ba959d-7852-4350-8d31-cf3dd42a4a9b",
+   "metadata": {},
+   "source": [
+    "### Plot corrected data against rainfall data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "44cf9dfd-500c-46d4-8306-7768cd7435d9",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "rainfall = ts_from_mseed(network=network, station=station, location='*', channel='RRO', \n",
+    "                         start=start, end=end, period=60*30, scale_factor=0.0001, units='mm/30m')\n",
+    "regional_corrected.plot(rainfall=rainfall)\n",
+    "regional_corrected.stats()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ca8163b3-8368-4f89-b158-797f4f6e55eb",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.16"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

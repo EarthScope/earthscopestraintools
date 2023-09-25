@@ -1,0 +1,92 @@
+Metadata-Version: 2.1
+Name: earthscopestraintools
+Version: 0.1.19rc0
+Summary: A collection of utilities for working with EarthScope strainmeter data
+Author-email: Mike Gottlieb <mike.gottlieb@eartscope.org>
+License: Copyright (c) 2023
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+Project-URL: Homepage, https://gitlab.com/earthscope/gds/strain/earthscopestraintools
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: scipy>=1.10.1
+Requires-Dist: numpy>=1.24.1
+Requires-Dist: pandas>=1.5.3
+Requires-Dist: requests>=2.28.2
+Requires-Dist: geopy>=2.3.0
+Provides-Extra: mseed
+Requires-Dist: obspy>=1.4.0; extra == "mseed"
+Provides-Extra: tiledb
+Requires-Dist: tiledb==0.21.4; extra == "tiledb"
+Requires-Dist: pyarrow==13.0.0; extra == "tiledb"
+
+This repo contains the code associated with a library on pypi
+https://pypi.org/project/earthscopestraintools/
+M. Gottlieb 1-20-23
+
+It can be installed with 
+    
+> pip install earthscopestraintools
+
+Or with optional dependencies:
+
+> pip install 'earthscopestraintools[mseed]'
+> 
+> pip install 'earthscopestraintools[tiledb]'
+> 
+> pip install 'earthscopestraintools[mseed,tiledb]'
+
+
+### straintiledbarray.py
+class with methods and metadata to interact with strain tiledb arrays.  
+Methods include create, delete, consolidate, vacuum, read, write.  it also 
+includes the current schema definition.
+
+### ascii2tdb.py
+ETL script to read level 2 ascii files and write them to tiledb local arrays.  then need to
+> aws s3 sync arrayname s3://tiledb-strain/arrayname
+
+### tdb2ascii.py
+distrubution script to generate level 2 ascii files based on a time query
+back from tiledb and package as tarball
+
+### tdb2tdb.py
+distribution script to generate a subset tdb array based on a time query and 
+package as tarball
+
+### bottle.py
+library for reading gtsm bottle files
+
+### bottletar.py
+wrapper class for reading 5 cases of tarballs of bottle files and writing to tiledb
+
+### bottle2mseed.py
+add on functionality around bottletar to use obspy to write mseed files
+
+### bottle2tiledb.py
+add on functionality around bottletar to use straintiledbarray to write to tiledb
+
+### mseed_tools.py
+functions to download miniseed from DataSelect and load into pandas dataframes
+
+### gtsm_metadata.py
+class to load GTSM metadata 

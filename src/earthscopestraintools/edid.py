@@ -22,7 +22,7 @@ def get_network_edid(
     with_parents=False,
     with_slugs=False,
 ):
-    """Returns a single network edid"""
+    """Returns a single network edid!"""
 
     parameters = {
         "network_name": f"{namespace}:{network}",

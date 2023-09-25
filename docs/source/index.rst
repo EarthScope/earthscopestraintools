@@ -3,18 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Earthscope Strain Tools documentation!
-===================================================
+Welcome to the Earthscope Strain Tools documentation!
+=====================================================
+
+``earthscopestraintools`` is an open source python-based software package for utilizing borehole strainmeter data.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   pages/IntroductoryMaterial.md
+   pages/DataAvailability.md
+   notebooks/level2.ipynb
+   api
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. note:: 
+   This package and its documentation are under development.
