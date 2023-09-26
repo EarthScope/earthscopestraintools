@@ -23,15 +23,18 @@ def calc_hypocentral_dist(
 
     Parameters
     ----------
-    :param lat: float
-    :param long: float
-    :param eq: earthquake class object
-        Must include the following attributes
-        :eq.lat: float
-        :eq.long: float
-        :eq.depth: float
-    :return:
-        hypocentral_dist: int
+    :param eq_latitude: latitude of earthquake
+    :type eq_latitude: float
+    :param eq_longitude: longitude of earthquake
+    :type eq_longitude: float
+    :param eq_depth: depth of earthquake
+    :type eq_depth: float
+    :param station_latitude: latitude of station
+    :type station_latitude: float
+    :param station_longitude: longitude of station
+    :type station_longitude: float
+    :return: hypocentral distance in km
+    :rtype: int
 
     """
 
@@ -50,16 +53,19 @@ def calculate_p_s_arrival(eq_latitude,
 
     Parameters
     ----------
-    :param eq: earthquake class object
-        Must include the following attributes
-        :eq.lat: float
-        :eq.long: float
-        :eq.time: datetime.datetime
-    :param latitude: float, latitude
-    :param longitude: float, longitude
-    :return:
-        :p_arrival: datetime.datetime
-        :s_arrival: datetime.datetime
+    :param eq_latitude: latitude of earthquake
+    :type eq_latitude: float
+    :param eq_longitude: longitude of earthquake
+    :type eq_longitude: float
+    :param eq_time: time of earthquake
+    :type eq_time: datetime.datetime
+    :param station_latitude: latitude of station
+    :type station_latitude: float
+    :param station_longitude: longitude of station
+    :type station_longitude: float
+    :return: p_arrival, s_arrival
+    :rtype: datetime.datetime
+
     """
 
     event_loc = "[" + str(eq_latitude) + "," + str(eq_longitude) + "]"

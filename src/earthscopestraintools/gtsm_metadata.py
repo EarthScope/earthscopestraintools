@@ -17,6 +17,13 @@ logger = logging.getLogger(__name__)
 
 
 class GtsmMetadata:
+    """
+    Class for loading and storing GTSM processing metadata for a given station.  Metadata sources include 
+    a summary table \n
+    https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt \n
+    and individual station pages ie \n
+    http://bsm.unavco.org/bsm/level2/B001/B001.README.txt 
+    """
     def __init__(self, network, fcid, gauge_weights=None):
         self.network = network
         self.fcid = fcid  # todo: change to 'station' and fix usages
@@ -53,11 +60,21 @@ class GtsmMetadata:
     #     return xmltodict.parse(open(metadir + xml_file).read(), process_namespaces=True)
 
     def get_meta_table(self):
+        """loads summary metadata table into dataframe
+
+        :return: basic metadata for all strainmeter stations
+        :rtype: pandas.DataFrame
+        """
         url = "https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt"
         meta_df = pd.read_csv(url, sep="\s+", index_col="BNUM")
         return meta_df
 
     def get_latitude(self):
+        """parse latitude from metadata table
+
+        :return: station latitude
+        :rtype: float
+        """
         try:
             lats = self.meta_df["LAT"]
             return float(lats[self.fcid])
@@ -66,6 +83,11 @@ class GtsmMetadata:
             exit(1)
 
     def get_longitude(self):
+        """parse longitude from metadata table
+
+        :return: station longitude
+        :rtype: float
+        """
         try:
             longs = self.meta_df["LONG"]
             return float(longs[self.fcid])
@@ -74,6 +96,11 @@ class GtsmMetadata:
             exit(1)
 
     def get_elevation(self):
+        """parse elevation from metadata table
+
+        :return: station elevation
+        :rtype: float
+        """
         try:
             elevations = self.meta_df["ELEV(m)"]
             return float(elevations[self.fcid])
@@ -82,6 +109,11 @@ class GtsmMetadata:
             exit(1)
 
     def get_gap(self):
+        """parse instrument gap from metadata table
+
+        :return: station instument gap in meters
+        :rtype: float
+        """
         try:
             gaps = self.meta_df["GAP(m)"]
             return float(gaps[self.fcid])
@@ -90,6 +122,11 @@ class GtsmMetadata:
             return 0.0001
 
     def get_orientation(self):
+        """parse instrument orientation from metadata table
+
+        :return: orientation of CH0 in degrees East of North
+        :rtype: float
+        """
         try:
             orientations = self.meta_df["CH0(EofN)"]
             return float(orientations[self.fcid])
@@ -99,13 +136,17 @@ class GtsmMetadata:
             return 0
 
     def get_start_date(self):
+        """parse data start date from metadata table
+
+        :return: start date
+        :rtype: datetime.datetime
+        """
         try:
             start_date = self.meta_df.loc[self.fcid]["DATA_START"]
             return datetime.strptime(start_date, "%Y:%j").strftime("%Y-%m-%d")
 
         except Exception as e:
             logger.error(e)
-            logger.error("No orientation found for %s, using 0 deg" % self.fcid)
             return None
 
     # def get_orientation_xml(self):
@@ -126,6 +167,13 @@ class GtsmMetadata:
     #         return 0
 
     def make_weighted_strain_matrix(self, gauge_weights=[1, 1, 1, 1]):
+        """calculates lab strain matrix, and allows exclusion of a single gauge
+
+        :param gauge_weights: which gauges to use, set to 0 to exclude one gauge, defaults to [1, 1, 1, 1]
+        :type gauge_weights: list, optional
+        :return: lab calibration matrix
+        :rtype: numpy.array
+        """
         # make strain matrix from manufacturers coefficients
         # logger.info(gauge_weights)
         c = 1.5
@@ -185,6 +233,11 @@ class GtsmMetadata:
         return strain_matrix
 
     def get_lab_strain_matrix(self):
+        """parse lab strain matrix from station metadata 
+
+        :return: lab calibration matrix
+        :rtype: np.array
+        """
         try:
             url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
 
@@ -206,6 +259,13 @@ class GtsmMetadata:
             return None
 
     def get_er2010_strain_matrix(self):
+        """parse ER2010 strain matrix from station metadata if available.  From
+        Roeloffs, E. (2010), Tidal calibration of Plate Boundary Observatory borehole strainmeters: 
+        Roles of vertical and shear coupling , J. Geophys. Res., 115, B06405, doi:10.1029/2009JB006407
+        
+        :return: ER2010 calibration matrix
+        :rtype: np.array
+        """
         url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
         try:
             with request.urlopen(url) as response:
@@ -227,6 +287,12 @@ class GtsmMetadata:
             return None
 
     def get_ch_prelim_strain_matrix(self):
+        """parse CH preliminary strain matrix from station metadata if available.  
+        Calibrations of TABOO-STAR stations performed by Cassie Hanagan in 2022.
+        
+        :return: CH_PRELIM calibration matrix
+        :rtype: np.array
+        """
         url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
         try:
             with request.urlopen(url) as response:
@@ -248,6 +314,11 @@ class GtsmMetadata:
             return None
 
     def get_reference_strains(self):
+        """Parse reference strains from metadata 
+
+        :return: reference strains
+        :rtype: dict
+        """
         reference_strains = {}
         reference_strains["linear_date"] = self.meta_df.loc[self.fcid]["L_DATE"]
         reference_strains["CH0"] = int(self.meta_df.loc[self.fcid]["L0(cnts)"])
@@ -311,6 +382,11 @@ class GtsmMetadata:
     #     return detrend
 
     def get_atmp_response(self):
+        """Parse atmospheric pressure response from station processing metadata
+
+        :return: atmospheric response coefficients
+        :rtype: dict
+        """
         url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
         try:
             with request.urlopen(url) as response:
@@ -335,6 +411,11 @@ class GtsmMetadata:
             return None
 
     def get_tidal_params(self):
+        """Parse tidal params from station processing metadata
+
+        :return: tidal coefficients
+        :rtype: dict
+        """
         url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
         try:
             with request.urlopen(url) as response:
@@ -371,11 +452,16 @@ class GtsmMetadata:
             return None
 
     def load_site_terms(self):
+        """Read site terms from file"""
         terms_file = files("earthscopestraintools").joinpath("event_site_terms.txt")
         site_terms = pd.read_csv(terms_file, sep=" ", header=0).fillna(0)
         return site_terms
 
     def get_event_terms(self):
+        """
+        Loads site and longitude terms for a particular strainmeter using Barbour et al 2021.  
+        These terms are used for event magnitude estimation.
+        """
         site_terms = self.load_site_terms()
         if self.fcid in site_terms.Station.values:
             self.site_term = site_terms[site_terms.Station == self.fcid].delta_s.item()
@@ -387,6 +473,8 @@ class GtsmMetadata:
             self.longitude_term = 0
 
     def show(self):
+        """print metadata
+        """
         # pp = pprint.PrettyPrinter()
         logger.info(f"network: {self.network}")
         logger.info(f"fcid: {self.fcid}")
@@ -422,13 +510,14 @@ class GtsmMetadata:
 
 
 def fdsn2bottlename(channel):
-    """
-    convert FDSN channel into bottlename
+    """convert FDSN channel into bottlename
+
     :param channel: FDSN channel code
     :type channel: str
     :return: bottlename 
     :rtype: str
     """
+
     codes = {
         "RS1": "CH0",
         "LS1": "CH0",
@@ -450,14 +539,20 @@ def fdsn2bottlename(channel):
 
 
 def get_metadata_df():
-    """
-    Function loads strainmeter metadata into pandas dataframe
+    """Function loads strainmeter metadata into pandas dataframe
 
-    Parameters
-    ----------
-    :return: metadata: pandas DataFrame
-
+    :return: bsm metadata 
+    :rtype: pandas.DataFrame
     """
+        
+    # """
+    # 
+
+    # Parameters
+    # ----------
+    # :return: metadata: pandas DataFrame
+
+    # """
     url = (
         "https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt"
     )
@@ -466,7 +561,13 @@ def get_metadata_df():
 
 
 def get_fdsn_network(station):
-    # depends on es-datasources-id api, requires VPN
+    """Get FDSN network name from station fourcharid using es-datasources-api
+
+    :param station: station four character id
+    :type station: string
+    :return: 2 char FDSN network code for station
+    :rtype: string
+    """
     try:
         return get_network_name(station)
     except requests.exceptions.ConnectionError:

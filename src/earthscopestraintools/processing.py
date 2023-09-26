@@ -3,26 +3,25 @@ import pandas as pd
 from scipy import signal, stats
 import subprocess
 
-from earthscopestraintools.timeseries import Timeseries
-from earthscopestraintools.gtsm_metadata import GtsmMetadata
+#from earthscopestraintools.gtsm_metadata import GtsmMetadata
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 def linearize(df: pd.DataFrame, reference_strains: dict, gap: float):
+    """Linearize raw gauge strain.
+
+    :param df: Dataframe with four columns corresponding to raw gauge data in units of counts.
+    :type df: pd.DataFrame
+    :param reference_strains: Dictionary with four entries noting the reference count value on each gauge to zero the timeseries against in the conversion to gauge strain (in microstrain). 
+    :type reference_strains: dict
+    :param gap: Instrument measurement gap. For most NOTA strainmeters, the reference gap is 0.0001 m.
+    :type gap: float
+    :return: DataFrame with with four columns of microstrain.
+    :rtype: pd.DataFrame
     """
-    Linearize raw gauge strain.
-    
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Dataframe with four columns corresponding to raw gauge data in units of counts.
-    reference_strains : dict
-        Dictionary with four entries noting the reference count value on each gauge to zero the timeseries against in the conversion to gauge strain (in microstrain). 
-    gap : float
-        Instrument measurement gap. For most PBO strainmeters, the reference gap is 0.0001 m.
-    """
+
     logger.info(f"Converting raw counts to microstrain")
     # build a series of reference strains.  if using metadata from XML the /1e8 is already included.
     reference_strain_series = pd.Series(dtype="float64")
@@ -48,6 +47,19 @@ def apply_calibration_matrix(
     calibration_matrix_name: str = None,
     use_channels: list = [1, 1, 1, 1],
 ):
+    """Applies a calibration matrix to convert 4 gauges into areal, differential, and shear strains
+
+    :param df: four channels of strain data or correction in microstrain
+    :type df: pd.DataFrame
+    :param calibration_matrix: calibration matrix 
+    :type calibration_matrix: np.array
+    :param calibration_matrix_name: name of calibration matrix used, defaults to None
+    :type calibration_matrix_name: str, optional
+    :param use_channels: not yet implemented, set to 0 to ignore a bad channel, defaults to [1, 1, 1, 1]
+    :type use_channels: list, optional
+    :return: areal, differential, and shear strains based on the given calibration
+    :rtype: pd.DataFrame
+    """
     # todo: implement use channels
     logger.info(f"Applying {calibration_matrix_name} matrix: {calibration_matrix}")
     areal = "Eee+Enn"
@@ -73,6 +85,21 @@ def butterworth_filter(
     filter_order: int,
     filter_cutoff_s: float,
 ):
+    """Apply a butterworth filter to a DataFrame using scipy.signal.butter()
+
+    :param df: data to filter
+    :type df: pd.DataFrame
+    :param period: sample period of data
+    :type period: float
+    :param filter_type: {'lowpass', 'highpass', 'bandpass', 'bandstop'}
+    :type filter_type: str
+    :param filter_order: the order of the filter
+    :type filter_order: int
+    :param filter_cutoff_s: the filter cutoff in seconds
+    :type filter_cutoff_s: float
+    :return: butterworth filtered data
+    :rtype: pandas.DataFrame
+    """
     logger.info(f"Applying Butterworth Filter")
     fc = 1 / filter_cutoff_s
     fs = 1 / period
@@ -90,6 +117,21 @@ def interpolate(
     limit: int = 3600,
     limit_direction="both",
 ):
+    """Interpolate across gaps in data using pd.DataFrame.interpolate()
+
+    :param df: data to be interpolated
+    :type df: pd.DataFrame
+    :param replace: gap fill value to interpolate across, defaults to 999999
+    :type replace: int, optional
+    :param method: interpolation method, defaults to "linear"
+    :type method: str, optional
+    :param limit: max number of samples to interpolate, defaults to 3600
+    :type limit: int, optional
+    :param limit_direction: ['forward', 'backward', 'both'], defaults to "both"
+    :type limit_direction: str, optional
+    :return: interpolated data
+    :rtype: pd.DataFrame
+    """
     logger.info(f"Interpolating data using method={method} and limit={limit}")
     df2 = df.replace(replace, np.nan).interpolate(
         method=method, limit_direction=limit_direction, limit=limit
@@ -98,11 +140,31 @@ def interpolate(
 
 
 def decimate_to_hourly(df: pd.DataFrame):
+    """decimates a timeseries to hourly by selecting the first minute of each hour
+
+    :param df: time series data to decimate
+    :type df: pd.DataFrame
+    :return: decimated data
+    :rtype: pd.DataFrame
+    """
     logger.info(f"Decimating to hourly")
     return df[df.index.minute == 0]
 
 
 def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3600):
+    """decimate 1hz data to 5 min data using \n
+    Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
+    low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99
+
+    :param df: 1 hz data
+    :type df: pd.DataFrame
+    :param method: method to interpolate across gaps, defaults to "linear"
+    :type method: str, optional
+    :param limit: largest gap to interpolate, defaults to 3600 samples
+    :type limit: int, optional
+    :return: 300s (5 min) data
+    :rtype: pd.DataFrame
+    """
     logger.info(f"Decimating to 300s")
     df2 = interpolate(df, method="linear", limit=3600)
 
@@ -248,6 +310,17 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
 
 
 def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float = 0.75):
+    """Calculate offsets using first differencing method (add more details).  
+
+    :param df: uncorrected data, as dataframe with datetime index and 1 channel per column
+    :type df: pandas.DataFrame
+    :param limit_multiplier: _description_, defaults to 10
+    :type limit_multiplier: int, optional
+    :param cutoff_percentile: _description_, defaults to 0.75
+    :type cutoff_percentile: float, optional
+    :return: _description_
+    :rtype: _type_
+    """
     logger.info(
         f"Calculating offsets using cutoff percentile of {cutoff_percentile} and limit multiplier of {limit_multiplier}."
     )
@@ -276,6 +349,15 @@ def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float =
 
 
 def calculate_pressure_correction(df: pd.DataFrame, response_coefficients: dict):
+    """Generate a pressure correction timeseries from pressure data and response coefficients
+
+    :param df: atmospheric pressure data 
+    :type df: pd.DataFrame
+    :param response_coefficients: response coefficients for each channel loaded from metadata
+    :type response_coefficients: dict
+    :return: pressure corrections for each channel
+    :rtype: pd.DataFrame
+    """
     logger.info(f"Calculating pressure correction")
     data_df = pd.DataFrame(index=df.index)
     for key in response_coefficients:
@@ -284,6 +366,17 @@ def calculate_pressure_correction(df: pd.DataFrame, response_coefficients: dict)
 
 
 def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
+    """Generate a linear trend correction
+
+    :param df: uncorrected data, as dataframe with datetime index and 1 channel per column
+    :type df: pd.DataFrame
+    :param trend_start: start of window to calculate trend, defaults to first_valid_index()
+    :type trend_start: datetime.datetime, optional
+    :param trend_end: end of window to calculate trend, defaults to last_valid_index()
+    :type trend_end: datetime.datetime, optional
+    :return: trend correction timeseries for each column/channel in input data
+    :rtype: pd.DataFrame
+    """
     logger.info(f"Calculating linear trend correction")
     if not trend_start:
         trend_start = df.first_valid_index()
@@ -303,6 +396,19 @@ def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
 
 
 def calculate_tide_correction(df, period, tidal_parameters, longitude):
+    """Generate tidal correction timeseries using SPOTL hartid
+
+    :param df: uncorrected data, as dataframe with datetime index and 1 channel per column
+    :type df: pd.DataFrame
+    :param period: sample period of data, must be >= 1
+    :type period: int
+    :param tidal_parameters: tidal parameters loaded from station metadata
+    :type tidal_parameters: dict
+    :param longitude: station longitude
+    :type longitude: float
+    :return: tidal correction timeseries for each column/channel in input data
+    :rtype: pd.DataFrame
+    """
     logger.info(f"Calculating tide correction")
     # check if hartid in path, or else use spotl container
     result = subprocess.run("which hartid", shell=True)
