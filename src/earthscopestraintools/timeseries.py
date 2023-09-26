@@ -28,6 +28,21 @@ def test():
 
 
 class Timeseries:
+    """
+    Class for storing strainmeter data or correction timeseries.  Each Timeseries object 
+    contains the following attributes: \n
+    - data: (pd.DataFrame) with datetime index and one or more columns of timeseries data \n
+    - quality_df: (pd.DataFrame) with same shape as data, but with a character mapped to each
+      data point.  flags include "g"=good, "m"=missing, "i"=interpolated, "b"=bad \n
+    - series: (str) description of timeseries, ie 'raw', 'microstrain', 'atmp_c', 'tide_c', 'offset_c', 'trend_c' \n
+    - units: (str) units of timeseries \n
+    - level: (str) level of data. ie. '0','1','2a','2b' \n
+    - period: (float) sample period of data \n
+    - name: (str) name of timeseries, including station name.  useful for showing stats.  
+      defaults to network.station \n
+    - network: (str) FDSN two character network code\n
+    - station: (str) FDSN four character station code
+    """
     def __init__(
         self,
         data: pd.DataFrame = None,
@@ -275,6 +290,7 @@ class Timeseries:
     def linearize(self, reference_strains: dict, gap: float, name: str = None):
         """
         Processing step to convert digital counts to microstrain based on geometry of GTSM gauges
+
         :param ts: Timeseries object, containing data to convert to microstrain
         :param reference_strains: dict, containing keys of CHX and values of reference strains
         :param gap: float, instrument gap
@@ -411,6 +427,7 @@ class Timeseries:
     ):
         """
         Processing step to convert gauge strains into areal and shear strains
+
         :param ts: Timeseries object containing gauge data in microstrain
         :param calibration_matrix: np.array containing strain matrix
         :param calibration_matrix_name: str describing which calibration matrix is used
