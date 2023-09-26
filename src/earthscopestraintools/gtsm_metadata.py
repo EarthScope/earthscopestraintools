@@ -423,9 +423,11 @@ class GtsmMetadata:
 
 def fdsn2bottlename(channel):
     """
-    convert location and channel into bottlename
-    :param channel: str
-    :return: str
+    convert FDSN channel into bottlename
+    :param channel: FDSN channel code
+    :type channel: str
+    :return: bottlename 
+    :rtype: str
     """
     codes = {
         "RS1": "CH0",
