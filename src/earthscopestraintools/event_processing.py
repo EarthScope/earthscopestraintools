@@ -21,8 +21,6 @@ def calc_hypocentral_dist(
     """
     Function calculates hypocentral distance (km) between lat,long and earthquake
 
-    Parameters
-    ----------
     :param eq_latitude: latitude of earthquake
     :type eq_latitude: float
     :param eq_longitude: longitude of earthquake
@@ -51,8 +49,6 @@ def calculate_p_s_arrival(eq_latitude,
     """
     Function calculates arrival times for P and S waves at a given lat and long
 
-    Parameters
-    ----------
     :param eq_latitude: latitude of earthquake
     :type eq_latitude: float
     :param eq_longitude: longitude of earthquake
@@ -80,6 +76,15 @@ def calculate_p_s_arrival(eq_latitude,
     return p_arrival, s_arrival
 
 def dynamic_strain(df, gauge_weights=[1, 1, 1, 1]):
+    """Calculates dynamic strain as RMS of gauge strains
+
+    :param df: dataframe containing gauge strains as columns and time as an index
+    :type df: pandas.DataFrame
+    :param gauge_weights: list of which gauges to include, defaults to [1, 1, 1, 1]
+    :type gauge_weights: list, optional
+    :return: dataframe containing a single column of dynamic strain, time as an index
+    :rtype: pandas.DataFrame
+    """
     logger.info(f"Calculating dynamic strain using gauge weights: {gauge_weights}")
     ser = np.sqrt(
         (
@@ -94,6 +99,15 @@ def dynamic_strain(df, gauge_weights=[1, 1, 1, 1]):
 
 
 def pre_event_trend_correction(df, eq_time):
+    """calculate a linear trend correction based on any data provided prior to event start time
+
+    :param df: dataframe containing strain data
+    :type df: pandas.DataFrame
+    :param eq_time: time of event 
+    :type eq_time: datetime.datetime
+    :return: dataframe containing a linear trend correction
+    :rtype: pandas.DataFrame
+    """
     df_trend_c = pd.DataFrame(data=df.index)
     df_pre = pd.DataFrame(data=df.index[df.index < eq_time])
     # print(df_pre.index)
@@ -108,6 +122,19 @@ def pre_event_trend_correction(df, eq_time):
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
 def calculate_magnitude(dynamic_strain_df, hypocentral_distance, site_term, longitude_term):
+    """Calculates a magnitude estimate based on Barbour et al 2021.
+
+    :param dynamic_strain_df: dataframe containing dynamic strain during an event
+    :type dynamic_strain_df: pandas.DataFrame
+    :param hypocentral_distance: distance from station to event hypocenter, in km
+    :type hypocentral_distance: float
+    :param site_term: site term from Barbour et al 2021
+    :type site_term: float
+    :param longitude_term: longitude term from Barbour et al 2021
+    :type longitude_term: float
+    :return: dataframe containing a dynamic strain based magnitude estimate as a function of time
+    :rtype: pandas.DataFrame
+    """
     logger.info(f"Calculating magnitude from dynamic strain using site term {site_term} "
                 f"and longitude term {longitude_term}")
     df2 = pd.DataFrame(index=dynamic_strain_df.index)
@@ -117,6 +144,7 @@ def calculate_magnitude(dynamic_strain_df, hypocentral_distance, site_term, long
                              8.52 - longitude_term - site_term
                              ) / 0.92
     return df2
+
 def plot_coseismic_offset(
     df,
     title: str = "",
@@ -132,6 +160,35 @@ def plot_coseismic_offset(
     color="black",
     save_as: str = None,
 ):
+    """plot strain data from an event 
+
+    :param df: strain data including an event signal
+    :type df: pandas.DataFrame
+    :param title: plot title, defaults to ""
+    :type title: str, optional
+    :param remove_9s: option to remove gap fill values, defaults to True
+    :type remove_9s: bool, optional
+    :param zero: option to zero the data against the first valid index, defaults to False
+    :type zero: bool, optional
+    :param detrend: option to linearly detrend data, will use pre-event data only if eq_time is provided, defaults to None
+    :type detrend: bool, optional
+    :param ymin: y-axis minimum for plot, defaults to None
+    :type ymin: float, optional
+    :param ymax: y-axis maximum for plot, defaults to None
+    :type ymax: float, optional
+    :param plot_type: matplotlib plot type. option of ['scatter','line'], defaults to "scatter"
+    :type plot_type: str, optional
+    :param units: units to display on y-axis, defaults to None
+    :type units: str, optional
+    :param eq_time: origin time of event, defaults to None
+    :type eq_time: datetime.datetime, optional
+    :param coseismic_offset: option to calculate and display the coseismic offset as a difference of the mean of the first quintile and last quintile of data, defaults to False
+    :type coseismic_offset: bool, optional
+    :param color: matplotlib color option, defaults to "black"
+    :type color: str, optional
+    :param save_as: filename to save plot, defaults to None
+    :type save_as: str, optional
+    """
     fig, axs = plt.subplots(len(df.columns), 1, figsize=(12, 10), squeeze=False)
 
     if remove_9s:
@@ -207,6 +264,21 @@ def magnitude_plot(dynamic_strain_df: pd.DataFrame,
                    eq_mag: datetime.datetime,
                    title: str=None,
                    save_as: str = None,):
+    """plot dynamic strain and associated magnitude estimate on the same plot
+
+    :param dynamic_strain_df: dataframe containing dynamic strain during an event
+    :type dynamic_strain_df: pd.DataFrame
+    :param magnitude_df: dataframe containing strain-based magnitude estimate during an event 
+    :type magnitude_df: pd.DataFrame
+    :param eq_time: event origin time
+    :type eq_time: datetime.datetime
+    :param eq_mag: published event magnitude from COMCAT 
+    :type eq_mag: datetime.datetime
+    :param title: plot title, defaults to None
+    :type title: str, optional
+    :param save_as: filename to save plot, defaults to None
+    :type save_as: str, optional
+    """
     num_colors = 4
     fig, ax = plt.subplots(figsize=(12, 3))
     colors = [cm.gnuplot(x) for x in np.linspace(0, 0.8, num_colors)]
@@ -229,6 +301,21 @@ def magnitude_plot(dynamic_strain_df: pd.DataFrame,
         plt.savefig(save_as)
 
 def get_stations_in_radius(latitude, longitude, depth, radius, print_it=False):
+    """determine list of stations within a given radius from an event, using lat/long in gtsm metadata summary table
+
+    :param latitude: event latitude
+    :type latitude: float
+    :param longitude: event longitude
+    :type longitude: float
+    :param depth: event depth
+    :type depth: float
+    :param radius: radius from event, in km
+    :type radius: float
+    :param print_it: option to print list of stations within radius, and calculated distances from event, defaults to False
+    :type print_it: bool, optional
+    :return: list of four character station codes for stations within the given radius
+    :rtype: list
+    """
     meta_df = get_metadata_df()
     station_list = []
     for station in meta_df.index:

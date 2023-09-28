@@ -97,6 +97,13 @@ class Timeseries:
         self.s3_tdb_uri = s3_tdb_uri
 
     def set_initial_quality_flags(self, missing_data=999999):
+        """used to flag any missing data
+
+        :param missing_data: value used to represent gaps, defaults to 999999
+        :type missing_data: int, optional
+        :return: dataframe of quality flags
+        :rtype: pandas.DataFrame
+        """
         qual_df = pd.DataFrame(index=self.data.index)
         for ch in self.columns:
             qual_df[ch] = "g"
@@ -106,12 +113,24 @@ class Timeseries:
         return qual_df
 
     def set_initial_level_flags(self, level):
+        """used to set level flag 
+
+        :param level: level of data ['0','1','2a','2b']
+        :type level: str, optional
+        :return: dataframe of level flags
+        :rtype: pandas.DataFrame
+        """
         level_df = pd.DataFrame(index=self.data.index)
         for ch in self.columns:
             level_df[ch] = level
         return level_df
 
     def set_initial_version(self):
+        """adds a version timestamp to each data point
+
+        :return: dataframe of version flags
+        :rtype: pandas.DataFrame
+        """
         version_df = pd.DataFrame(index=self.data.index)
         version = int(datetime.datetime.now().strftime("%Y%j%H%M%S"))
         for ch in self.columns:
@@ -119,6 +138,8 @@ class Timeseries:
         return version_df
 
     def check_for_gaps(self):
+        """generates some statistics around nans, fill values, and missing epochs.
+        """
         if self.period != 0 and self.data is not None:
             days = (self.data.index[-1] - self.data.index[0]).days
             seconds = (self.data.index[-1] - self.data.index[0]).seconds
@@ -141,6 +162,8 @@ class Timeseries:
             self.gap_percentage = None
 
     def stats(self):
+        """displays summary information describing the Timeseries object
+        """
         if len(self.data):
             outputstring = f"{self.name}\n{'':4}| Channels: {str(self.columns):40} "
             outputstring += f"\n{'':4}| TimeRange: {self.data.index[0]} - {self.data.index[-1]}        | Period: {self.period:>13}s"
@@ -166,41 +189,34 @@ class Timeseries:
             logger.info(f"{outputstring}")
 
     def show_flags(self):
+        """returns a dataframe with all flags that are not 'g'
+
+        :return: times and channels with flagged data within the timeseries
+        :rtype: pandas.DataFrame
+        """
         return self.quality_df[self.quality_df[self.quality_df != "g"].any(axis=1)]
 
     def show_flagged_data(self):
+        """returns dataframe containing any data with a flag other than 'g'
+
+        :return: data that has been flagged
+        :rtype: pandas.DataFrame
+        """
         return self.data[self.quality_df[self.quality_df != "g"].any(axis=1)]
 
-    # def stats_old(self):
-    #     if len(self.data):
-    #         outputstring = f"{self.name}\n{'':6} | Channels: {str(self.columns):40} "
-    #         outputstring += (
-    #             f"\n{'':6} | TimeRange: {self.data.index[0]} - {self.data.index[-1]} "
-    #         )
-    #         outputstring += f"\n{'':6} | Period: {self.period:9}s | Epochs: {len(self.data):10} | Gaps: {self.gap_percentage:4}% "
-    #         outputstring += f"\n{'':6} | Series: {self.series:10} | Units: {self.units:12} | Level: {self.level:4}\n"
-    #         logger.info(f"{outputstring}")
-    #
-    # def quality_stats(self):
-    #     if len(self.quality_df):
-    #         outputstring = f"{self.name}\n{'':6} | Channels: {str(self.columns):43} "
-    #         cols = len(self.quality_df.columns)
-    #         outputstring += f"\n{'':6} | Epochs: {len(self.quality_df):9}"
-    #         outputstring += f"| Good: {(self.quality_df == 'g').sum().sum() / cols:10}"
-    #         outputstring += (
-    #             f"| Missing: {(self.quality_df == 'm').sum().sum() / cols:8}"
-    #         )
-    #         outputstring += (
-    #             f"| Interpolated: {(self.quality_df == 'i').sum().sum() / cols:8}"
-    #         )
-    #
-    #         outputstring += f"\n{'':6} | Samples: {len(self.quality_df) * cols:8}"
-    #         outputstring += f"| Good: {(self.quality_df == 'g').sum().sum():10}"
-    #         outputstring += f"| Missing: {(self.quality_df == 'm').sum().sum():8}"
-    #         outputstring += f"| Interpolated: {(self.quality_df == 'i').sum().sum():8}"
-    #         logger.info(f"{outputstring}")
 
     def save_csv(self, filename: str, datadir: str = "./", sep=",", compression=None):
+        """save data attribute as csv.  flattens object, does not save quality flags, level, or version information
+
+        :param filename: name of csv file to save
+        :type filename: str
+        :param datadir: path to local directory to save file, defaults to "./"
+        :type datadir: str, optional
+        :param sep: separator to use in csv, defaults to ","
+        :type sep: str, optional
+        :param compression: compression algorthim ['infer', 'gzip', 'bz2', 'zip', 'xz', 'zstd'], defaults to None
+        :type compression: str, optional
+        """
         filepath = os.path.join(datadir, filename)
         logger.info(f"saving to {filepath}")
         if compression:
@@ -237,6 +253,19 @@ class Timeseries:
         limit_direction: str = "both",
         limit: any = None,
     ):
+        """remove 999999 gap fill values from data, options to either replace with nans or interpolate
+
+        :param interpolate: boolean of whether to interpolate across gaps using pd.DataFrame.interpolate(), defaults to False
+        :type interpolate: bool, optional
+        :param method: interpolation method from pd.DataFrame.interpolate(), defaults to "linear"
+        :type method: str, optional
+        :param limit_direction: limit direction from pd.DataFrame.interpolate(), defaults to "both"
+        :type limit_direction: str, optional
+        :param limit: limit from pd.DataFrame.interpolate(), defaults to None
+        :type limit: any, optional
+        :return: Timeseries with 999999 gap fills removed, and appropriate flags set 
+        :rtype: Timeseries
+        """
         logger.info("  Converting 999999 values to nan")
         if interpolate:
             df = self.data.replace(999999, np.nan).interpolate(
@@ -260,6 +289,20 @@ class Timeseries:
     def decimate_1s_to_300s(
         self, method: str = "linear", limit: int = 3600, name: str = None
     ):
+        """decimate 1hz data to 5 min data using \n
+        Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
+        low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99
+
+        :param method: method to interpolate across gaps, defaults to "linear"
+        :type method: str, optional
+        :param limit: largest gap to interpolate, defaults to 3600 samples
+        :type limit: int, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: Timeseries containing 300s decimated data
+        :rtype: Timeseries
+        """
+        
         data = decimate_1s_to_300s(self.data, method=method, limit=limit)
         quality_df = self.quality_df.copy().reindex(data.index)
         quality_df[quality_df.isna()] = "i"
@@ -288,13 +331,16 @@ class Timeseries:
         return ts2
 
     def linearize(self, reference_strains: dict, gap: float, name: str = None):
-        """
-        Processing step to convert digital counts to microstrain based on geometry of GTSM gauges
+        """Processing step to convert digital counts to microstrain based on geometry of GTSM gauges
 
-        :param ts: Timeseries object, containing data to convert to microstrain
-        :param reference_strains: dict, containing keys of CHX and values of reference strains
-        :param gap: float, instrument gap
-        :return: Timeseries object, in units of microstrain
+        :param reference_strains: dict containing keys of CHX and values of reference strains
+        :type reference_strains: dict
+        :param gap: instrument gap in meters
+        :type gap: float
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: Timeseries of linearized data in microstrain
+        :rtype: Timeseries
         """
 
         # remove any 999999 values in data, ok to leave as Nan rather than interpolate.
@@ -329,6 +375,30 @@ class Timeseries:
         level=None,
         series=None,
     ):
+        """Interpolate across gaps in data using pd.DataFrame.interpolate()
+
+        :param replace: gap fill value to interpolate across, defaults to 999999
+        :type replace: int, optional
+        :param method: interpolation method, defaults to "linear"
+        :type method: str, optional
+        :param limit_seconds: max gap (in seconds) to interpolate , defaults to 3600
+        :type limit_seconds: int, optional
+        :param limit_direction: ['forward', 'backward', 'both'], defaults to "both"
+        :type limit_direction: str, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :param new_index: option to manually set the index of the interpolated data, defaults to None
+        :type new_index: pd.DatetimeIndex, optional
+        :param period: sample rate of data in seconds, defaults to None
+        :type period: float, optional
+        :param level: level of data, defaults to None
+        :type level: str, optional
+        :param series: series name, defaults to None
+        :type series: str, optional
+        :return: Timeseries containing interpolated data
+        :rtype: Timeseries
+        """
+        
         if new_index is None:
             new_index = self.data.index
             period = self.period
@@ -379,6 +449,22 @@ class Timeseries:
         series: str = "",
         name: str = None,
     ):
+        """Apply a butterworth filter to a DataFrame using scipy.signal.butter()
+
+        :param filter_type: {'lowpass', 'highpass', 'bandpass', 'bandstop'}
+        :type filter_type: str
+        :param filter_order: the order of the filter
+        :type filter_order: int
+        :param filter_cutoff_s: the filter cutoff in seconds
+        :type filter_cutoff_s: float
+        :param series: series name, defaults to ""
+        :type series: str, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: Timeseries containing filtered data
+        :rtype: Timeseries
+        """
+
         df2 = butterworth_filter(
             df=self.data,
             period=self.period,
@@ -404,6 +490,17 @@ class Timeseries:
         cutoff_percentile: float = 0.75,
         name: str = None,
     ):
+        """Calculate offsets using first differencing method (add more details).  
+
+        :param limit_multiplier: _description_, defaults to 10
+        :type limit_multiplier: int, optional
+        :param cutoff_percentile: _description_, defaults to 0.75
+        :type cutoff_percentile: float, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: _description_
+        :rtype: _type_
+        """
         data = calculate_offsets(self.data, limit_multiplier, cutoff_percentile)
         if not name:
             name = f"{self.name}.offset_c"
@@ -425,13 +522,18 @@ class Timeseries:
         use_channels: list = [1, 1, 1, 1],
         name: str = None,
     ):
-        """
-        Processing step to convert gauge strains into areal and shear strains
+        """Applies a calibration matrix to convert 4 gauges into areal, differential, and shear strains
 
-        :param ts: Timeseries object containing gauge data in microstrain
-        :param calibration_matrix: np.array containing strain matrix
-        :param calibration_matrix_name: str describing which calibration matrix is used
-        :return: Timeseries object, in units of microstrain
+        :param calibration_matrix: calibration matrix 
+        :type calibration_matrix: np.array
+        :param calibration_matrix_name:  name of calibration matrix used, defaults to None
+        :type calibration_matrix_name: str, optional
+        :param use_channels: not yet implemented, set to 0 to ignore a bad channel, defaults to [1, 1, 1, 1]
+        :type use_channels: list, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: areal, differential, and shear strains based on the given calibration
+        :rtype: Timeseries
         """
         # calculate areal and shear strains from gauge strains
         # todo: implement UseChannels to arbitrary matrices
@@ -460,6 +562,15 @@ class Timeseries:
     def calculate_pressure_correction(
         self, response_coefficients: dict, name: str = None
     ):
+        """Generate a pressure correction timeseries from pressure data and response coefficients
+
+        :param response_coefficients: response coefficients for each channel loaded from metadata
+        :type response_coefficients: dict
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: pressure corrections for each channel
+        :rtype: Timeseries
+        """
         data = calculate_pressure_correction(self.data, response_coefficients)
         quality_df = pd.DataFrame(index=data.index)
         for key in response_coefficients:
@@ -480,6 +591,17 @@ class Timeseries:
     def calculate_tide_correction(
         self, tidal_parameters: dict, longitude: float, name: str = None
     ):
+        """Generate tidal correction timeseries using SPOTL hartid
+
+        :param tidal_parameters: tidal parameters loaded from station metadata
+        :type tidal_parameters: dict
+        :param longitude: station longitude
+        :type longitude: float
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: tidal correction Timeseries calculated for each column/channel in input data
+        :rtype: Timeseries
+        """
         data = calculate_tide_correction(
             self.data, self.period, tidal_parameters, longitude
         )
@@ -498,6 +620,17 @@ class Timeseries:
     def linear_trend_correction(
         self, trend_start=None, trend_end=None, name: str = None
     ):
+        """Generate a linear trend correction
+
+        :param trend_start: start of window to calculate trend, defaults to first_valid_index()
+        :type trend_start: datetime.datetime, optional
+        :param trend_end: end of window to calculate trend, defaults to last_valid_index()
+        :type trend_end: datetime.datetime, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: trend correction timeseries for each column/channel in input data
+        :rtype: Timeseries
+        """
         data = calculate_linear_trend_correction(self.data, trend_start, trend_end)
         if not name:
             name = f"{self.name}.trend_c"
@@ -512,6 +645,15 @@ class Timeseries:
         return ts
 
     def apply_corrections(self, corrections: list = [], name: str = None):
+        """applies one or more corrections to a Timeseries and returns the corrected Timeseries
+
+        :param corrections: List of correction Timeseries to apply, defaults to []
+        :type corrections: list, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: corrected Timeseries
+        :rtype: Timeseries
+        """
         logger.info(f"Applying corrections")
         if len(corrections):
             data = self.data.copy()
@@ -536,6 +678,17 @@ class Timeseries:
         series="dynamic",
         name=None,
     ):
+        """calculates dynamic strain for a given Timeseries as RMS of gauge strains
+
+        :param gauge_weights: list of which channels to use, defaults to [1, 1, 1, 1]
+        :type gauge_weights: list, optional
+        :param series: series name, defaults to "dynamic"
+        :type series: str, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: calculated dynamic strain as a Timeseries object
+        :rtype: Timeseries
+        """
         df2 = dynamic_strain(self.data, gauge_weights)
         quality_df = pd.DataFrame(index=self.data.index)
         quality_df["dynamic"] = "g"
@@ -560,6 +713,18 @@ class Timeseries:
         longitude_term=0,
         name: str = None,
     ):
+        """Calculates a magnitude estimate based on Barbour et al 2021.
+        :param hypocentral_distance: distance from station to event hypocenter, in km
+        :type hypocentral_distance: float
+        :param site_term: site term from Barbour et al 2021, defaults to 0
+        :type site_term: float, optional
+        :param longitude_term: longitude term from Barbour et al 2021, defaults to 0
+        :type longitude_term: int, optional
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: Timeseries containing a dynamic strain based magnitude estimate as a function of time
+        :rtype: Timeseries
+        """
         data = calculate_magnitude(
             self.data, hypocentral_distance, site_term, longitude_term
         )
@@ -589,6 +754,31 @@ class Timeseries:
         rainfall=None,
         save_as: str = None,
     ):
+        """Generic plotting function for Timeseries data
+
+        :param title: plot title, defaults to None
+        :type title: str, optional
+        :param remove_9s: option to remove gap fill values, defaults to False
+        :type remove_9s: bool, optional
+        :param zero: option to zero against first_valid_index(), defaults to False
+        :type zero: bool, optional
+        :param detrend: signal.detrend type, only 'linear' implented currently, defaults to None
+        :type detrend: str, optional
+        :param ymin: y-axis minimum for plot, defaults to None
+        :type ymin: float, optional
+        :param ymax: y-axis maximum for plot, defaults to None
+        :type ymax: float, optional
+        :param type: matplotlib plot type. option of ['scatter','line'], defaults to "line"
+        :type type: str, optional
+        :param show_quality_flags: option to highlight missing data flags, defaults to False
+        :type show_quality_flags: bool, optional
+        :param atmp: optional Timeseries containing atmospheric pressure data to be plotted in an extra subplot, defaults to None
+        :type atmp: Timeseries, optional
+        :param rainfall: optional Timeseries containing rainfall data to be plotted in an extra subplot.  will also plot cumsum of rainfall during time window. defaults to None
+        :type rainfall: Timeseries, optional
+        :param save_as: filename to save as, defaults to None
+        :type save_as: str, optional
+        """
         num_plots = len(self.columns)
         num_colors = 1
         if atmp is not None:
@@ -711,6 +901,26 @@ def plot_timeseries_comparison(
     type: str = "line",
     save_as: str = None,
 ):
+    """plot multiple Timeseries in the same plot to compare values.
+       useful for viewing uncorrected vs corrected data
+
+    :param timeseries: list of Timeseries to plot, defaults to []
+    :type timeseries: list, optional
+    :param title: plot title, defaults to None
+    :type title: str, optional
+    :param names: list of names to use in legend, defaults to []
+    :type names: list, optional
+    :param remove_9s: option to remove gap fill values, defaults to False
+    :type remove_9s: bool, optional
+    :param zero: option to zero against first_valid_index(), defaults to False
+    :type zero: bool, optional
+    :param detrend: signal.detrend type, only 'linear' implented currently, defaults to None
+    :type detrend: str, optional
+    :param type: matplotlib plot type. option of ['scatter','line'], defaults to "line"
+    :type type: str, optional
+    :param save_as: filename to save as, defaults to None
+    :type save_as: str, optional
+    """
     if not isinstance(timeseries, list):
         timeseries = [timeseries]
     colors = [cm.gnuplot(x) for x in np.linspace(0, 0.8, len(timeseries))]

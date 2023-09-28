@@ -81,7 +81,7 @@ def save_mseed_file(
 ):
     """Load miniseed data from fdsnws-dataselect into obspy, and save as miniseed.
 
-     :param net: FDSN 2 character network code, accepts wildcards
+    :param net: FDSN 2 character network code, accepts wildcards
     :type net: str
     :param sta: FDSN 4 character station code, accepts wildcards
     :type sta: str
