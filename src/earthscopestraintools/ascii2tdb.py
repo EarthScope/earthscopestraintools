@@ -8,7 +8,7 @@ import sys, os
 import shutil
 
 # from edid import find_station_edid
-from earthscopestraintools.edid import get_station_edid
+#from earthscopestraintools.datasources_api_interact import get_station_edid
 import json
 from io import BytesIO
 import requests

@@ -6,10 +6,11 @@ import json
 import logging
 from typing import Union
 from earthscopestraintools.timeseries import Timeseries
-from earthscopestraintools.edid import get_station_edid, get_session_edid
+from earthscopestraintools.datasources_api_interact import get_session_edid
 
 logger = logging.getLogger(__name__)
 
+DATASOURCES_API_URL = "https://datasources-api.prod.earthscope.org"
 
 def str_to_unix_ms(time_string: str):
     # convert string into unix ms
@@ -878,6 +879,9 @@ def lookup_s3_uri(network, station, period):
         session = "Hour"
     elif period == 0.05:
         session = "Min"
-    edid = get_session_edid(network, station, session)
+    edid = get_session_edid(api_url=DATASOURCES_API_URL, 
+                            namespace="BNUM", 
+                            station=station, 
+                            session=session)
     uri = f"s3://{bucket}/{edid}.tdb"
     return uri
