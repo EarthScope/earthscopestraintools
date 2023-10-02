@@ -6,7 +6,7 @@ import urllib.request as request
 # from obspy.clients.fdsn import Client
 from importlib.resources import files
 from datetime import datetime
-from earthscopestraintools.edid import get_network_name
+from earthscopestraintools.datasources_api_interact import lookup_fdsn_network_from_bnum
 import requests
 
 # inv_client = Client("IRIS")
@@ -569,7 +569,8 @@ def get_fdsn_network(station):
     :rtype: string
     """
     try:
-        return get_network_name(station)
+        DATASOURCES_API_URL = "https://datasources-api.prod.earthscope.org"
+        return lookup_fdsn_network_from_bnum(DATASOURCES_API_URL,station)
     except requests.exceptions.ConnectionError:
         logger.error(
             "Error: Unable to connect to datasources-api to lookup FDSN network code"

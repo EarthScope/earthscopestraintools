@@ -9,12 +9,13 @@ import os
 import json
 import datetime
 from earthscopestraintools.tiledbtools import ProcessedStrainReader
-from earthscopestraintools.edid import get_station_edid
+from earthscopestraintools.datasources_api_interact import get_station_edid
 
 # from earthscopestraintools.straintiledbarray import StrainTiledbArray
 # from edid import get_station_edid
 
 import logging
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 workdir = "arrays"
 outputdir = "ascii_output"
-
+DATASOURCES_API_URL = "https://datasources-api.prod.earthscope.org"
 
 def to_date(datetime64):
     ts = pd.to_datetime(str(datetime64))
@@ -34,7 +35,7 @@ def to_date(datetime64):
 
 
 def read_date_range(network, station, start_str, end_str):
-    edid = get_station_edid(network, station)
+    edid = get_station_edid(api_url=DATASOURCES_API_URL, namespace="BNUM", station=station)
     uri = f"{workdir}/{edid}_level2.tdb"
     logger.info(f"Array uri: {uri}")
     reader = ProcessedStrainReader(uri)
