@@ -17,7 +17,7 @@ Submodules
    earthscopestraintools.bottle2mseed
    earthscopestraintools.bottle2tdb
    earthscopestraintools.bottletar
-   earthscopestraintools.edid
+   earthscopestraintools.datasources_api_interact
    earthscopestraintools.event
    earthscopestraintools.event_processing
    earthscopestraintools.gtsm_metadata
