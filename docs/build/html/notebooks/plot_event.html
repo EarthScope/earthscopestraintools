@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example of looking at high rate event data from a strainmeter &mdash; Earthscope Strain Tools 1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API documentation" href="../api.html" />
+    <link rel="prev" title="Example of running level 2 processing steps" href="level2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Earthscope Strain Tools
+              <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.1.20
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example of looking at high rate event data from a strainmeter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Load-event-data-based-on-USGS-event_id">Load event data based on USGS event_id</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Load-raw-strain-data">Load raw strain data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Convert-counts-to-microstrain">Convert counts to microstrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Interpolate-and-high-pass-filter-(1000s-cutoff)">Interpolate and high pass filter (1000s cutoff)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Calculate-dynamic-strain-and-estimated-magnitude-using-Barbour-et-al-2021">Calculate dynamic strain and estimated magnitude using Barbour et al 2021</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Plot-any-co-seismic-offsets-in-regional-strains">Plot any co-seismic offsets in regional strains</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Earthscope Strain Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Example of looking at high rate event data from a strainmeter</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/notebooks/plot_event.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Example-of-looking-at-high-rate-event-data-from-a-strainmeter">
+<h1>Example of looking at high rate event data from a strainmeter<a class="headerlink" href="#Example-of-looking-at-high-rate-event-data-from-a-strainmeter" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">earthscopestraintools.mseed_tools</span> <span class="kn">import</span> <span class="n">ts_from_mseed</span>
+<span class="kn">from</span> <span class="nn">earthscopestraintools.gtsm_metadata</span> <span class="kn">import</span> <span class="n">GtsmMetadata</span>
+<span class="kn">from</span> <span class="nn">earthscopestraintools.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
+<span class="kn">from</span> <span class="nn">earthscopestraintools.event</span> <span class="kn">import</span> <span class="n">Earthquake</span>
+<span class="kn">from</span> <span class="nn">earthscopestraintools.event_processing</span> <span class="kn">import</span> <span class="n">calc_hypocentral_dist</span><span class="p">,</span> <span class="n">magnitude_plot</span><span class="p">,</span> <span class="n">plot_coseismic_offset</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;IV&#39;</span>
+<span class="n">station</span> <span class="o">=</span> <span class="s1">&#39;TSM3&#39;</span>
+<span class="n">meta</span> <span class="o">=</span> <span class="n">GtsmMetadata</span><span class="p">(</span><span class="n">network</span><span class="p">,</span><span class="n">station</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Load-event-data-based-on-USGS-event_id">
+<h2>Load event data based on USGS event_id<a class="headerlink" href="#Load-event-data-based-on-USGS-event_id" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eq</span> <span class="o">=</span> <span class="n">Earthquake</span><span class="p">(</span><span class="n">event_id</span> <span class="o">=</span> <span class="s2">&quot;us7000jiky&quot;</span><span class="p">)</span>
+<span class="n">hypocentral_distance</span> <span class="o">=</span> <span class="n">calc_hypocentral_dist</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span>
+                                                 <span class="n">eq</span><span class="o">.</span><span class="n">long</span><span class="p">,</span>
+                                                 <span class="n">eq</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
+                                                 <span class="n">meta</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+                                                 <span class="n">meta</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;USGS Magnitude </span><span class="si">{</span><span class="n">eq</span><span class="o">.</span><span class="n">mag</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">hypocentral_distance</span><span class="si">}</span><span class="s2"> km at </span><span class="si">{</span><span class="n">eq</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">meta</span><span class="o">.</span><span class="n">get_event_terms</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+USGS Magnitude 4.5 at 15 km at 2023-03-09 19:08:07.123000+00:00
+</pre></div></div>
+</div>
+</section>
+<section id="Load-raw-strain-data">
+<h2>Load raw strain data<a class="headerlink" href="#Load-raw-strain-data" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">time</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">15</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S&quot;</span><span class="p">)</span>
+<span class="n">strain_raw</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;T0&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;BS*&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+<span class="n">strain_raw</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+<span class="n">strain_raw</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Loading T0 BS* from 2023-03-09T19:07:52 to 2023-03-09T19:09:07 from Earthscope DMC miniseed
+    Trace 1. 2023-03-09T19:07:52.000000Z:2023-03-09T19:09:07.000000Z mapping BS1 to CH0
+    Trace 2. 2023-03-09T19:07:52.000000Z:2023-03-09T19:09:07.000000Z mapping BS2 to CH1
+    Trace 3. 2023-03-09T19:07:52.000000Z:2023-03-09T19:09:07.000000Z mapping BS3 to CH2
+    Trace 4. 2023-03-09T19:07:52.000000Z:2023-03-09T19:09:07.000000Z mapping BS4 to CH3
+    Found 0 epochs with nans, 17.75 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 1.18%
+Converting missing data from 999999 to nan
+  Converting 999999 values to nan
+    Found 17 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 1.13%
+IV.TSM3.T0.BS*
+    | Channels: [&#39;CH0&#39;, &#39;CH1&#39;, &#39;CH2&#39;, &#39;CH3&#39;]
+    | TimeRange: 2023-03-09 19:07:52 - 2023-03-09 19:09:07        | Period:          0.05s
+    | Series:         raw| Units:        counts| Level:          0| Gaps:            1.13%
+    | Epochs:        1501| Good:        1483.25| Missing:    17.75| Interpolated:      0.0
+    | Samples:       6004| Good:           5933| Missing:       71| Interpolated:        0
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_plot_event_6_1.png" src="../_images/notebooks_plot_event_6_1.png" />
+</div>
+</div>
+</section>
+<section id="Convert-counts-to-microstrain">
+<h2>Convert counts to microstrain<a class="headerlink" href="#Convert-counts-to-microstrain" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gauge_microstrain</span> <span class="o">=</span> <span class="n">strain_raw</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">reference_strains</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">reference_strains</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">gap</span><span class="p">)</span>
+<span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Converting raw counts to microstrain
+    Found 17 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 1.13%
+IV.TSM3.T0.BS*.linearized
+    | Channels: [&#39;CH0&#39;, &#39;CH1&#39;, &#39;CH2&#39;, &#39;CH3&#39;]
+    | TimeRange: 2023-03-09 19:07:52 - 2023-03-09 19:09:07        | Period:          0.05s
+    | Series: microstrain| Units:   microstrain| Level:          1| Gaps:            1.13%
+    | Epochs:        1501| Good:        1483.25| Missing:    17.75| Interpolated:      0.0
+    | Samples:       6004| Good:           5933| Missing:       71| Interpolated:        0
+</pre></div></div>
+</div>
+</section>
+<section id="Interpolate-and-high-pass-filter-(1000s-cutoff)">
+<h2>Interpolate and high pass filter (1000s cutoff)<a class="headerlink" href="#Interpolate-and-high-pass-filter-(1000s-cutoff)" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gauge_microstrain_interpolated</span> <span class="o">=</span> <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">limit_seconds</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<span class="n">gauge_microstrain_interpolated</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+<span class="c1">#ts3.plot(type=&#39;line&#39;)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Interpolating data using method=linear and limit=72000
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+IV.TSM3.T0.BS*.linearized.interpolated
+    | Channels: [&#39;CH0&#39;, &#39;CH1&#39;, &#39;CH2&#39;, &#39;CH3&#39;]
+    | TimeRange: 2023-03-09 19:07:52 - 2023-03-09 19:09:07        | Period:          0.05s
+    | Series: microstrain| Units:   microstrain| Level:          1| Gaps:             0.0%
+    | Epochs:        1501| Good:        1483.25| Missing:      0.0| Interpolated:    17.75
+    | Samples:       6004| Good:           5933| Missing:        0| Interpolated:       71
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gauge_microstrain_filtered</span> <span class="o">=</span> <span class="n">gauge_microstrain_interpolated</span><span class="o">.</span><span class="n">butterworth_filter</span><span class="p">(</span><span class="n">filter_type</span><span class="o">=</span><span class="s1">&#39;high&#39;</span><span class="p">,</span> <span class="n">filter_order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">filter_cutoff_s</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">gauge_microstrain_filtered</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+<span class="n">gauge_microstrain_filtered</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Applying Butterworth Filter
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+IV.TSM3.T0.BS*.linearized.interpolated.filtered
+    | Channels: [&#39;CH0&#39;, &#39;CH1&#39;, &#39;CH2&#39;, &#39;CH3&#39;]
+    | TimeRange: 2023-03-09 19:07:52 - 2023-03-09 19:09:07        | Period:          0.05s
+    | Series:            | Units:   microstrain| Level:          1| Gaps:             0.0%
+    | Epochs:        1501| Good:        1483.25| Missing:      0.0| Interpolated:    17.75
+    | Samples:       6004| Good:           5933| Missing:        0| Interpolated:       71
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_plot_event_11_1.png" src="../_images/notebooks_plot_event_11_1.png" />
+</div>
+</div>
+</section>
+<section id="Calculate-dynamic-strain-and-estimated-magnitude-using-Barbour-et-al-2021">
+<h2>Calculate dynamic strain and estimated magnitude using Barbour et al 2021<a class="headerlink" href="#Calculate-dynamic-strain-and-estimated-magnitude-using-Barbour-et-al-2021" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dynamic_strain</span> <span class="o">=</span> <span class="n">gauge_microstrain_filtered</span><span class="o">.</span><span class="n">dynamic_strain</span><span class="p">()</span>
+<span class="n">dynamic_strain</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+<span class="n">dynamic_strain</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Calculating dynamic strain using gauge weights: [1, 1, 1, 1]
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+IV.TSM3.T0.BS*.linearized.interpolated.filtered.dynamic
+    | Channels: [&#39;dynamic&#39;]
+    | TimeRange: 2023-03-09 19:07:52 - 2023-03-09 19:09:07        | Period:          0.05s
+    | Series:     dynamic| Units:   microstrain| Level:          1| Gaps:             0.0%
+    | Epochs:        1501| Good:         1435.0| Missing:      0.0| Interpolated:     66.0
+    | Samples:       1501| Good:           1435| Missing:        0| Interpolated:       66
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_plot_event_13_1.png" src="../_images/notebooks_plot_event_13_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">estimated_magnitude</span> <span class="o">=</span> <span class="n">dynamic_strain</span><span class="o">.</span><span class="n">calculate_magnitude</span><span class="p">(</span><span class="n">hypocentral_distance</span><span class="p">,</span> <span class="n">meta</span><span class="o">.</span><span class="n">site_term</span><span class="p">,</span> <span class="n">meta</span><span class="o">.</span><span class="n">longitude_term</span><span class="p">)</span>
+<span class="n">estimated_magnitude</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Calculating magnitude from dynamic strain using site term 0 and longitude term 0
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_plot_event_14_1.png" src="../_images/notebooks_plot_event_14_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">hypocentral_distance</span><span class="si">}</span><span class="s2"> km from </span><span class="si">{</span><span class="n">eq</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">magnitude_plot</span><span class="p">(</span><span class="n">dynamic_strain_df</span><span class="o">=</span><span class="n">dynamic_strain</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+               <span class="n">magnitude_df</span><span class="o">=</span><span class="n">estimated_magnitude</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+               <span class="n">eq_time</span><span class="o">=</span><span class="n">eq</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+               <span class="n">eq_mag</span><span class="o">=</span><span class="n">eq</span><span class="o">.</span><span class="n">mag</span><span class="p">,</span>
+               <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_plot_event_15_0.png" src="../_images/notebooks_plot_event_15_0.png" />
+</div>
+</div>
+</section>
+<section id="Plot-any-co-seismic-offsets-in-regional-strains">
+<h2>Plot any co-seismic offsets in regional strains<a class="headerlink" href="#Plot-any-co-seismic-offsets-in-regional-strains" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">regional_microstrain</span> <span class="o">=</span> <span class="n">gauge_microstrain_filtered</span><span class="o">.</span><span class="n">apply_calibration_matrix</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">strain_matrices</span><span class="p">[</span><span class="s1">&#39;lab&#39;</span><span class="p">])</span>
+<span class="n">regional_microstrain</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Applying None matrix: [[ 0.2962963   0.51851852  0.2962963   0.22222222]
+ [ 0.16507151  0.30039401 -0.28522912 -0.1802364 ]
+ [-0.35550881  0.21665099  0.26884841 -0.12999059]]
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_plot_event_17_1.png" src="../_images/notebooks_plot_event_17_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_coseismic_offset</span><span class="p">(</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">regional_microstrain</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">plot_type</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">,</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;microstrain&#39;</span><span class="p">,</span>
+    <span class="n">eq_time</span><span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+    <span class="n">coseismic_offset</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_plot_event_18_0.png" src="../_images/notebooks_plot_event_18_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="level2.html" class="btn btn-neutral float-left" title="Example of running level 2 processing steps" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Earthscope Consortium.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -36,7 +36,7 @@
               <img src="_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.19c
+                0.1.20
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 </ul>
 
@@ -94,14 +95,17 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/level2.html">Example of running level 2 processing steps</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Download-1hz-counts,-downsample-to-300s-and-convert-to-microstrain">Download 1hz counts, downsample to 300s and convert to microstrain</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Trend-correction">Trend correction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Tidal-correction">Tidal correction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Pressure-correction">Pressure correction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Offset-correction">Offset correction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Plot-corrections">Plot corrections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Convert-to-regional-strain,-apply-corrections">Convert to regional strain, apply corrections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Plot-corrected-data-against-rainfall-data">Plot corrected data against rainfall data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Acquire,-decimate,-convert-the-data-from-raw">Acquire, decimate, convert the data from raw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Corrections">Corrections</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/plot_event.html#Load-event-data-based-on-USGS-event_id">Load event data based on USGS event_id</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/plot_event.html#Load-raw-strain-data">Load raw strain data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/plot_event.html#Convert-counts-to-microstrain">Convert counts to microstrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/plot_event.html#Interpolate-and-high-pass-filter-(1000s-cutoff)">Interpolate and high pass filter (1000s cutoff)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/plot_event.html#Calculate-dynamic-strain-and-estimated-magnitude-using-Barbour-et-al-2021">Calculate dynamic strain and estimated magnitude using Barbour et al 2021</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/plot_event.html#Plot-any-co-seismic-offsets-in-regional-strains">Plot any co-seismic offsets in regional strains</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
@@ -111,6 +115,7 @@
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>

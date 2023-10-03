@@ -37,7 +37,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.19c
+                0.1.20
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="earthscopestraintools.html">earthscopestraintools package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="earthscopestraintools.html#submodules">Submodules</a><ul class="current">
@@ -60,7 +61,7 @@
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">earthscopestraintools.gtsm_metadata module</a></li>
@@ -79,6 +80,7 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
@@ -150,112 +152,280 @@
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.gtsm_metadata.</span></span><span class="sig-name descname"><span class="pre">GtsmMetadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gauge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for loading and storing GTSM processing metadata for a given station.  Metadata sources include
+a summary table</p>
+<p><a class="reference external" href="https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt">https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt</a></p>
+<p>and individual station pages ie</p>
+<p><a class="reference external" href="http://bsm.unavco.org/bsm/level2/B001/B001.README.txt">http://bsm.unavco.org/bsm/level2/B001/B001.README.txt</a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_atmp_response">
 <span class="sig-name descname"><span class="pre">get_atmp_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_atmp_response" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Parse atmospheric pressure response from station processing metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>atmospheric response coefficients</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_ch_prelim_strain_matrix">
 <span class="sig-name descname"><span class="pre">get_ch_prelim_strain_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_ch_prelim_strain_matrix" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse CH preliminary strain matrix from station metadata if available.
+Calibrations of TABOO-STAR stations performed by Cassie Hanagan in 2022.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CH_PRELIM calibration matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_elevation">
 <span class="sig-name descname"><span class="pre">get_elevation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_elevation" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse elevation from metadata table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>station elevation</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_er2010_strain_matrix">
 <span class="sig-name descname"><span class="pre">get_er2010_strain_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_er2010_strain_matrix" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse ER2010 strain matrix from station metadata if available.  From
+Roeloffs, E. (2010), Tidal calibration of Plate Boundary Observatory borehole strainmeters:
+Roles of vertical and shear coupling , J. Geophys. Res., 115, B06405, doi:10.1029/2009JB006407</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ER2010 calibration matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_event_terms">
 <span class="sig-name descname"><span class="pre">get_event_terms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_event_terms" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Loads site and longitude terms for a particular strainmeter using Barbour et al 2021.
+These terms are used for event magnitude estimation.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_gap">
 <span class="sig-name descname"><span class="pre">get_gap</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_gap" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse instrument gap from metadata table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>station instument gap in meters</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_lab_strain_matrix">
 <span class="sig-name descname"><span class="pre">get_lab_strain_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_lab_strain_matrix" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse lab strain matrix from station metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>lab calibration matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_latitude">
 <span class="sig-name descname"><span class="pre">get_latitude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_latitude" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse latitude from metadata table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>station latitude</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_longitude">
 <span class="sig-name descname"><span class="pre">get_longitude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_longitude" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse longitude from metadata table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>station longitude</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_meta_table">
 <span class="sig-name descname"><span class="pre">get_meta_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_meta_table" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>loads summary metadata table into dataframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>basic metadata for all strainmeter stations</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_orientation">
 <span class="sig-name descname"><span class="pre">get_orientation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_orientation" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse instrument orientation from metadata table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>orientation of CH0 in degrees East of North</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_reference_strains">
 <span class="sig-name descname"><span class="pre">get_reference_strains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_reference_strains" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Parse reference strains from metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reference strains</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_start_date">
 <span class="sig-name descname"><span class="pre">get_start_date</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_start_date" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>parse data start date from metadata table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>start date</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>datetime.datetime</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.get_tidal_params">
 <span class="sig-name descname"><span class="pre">get_tidal_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_tidal_params" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Parse tidal params from station processing metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tidal coefficients</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.load_site_terms">
 <span class="sig-name descname"><span class="pre">load_site_terms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.load_site_terms" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Read site terms from file</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.make_weighted_strain_matrix">
 <span class="sig-name descname"><span class="pre">make_weighted_strain_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gauge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.make_weighted_strain_matrix" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>calculates lab strain matrix, and allows exclusion of a single gauge</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gauge_weights</strong> (<em>list</em><em>, </em><em>optional</em>) – which gauges to use, set to 0 to exclude one gauge, defaults to [1, 1, 1, 1]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>lab calibration matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.GtsmMetadata.show">
 <span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.GtsmMetadata.show" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>print metadata</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.fdsn2bottlename">
 <span class="sig-prename descclassname"><span class="pre">earthscopestraintools.gtsm_metadata.</span></span><span class="sig-name descname"><span class="pre">fdsn2bottlename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.fdsn2bottlename" title="Link to this definition"></a></dt>
-<dd><p>convert location and channel into bottlename
-:param channel: str
-:return: str</p>
+<dd><p>convert FDSN channel into bottlename</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>channel</strong> (<em>str</em>) – FDSN channel code</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>bottlename</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.get_fdsn_network">
 <span class="sig-prename descclassname"><span class="pre">earthscopestraintools.gtsm_metadata.</span></span><span class="sig-name descname"><span class="pre">get_fdsn_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.get_fdsn_network" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get FDSN network name from station fourcharid using es-datasources-api</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>station</strong> (<em>string</em>) – station four character id</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2 char FDSN network code for station</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="earthscopestraintools.gtsm_metadata.get_metadata_df">
 <span class="sig-prename descclassname"><span class="pre">earthscopestraintools.gtsm_metadata.</span></span><span class="sig-name descname"><span class="pre">get_metadata_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.gtsm_metadata.get_metadata_df" title="Link to this definition"></a></dt>
 <dd><p>Function loads strainmeter metadata into pandas dataframe</p>
-<p>:param :
-:type : return: metadata: pandas DataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bsm metadata</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
