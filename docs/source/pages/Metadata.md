@@ -2,13 +2,9 @@
 
 This library currently supports one type of strainmeter, the Gladwin Tensor Strainmeter (GTSM).  We have implemented a class and methods to load and store the metadata associated with these instruments.
 ## earthscopestraintools.gtsm_metadata.GtsmMetadata
-Class for loading and storing GTSM processing metadata for a given station. Metadata sources include a summary table containing basic information about all stations
+Class for loading and storing GTSM processing metadata for a given station. Metadata sources include a [summary table](https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt) containing basic information about all stations and [individual pages](http://bsm.unavco.org/bsm/level2/B001/B001.README.txt) with station specific processing parameters such as pressure response coefficients, tidal constituents, and calibration matricies. 
 
-https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt
 
-and individual pages with station specific processing parameters (pressure response coefficients, tidal constituents, and calibration matricies)  i.e.
-
-http://bsm.unavco.org/bsm/level2/B001/B001.README.txt
 
 A station metadata object will contain the following attributes:
 | Attributes |  |
@@ -32,7 +28,8 @@ Example usage:
 from earthscopestraintools.gtsm_metadata import GtsmMetadata
 meta = GtsmMetadata(network='PB',station='B004')
 meta.show()
-
+```
+```
 network: PB
 station: B004
 latitude: 48.20193

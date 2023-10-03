@@ -25,31 +25,30 @@ New DataFrames are created during each processing step.  Calculated corrections 
 
 ## On Disk
 
-#### CSV
+### CSV
 DataFrames can be saved to CSV (with optional compression), and that functionality is supported by the software. 
 
 However, it is often desireable to store more than just the data itself, for example discription of the specific data, or quality flags allow keeping track of any data that is known to be bad or missing or interpolated.  We also may want to be able to version the data. Therefore, we have been developing a three dimensional array structure using TileDB to store processed strain data, as well as a python Class earthscopestraintools.timeseries.Timeseries to handle
 
-#### TileDB arrays
+### TileDB arrays
    
 
-Processed data will be stored with a Tiledb array per station, and indexed along the following three dimensions.
+Processed data will be stored with a Tiledb array per station, and indexed along the following three dimensions.  Implementation of this is still under development, but the schema has been defined as follows.
 
-- data_type: variable length string. defines channel (i.e. 'CH0') or strain (i.e. 'Eee-Enn').  may also describe the calibration matrix used (i.e. 'Eee+Enn.ER2010') if choosing a calibration other than the default 'lab'
-
-- timeseries: variable length string. used to define whether the data is a measurement or a correction.  Options include ['counts', 'microstrain', 'offset_c', 'tide_c', 'trend_c', 'atmp_c']
-
-- time: int64 unix milliseconds since 1970.
+| Dimensions | |
+| --- | --- |
+| data_type | variable length string. defines channel (i.e. 'CH0') or strain (i.e. 'Eee-Enn').  may also describe the calibration matrix used (i.e. 'Eee+Enn.ER2010') if choosing a calibration other than the default 'lab' |
+| timeseries | variable length string. used to define whether the data is a measurement or a correction.  Options include ['counts', 'microstrain', 'offset_c', 'tide_c', 'trend_c', 'atmp_c'] |
+| time | int64 unix milliseconds since 1970. |
 
 Each cell in the multi-dimensional array will also have four attributes.
 
-- data: the actual data value, stored as float64
-
-- quality: single character quality flag (i.e. 'g'=good, 'b'=bad, 'm'=missing, 'i'=interpolated)
-
-- level: one/two character level flag (i.e. '0','1','2a','2b'). 
-
-- version: versioning is intended to be used to identify processing metadata which may change with time.  not yet well implemented.
+| Attributes | |
+| --- | --- |
+| data | (float64) the actual data value |
+| quality | (char) single character quality flag (i.e. 'g'=good, 'b'=bad, 'm'=missing, 'i'=interpolated) |
+| level | (str) one/two character level flag (i.e. '0','1','2a','2b') |
+| version | versioning is intended to be used to identify processing metadata which may change with time.  not yet well implemented. |
 
 
 ## Timeseries Objects
@@ -103,6 +102,8 @@ decimated_counts = strain_raw.decimate_1s_to_300s()
 They also contain a built-in method stats() which displays a summary of the Timeseries object, including information on missing/interpolated data.  An Epoch is defined as a single row in the data, while a Sample is an individual value.
 ```
 strain_raw.stats()
+```
+```
 PB.B004.T0.LS*
     | Channels: ['CH0', 'CH1', 'CH2', 'CH3']
     | TimeRange: 2023-01-01 00:00:00 - 2023-02-01 00:00:00        | Period:             1s
