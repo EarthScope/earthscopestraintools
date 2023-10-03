@@ -11,11 +11,12 @@ earthscopestraintools can be installed with
 > pip install earthscopestraintools
 
 Or with optional dependencies:
+```
+pip install 'earthscopestraintools[mseed]'
+pip install 'earthscopestraintools[tiledb]'
+pip install 'earthscopestraintools[mseed,tiledb]'
+```
 
-> pip install 'earthscopestraintools[mseed]'
-> 
-> pip install 'earthscopestraintools[tiledb]'
-> 
-> pip install 'earthscopestraintools[mseed,tiledb]'
+It is currently recommendeed to install the mseed optional dependencies, which includes obspy and some tools for loading data from the EarthScope miniseed archive.  The tiledb functionality, as of version 0.1.21, is not yet well implemented.  
 
-It is currently recommendeed to install the mseed optional dependencies, which includes obspy and some tools for loading data from the EarthScope miniseed archive.
+Some functionality (tidal analysis and corrections) depends on BAYTAP-08 and SPOTL, two legacy FORTRAN programs, which have been containerized for use by this library.  In order to run these processing methods, you must have Docker installed and running on your computer.  When required, the library will then fetch the required images and be able to run these processing steps.
