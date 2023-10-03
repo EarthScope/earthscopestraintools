@@ -21,27 +21,27 @@ class GtsmMetadata:
     and individual station pages ie \n
     http://bsm.unavco.org/bsm/level2/B001/B001.README.txt 
     
-    Attributes:
-        network: str
-        station: str
-        latitude: float
-        longitude: float
-        elevation: float
-        gap: float, instrument gap in meters
-        diameter: float, instrument sensing diameter in meters
-        start_date: str, formatted as "%Y-%m-%d"
-        orientation: float, degrees East of North for CH0
-        reference_strains: dict, containing 'linear_date':'YYYY:DOY' and each channel ie 'CH0':reference counts 
-        strain_matrices: dict, contains one or more calibration matrices, keyed to the name of the calibration.  
-        atmp_response: dict, reponse coefficients for each channel
-        tidal_params: dict, keys are tuple of (channel, tidal constituent, phz/amp/doodson)
-
     :param network: 2 character FDSN network code
     :type network: str
     :param station: 4 character FDSN station code
     :type station: str
     :param gauge_weights: optional list of 'good' channels, where 1 is good and 0 is bad, defaults to [1, 1, 1, 1]
     :type gauge_weights: list, optional
+    
+    :ivar network: str
+    :ivar station: str
+    :ivar latitude: float
+    :ivar longitude: float
+    :ivar elevation: float
+    :ivar gap: float, instrument gap in meters
+    :ivar diameter: float, instrument sensing diameter in meters
+    :ivar start_date: str, formatted as "%Y-%m-%d"
+    :ivar orientation: float, degrees East of North for CH0
+    :ivar reference_strains: dict, containing 'linear_date':'YYYY:DOY' and each channel ie 'CH0':reference counts 
+    :ivar strain_matrices: dict, contains one or more calibration matrices, keyed to the name of the calibration.  
+    :ivar atmp_response: dict, reponse coefficients for each channel
+    :ivar tidal_params: dict, keys are tuple of (channel, tidal constituent, phz/amp/doodson)
+
     """
     def __init__(self, network, station, gauge_weights=None):
         """
