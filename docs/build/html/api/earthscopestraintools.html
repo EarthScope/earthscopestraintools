@@ -37,7 +37,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.19c
+                0.1.20
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a><ul>
@@ -60,7 +61,7 @@
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
@@ -79,6 +80,7 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
@@ -124,7 +126,11 @@
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.ascii2tdb.html">earthscopestraintools.ascii2tdb module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.ascii2tdb.html">earthscopestraintools.ascii2tdb module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.ascii2tdb.html#earthscopestraintools.ascii2tdb.etl_yearly_ascii_file"><code class="docutils literal notranslate"><span class="pre">etl_yearly_ascii_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.ascii2tdb.html#earthscopestraintools.ascii2tdb.loop_through_ts"><code class="docutils literal notranslate"><span class="pre">loop_through_ts()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.bottle.html">earthscopestraintools.bottle module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle"><code class="docutils literal notranslate"><span class="pre">Bottle</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle.get_datetime_timestamps"><code class="docutils literal notranslate"><span class="pre">Bottle.get_datetime_timestamps()</span></code></a></li>
@@ -143,7 +149,14 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html#earthscopestraintools.bottle2mseed.build_stream"><code class="docutils literal notranslate"><span class="pre">build_stream()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.bottle2tdb"><code class="docutils literal notranslate"><span class="pre">bottle2tdb()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.build_ancillary_buffer"><code class="docutils literal notranslate"><span class="pre">build_ancillary_buffer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.build_strain_buffer"><code class="docutils literal notranslate"><span class="pre">build_strain_buffer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.check_result"><code class="docutils literal notranslate"><span class="pre">check_result()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.write_buffer"><code class="docutils literal notranslate"><span class="pre">write_buffer()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar"><code class="docutils literal notranslate"><span class="pre">GtsmBottleTar</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar.delete_bottles_from_disk"><code class="docutils literal notranslate"><span class="pre">GtsmBottleTar.delete_bottles_from_disk()</span></code></a></li>
@@ -158,14 +171,14 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html#earthscopestraintools.edid.get_all_sessions_in_network"><code class="docutils literal notranslate"><span class="pre">get_all_sessions_in_network()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html#earthscopestraintools.edid.get_all_stations_in_network"><code class="docutils literal notranslate"><span class="pre">get_all_stations_in_network()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html#earthscopestraintools.edid.get_bnum_list"><code class="docutils literal notranslate"><span class="pre">get_bnum_list()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html#earthscopestraintools.edid.get_network_edid"><code class="docutils literal notranslate"><span class="pre">get_network_edid()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html#earthscopestraintools.edid.get_network_name"><code class="docutils literal notranslate"><span class="pre">get_network_name()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html#earthscopestraintools.edid.get_session_edid"><code class="docutils literal notranslate"><span class="pre">get_session_edid()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html#earthscopestraintools.edid.get_station_edid"><code class="docutils literal notranslate"><span class="pre">get_station_edid()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_all_sessions_in_network"><code class="docutils literal notranslate"><span class="pre">get_all_sessions_in_network()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_all_stations_in_network"><code class="docutils literal notranslate"><span class="pre">get_all_stations_in_network()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_bnum_list"><code class="docutils literal notranslate"><span class="pre">get_bnum_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_network_edid"><code class="docutils literal notranslate"><span class="pre">get_network_edid()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_session_edid"><code class="docutils literal notranslate"><span class="pre">get_session_edid()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_station_edid"><code class="docutils literal notranslate"><span class="pre">get_station_edid()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.lookup_fdsn_network_from_bnum"><code class="docutils literal notranslate"><span class="pre">lookup_fdsn_network_from_bnum()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a><ul>
@@ -215,11 +228,128 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.tiledbtools.html">earthscopestraintools.tiledbtools module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.timeseries.html">earthscopestraintools.timeseries module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.apply_calibration_matrix"><code class="docutils literal notranslate"><span class="pre">apply_calibration_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.butterworth_filter"><code class="docutils literal notranslate"><span class="pre">butterworth_filter()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_linear_trend_correction"><code class="docutils literal notranslate"><span class="pre">calculate_linear_trend_correction()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_offsets"><code class="docutils literal notranslate"><span class="pre">calculate_offsets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_pressure_correction"><code class="docutils literal notranslate"><span class="pre">calculate_pressure_correction()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_tide_correction"><code class="docutils literal notranslate"><span class="pre">calculate_tide_correction()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.decimate_1s_to_300s"><code class="docutils literal notranslate"><span class="pre">decimate_1s_to_300s()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.decimate_to_hourly"><code class="docutils literal notranslate"><span class="pre">decimate_to_hourly()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.interpolate"><code class="docutils literal notranslate"><span class="pre">interpolate()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.linearize"><code class="docutils literal notranslate"><span class="pre">linearize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html#earthscopestraintools.tdb2ascii.read_date_range"><code class="docutils literal notranslate"><span class="pre">read_date_range()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html#earthscopestraintools.tdb2ascii.to_date"><code class="docutils literal notranslate"><span class="pre">to_date()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html#earthscopestraintools.tdb2ascii.write_ascii"><code class="docutils literal notranslate"><span class="pre">write_ascii()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html#earthscopestraintools.tdb2ascii.write_date_range"><code class="docutils literal notranslate"><span class="pre">write_date_range()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html#earthscopestraintools.tdb2tdb.convert_time_to_unix_ms"><code class="docutils literal notranslate"><span class="pre">convert_time_to_unix_ms()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html#earthscopestraintools.tdb2tdb.export_date_range"><code class="docutils literal notranslate"><span class="pre">export_date_range()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html#earthscopestraintools.tdb2tdb.read_date_range"><code class="docutils literal notranslate"><span class="pre">read_date_range()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.tiledbtools.html">earthscopestraintools.tiledbtools module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader.check_query_result"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader.check_query_result()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader.reindex_df"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader.reindex_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader.to_df"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader.to_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader.to_ts"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader.to_ts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter.create"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter.create()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter.df_2_tiledb"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter.df_2_tiledb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter.ts_2_tiledb"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter.ts_2_tiledb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter.write_df_to_tiledb"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter.write_df_to_tiledb()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader"><code class="docutils literal notranslate"><span class="pre">RawStrainReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader.check_query_result"><code class="docutils literal notranslate"><span class="pre">RawStrainReader.check_query_result()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader.reindex_df"><code class="docutils literal notranslate"><span class="pre">RawStrainReader.reindex_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader.to_df"><code class="docutils literal notranslate"><span class="pre">RawStrainReader.to_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader.to_ts"><code class="docutils literal notranslate"><span class="pre">RawStrainReader.to_ts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter.create"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter.create()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter.df_2_tiledb"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter.df_2_tiledb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter.ts_2_tiledb"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter.ts_2_tiledb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter.write_df_to_tiledb"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter.write_df_to_tiledb()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray"><code class="docutils literal notranslate"><span class="pre">StrainArray</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.cleanup"><code class="docutils literal notranslate"><span class="pre">StrainArray.cleanup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.cleanup_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.cleanup_meta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.consolidate_array_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.consolidate_array_meta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.consolidate_fragment_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.consolidate_fragment_meta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.consolidate_fragments"><code class="docutils literal notranslate"><span class="pre">StrainArray.consolidate_fragments()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.create"><code class="docutils literal notranslate"><span class="pre">StrainArray.create()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.default_config"><code class="docutils literal notranslate"><span class="pre">StrainArray.default_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.delete"><code class="docutils literal notranslate"><span class="pre">StrainArray.delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.exists"><code class="docutils literal notranslate"><span class="pre">StrainArray.exists()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_channels"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_channels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_data_types"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_network"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_network()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_nonempty_domain"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_nonempty_domain()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_period"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_period()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_schema"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_schema()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_schema_from_s3"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_schema_from_s3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_station"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_station()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_timeseries"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_timeseries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.print_schema"><code class="docutils literal notranslate"><span class="pre">StrainArray.print_schema()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.set_array_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.set_array_meta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.set_default_ctx"><code class="docutils literal notranslate"><span class="pre">StrainArray.set_default_ctx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.update_array_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.update_array_meta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.vacuum_array_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.vacuum_array_meta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.vacuum_fragment_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.vacuum_fragment_meta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.vacuum_fragments"><code class="docutils literal notranslate"><span class="pre">StrainArray.vacuum_fragments()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.lookup_s3_uri"><code class="docutils literal notranslate"><span class="pre">lookup_s3_uri()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.str_to_unix_ms"><code class="docutils literal notranslate"><span class="pre">str_to_unix_ms()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.timeseries.html">earthscopestraintools.timeseries module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.apply_calibration_matrix"><code class="docutils literal notranslate"><span class="pre">Timeseries.apply_calibration_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.apply_corrections"><code class="docutils literal notranslate"><span class="pre">Timeseries.apply_corrections()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.butterworth_filter"><code class="docutils literal notranslate"><span class="pre">Timeseries.butterworth_filter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_magnitude"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_magnitude()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_offsets"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_offsets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_pressure_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_pressure_correction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_tide_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_tide_correction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.check_for_gaps"><code class="docutils literal notranslate"><span class="pre">Timeseries.check_for_gaps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.decimate_1s_to_300s"><code class="docutils literal notranslate"><span class="pre">Timeseries.decimate_1s_to_300s()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.dynamic_strain"><code class="docutils literal notranslate"><span class="pre">Timeseries.dynamic_strain()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.interpolate"><code class="docutils literal notranslate"><span class="pre">Timeseries.interpolate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.linear_trend_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.linear_trend_correction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.linearize"><code class="docutils literal notranslate"><span class="pre">Timeseries.linearize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.plot"><code class="docutils literal notranslate"><span class="pre">Timeseries.plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.remove_999999s"><code class="docutils literal notranslate"><span class="pre">Timeseries.remove_999999s()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.save_csv"><code class="docutils literal notranslate"><span class="pre">Timeseries.save_csv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_data"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_initial_level_flags"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_initial_level_flags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_initial_quality_flags"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_initial_quality_flags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_initial_version"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_initial_version()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_local_tdb_uri"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_local_tdb_uri()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_period"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_period()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_s3_tdb_uri"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_s3_tdb_uri()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_units"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_units()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.show_flagged_data"><code class="docutils literal notranslate"><span class="pre">Timeseries.show_flagged_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.show_flags"><code class="docutils literal notranslate"><span class="pre">Timeseries.show_flags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.stats"><code class="docutils literal notranslate"><span class="pre">Timeseries.stats()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.plot_timeseries_comparison"><code class="docutils literal notranslate"><span class="pre">plot_timeseries_comparison()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.test"><code class="docutils literal notranslate"><span class="pre">test()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>

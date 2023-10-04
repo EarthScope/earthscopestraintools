@@ -20,6 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="earthscopestraintools.edid module" href="earthscopestraintools.edid.html" />
     <link rel="prev" title="earthscopestraintools.tiledbtools module" href="earthscopestraintools.tiledbtools.html" /> 
 </head>
 
@@ -36,7 +37,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.19c
+                0.1.20
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -51,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="earthscopestraintools.html">earthscopestraintools package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="earthscopestraintools.html#submodules">Submodules</a><ul class="current">
@@ -59,7 +61,7 @@
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
@@ -78,6 +80,7 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
@@ -87,7 +90,41 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html">earthscopestraintools.tiledbtools module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.timeseries module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.timeseries module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.apply_calibration_matrix"><code class="docutils literal notranslate"><span class="pre">Timeseries.apply_calibration_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.apply_corrections"><code class="docutils literal notranslate"><span class="pre">Timeseries.apply_corrections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.butterworth_filter"><code class="docutils literal notranslate"><span class="pre">Timeseries.butterworth_filter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.calculate_magnitude"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_magnitude()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.calculate_offsets"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_offsets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.calculate_pressure_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_pressure_correction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.calculate_tide_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_tide_correction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.check_for_gaps"><code class="docutils literal notranslate"><span class="pre">Timeseries.check_for_gaps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.decimate_1s_to_300s"><code class="docutils literal notranslate"><span class="pre">Timeseries.decimate_1s_to_300s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.dynamic_strain"><code class="docutils literal notranslate"><span class="pre">Timeseries.dynamic_strain()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.interpolate"><code class="docutils literal notranslate"><span class="pre">Timeseries.interpolate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.linear_trend_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.linear_trend_correction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.linearize"><code class="docutils literal notranslate"><span class="pre">Timeseries.linearize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.plot"><code class="docutils literal notranslate"><span class="pre">Timeseries.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.remove_999999s"><code class="docutils literal notranslate"><span class="pre">Timeseries.remove_999999s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.save_csv"><code class="docutils literal notranslate"><span class="pre">Timeseries.save_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.set_data"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.set_initial_level_flags"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_initial_level_flags()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.set_initial_quality_flags"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_initial_quality_flags()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.set_initial_version"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_initial_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.set_local_tdb_uri"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_local_tdb_uri()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.set_period"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_period()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.set_s3_tdb_uri"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_s3_tdb_uri()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.set_units"><code class="docutils literal notranslate"><span class="pre">Timeseries.set_units()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.show_flagged_data"><code class="docutils literal notranslate"><span class="pre">Timeseries.show_flagged_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.show_flags"><code class="docutils literal notranslate"><span class="pre">Timeseries.show_flags()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.stats"><code class="docutils literal notranslate"><span class="pre">Timeseries.stats()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.timeseries.plot_timeseries_comparison"><code class="docutils literal notranslate"><span class="pre">plot_timeseries_comparison()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.timeseries.test"><code class="docutils literal notranslate"><span class="pre">test()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -118,8 +155,487 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="earthscopestraintools-timeseries-module">
-<h1>earthscopestraintools.timeseries module<a class="headerlink" href="#earthscopestraintools-timeseries-module" title="Link to this heading"></a></h1>
+  <section id="module-earthscopestraintools.timeseries">
+<span id="earthscopestraintools-timeseries-module"></span><h1>earthscopestraintools.timeseries module<a class="headerlink" href="#module-earthscopestraintools.timeseries" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.timeseries.</span></span><span class="sig-name descname"><span class="pre">Timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for storing strainmeter data or correction timeseries.  Each Timeseries object
+contains the following attributes:</p>
+<ul class="simple">
+<li><p>data: (pd.DataFrame) with datetime index and one or more columns of timeseries data</p></li>
+<li><p>quality_df: (pd.DataFrame) with same shape as data, but with a character mapped to each
+data point.  flags include “g”=good, “m”=missing, “i”=interpolated, “b”=bad</p></li>
+<li><p>series: (str) description of timeseries, ie ‘raw’, ‘microstrain’, ‘atmp_c’, ‘tide_c’, ‘offset_c’, ‘trend_c’</p></li>
+<li><p>units: (str) units of timeseries</p></li>
+<li><p>level: (str) level of data. ie. ‘0’,’1’,’2a’,’2b’</p></li>
+<li><p>period: (float) sample period of data</p></li>
+<li><p>name: (str) name of timeseries, including station name.  useful for showing stats.
+defaults to network.station</p></li>
+<li><p>network: (str) FDSN two character network code</p></li>
+<li><p>station: (str) FDSN four character station code</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.apply_calibration_matrix">
+<span class="sig-name descname"><span class="pre">apply_calibration_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_matrix_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.apply_calibration_matrix" title="Link to this definition"></a></dt>
+<dd><p>Applies a calibration matrix to convert 4 gauges into areal, differential, and shear strains</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>calibration_matrix</strong> (<em>np.array</em>) – calibration matrix</p></li>
+<li><p><strong>calibration_matrix_name</strong> (<em>str</em><em>, </em><em>optional</em>) – name of calibration matrix used, defaults to None</p></li>
+<li><p><strong>use_channels</strong> (<em>list</em><em>, </em><em>optional</em>) – not yet implemented, set to 0 to ignore a bad channel, defaults to [1, 1, 1, 1]</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>areal, differential, and shear strains based on the given calibration</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.apply_corrections">
+<span class="sig-name descname"><span class="pre">apply_corrections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corrections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.apply_corrections" title="Link to this definition"></a></dt>
+<dd><p>applies one or more corrections to a Timeseries and returns the corrected Timeseries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>corrections</strong> (<em>list</em><em>, </em><em>optional</em>) – List of correction Timeseries to apply, defaults to []</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>corrected Timeseries</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.butterworth_filter">
+<span class="sig-name descname"><span class="pre">butterworth_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_cutoff_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.butterworth_filter" title="Link to this definition"></a></dt>
+<dd><p>Apply a butterworth filter to a DataFrame using scipy.signal.butter()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filter_type</strong> (<em>str</em>) – {‘lowpass’, ‘highpass’, ‘bandpass’, ‘bandstop’}</p></li>
+<li><p><strong>filter_order</strong> (<em>int</em>) – the order of the filter</p></li>
+<li><p><strong>filter_cutoff_s</strong> (<em>float</em>) – the filter cutoff in seconds</p></li>
+<li><p><strong>series</strong> (<em>str</em><em>, </em><em>optional</em>) – series name, defaults to “”</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Timeseries containing filtered data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.calculate_magnitude">
+<span class="sig-name descname"><span class="pre">calculate_magnitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hypocentral_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude_term</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.calculate_magnitude" title="Link to this definition"></a></dt>
+<dd><p>Calculates a magnitude estimate based on Barbour et al 2021.
+:param hypocentral_distance: distance from station to event hypocenter, in km
+:type hypocentral_distance: float
+:param site_term: site term from Barbour et al 2021, defaults to 0
+:type site_term: float, optional
+:param longitude_term: longitude term from Barbour et al 2021, defaults to 0
+:type longitude_term: int, optional
+:param name: name for new Timeseries, defaults to None
+:type name: str, optional
+:return: Timeseries containing a dynamic strain based magnitude estimate as a function of time
+:rtype: Timeseries</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.calculate_offsets">
+<span class="sig-name descname"><span class="pre">calculate_offsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit_multiplier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_percentile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.calculate_offsets" title="Link to this definition"></a></dt>
+<dd><p>Calculate offsets using first differencing method (add more details).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>limit_multiplier</strong> (<em>int</em><em>, </em><em>optional</em>) – _description_, defaults to 10</p></li>
+<li><p><strong>cutoff_percentile</strong> (<em>float</em><em>, </em><em>optional</em>) – _description_, defaults to 0.75</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.calculate_pressure_correction">
+<span class="sig-name descname"><span class="pre">calculate_pressure_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_coefficients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.calculate_pressure_correction" title="Link to this definition"></a></dt>
+<dd><p>Generate a pressure correction timeseries from pressure data and response coefficients</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response_coefficients</strong> (<em>dict</em>) – response coefficients for each channel loaded from metadata</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pressure corrections for each channel</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.calculate_tide_correction">
+<span class="sig-name descname"><span class="pre">calculate_tide_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tidal_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.calculate_tide_correction" title="Link to this definition"></a></dt>
+<dd><p>Generate tidal correction timeseries using SPOTL hartid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tidal_parameters</strong> (<em>dict</em>) – tidal parameters loaded from station metadata</p></li>
+<li><p><strong>longitude</strong> (<em>float</em>) – station longitude</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tidal correction Timeseries calculated for each column/channel in input data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.check_for_gaps">
+<span class="sig-name descname"><span class="pre">check_for_gaps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.check_for_gaps" title="Link to this definition"></a></dt>
+<dd><p>generates some statistics around nans, fill values, and missing epochs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.decimate_1s_to_300s">
+<span class="sig-name descname"><span class="pre">decimate_1s_to_300s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.decimate_1s_to_300s" title="Link to this definition"></a></dt>
+<dd><p>decimate 1hz data to 5 min data using</p>
+<p>Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for
+low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – method to interpolate across gaps, defaults to “linear”</p></li>
+<li><p><strong>limit</strong> (<em>int</em><em>, </em><em>optional</em>) – largest gap to interpolate, defaults to 3600 samples</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Timeseries containing 300s decimated data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.dynamic_strain">
+<span class="sig-name descname"><span class="pre">dynamic_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gauge_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dynamic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.dynamic_strain" title="Link to this definition"></a></dt>
+<dd><p>calculates dynamic strain for a given Timeseries as RMS of gauge strains</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gauge_weights</strong> (<em>list</em><em>, </em><em>optional</em>) – list of which channels to use, defaults to [1, 1, 1, 1]</p></li>
+<li><p><strong>series</strong> (<em>str</em><em>, </em><em>optional</em>) – series name, defaults to “dynamic”</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>calculated dynamic strain as a Timeseries object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.interpolate">
+<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">999999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'both'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DatetimeIndex</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.interpolate" title="Link to this definition"></a></dt>
+<dd><p>Interpolate across gaps in data using pd.DataFrame.interpolate()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>replace</strong> (<em>int</em><em>, </em><em>optional</em>) – gap fill value to interpolate across, defaults to 999999</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – interpolation method, defaults to “linear”</p></li>
+<li><p><strong>limit_seconds</strong> (<em>int</em><em>, </em><em>optional</em>) – max gap (in seconds) to interpolate , defaults to 3600</p></li>
+<li><p><strong>limit_direction</strong> (<em>str</em><em>, </em><em>optional</em>) – [‘forward’, ‘backward’, ‘both’], defaults to “both”</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+<li><p><strong>new_index</strong> (<em>pd.DatetimeIndex</em><em>, </em><em>optional</em>) – option to manually set the index of the interpolated data, defaults to None</p></li>
+<li><p><strong>period</strong> (<em>float</em><em>, </em><em>optional</em>) – sample rate of data in seconds, defaults to None</p></li>
+<li><p><strong>level</strong> (<em>str</em><em>, </em><em>optional</em>) – level of data, defaults to None</p></li>
+<li><p><strong>series</strong> (<em>str</em><em>, </em><em>optional</em>) – series name, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Timeseries containing interpolated data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.linear_trend_correction">
+<span class="sig-name descname"><span class="pre">linear_trend_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trend_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.linear_trend_correction" title="Link to this definition"></a></dt>
+<dd><p>Generate a linear trend correction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trend_start</strong> (<em>datetime.datetime</em><em>, </em><em>optional</em>) – start of window to calculate trend, defaults to first_valid_index()</p></li>
+<li><p><strong>trend_end</strong> (<em>datetime.datetime</em><em>, </em><em>optional</em>) – end of window to calculate trend, defaults to last_valid_index()</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>trend correction timeseries for each column/channel in input data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.linearize">
+<span class="sig-name descname"><span class="pre">linearize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_strains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.linearize" title="Link to this definition"></a></dt>
+<dd><p>Processing step to convert digital counts to microstrain based on geometry of GTSM gauges</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference_strains</strong> (<em>dict</em>) – dict containing keys of CHX and values of reference strains</p></li>
+<li><p><strong>gap</strong> (<em>float</em>) – instrument gap in meters</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Timeseries of linearized data in microstrain</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_9s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'line'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_quality_flags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atmp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_as</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.plot" title="Link to this definition"></a></dt>
+<dd><p>Generic plotting function for Timeseries data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – plot title, defaults to None</p></li>
+<li><p><strong>remove_9s</strong> (<em>bool</em><em>, </em><em>optional</em>) – option to remove gap fill values, defaults to False</p></li>
+<li><p><strong>zero</strong> (<em>bool</em><em>, </em><em>optional</em>) – option to zero against first_valid_index(), defaults to False</p></li>
+<li><p><strong>detrend</strong> (<em>str</em><em>, </em><em>optional</em>) – signal.detrend type, only ‘linear’ implented currently, defaults to None</p></li>
+<li><p><strong>ymin</strong> (<em>float</em><em>, </em><em>optional</em>) – y-axis minimum for plot, defaults to None</p></li>
+<li><p><strong>ymax</strong> (<em>float</em><em>, </em><em>optional</em>) – y-axis maximum for plot, defaults to None</p></li>
+<li><p><strong>type</strong> (<em>str</em><em>, </em><em>optional</em>) – matplotlib plot type. option of [‘scatter’,’line’], defaults to “line”</p></li>
+<li><p><strong>show_quality_flags</strong> (<em>bool</em><em>, </em><em>optional</em>) – option to highlight missing data flags, defaults to False</p></li>
+<li><p><strong>atmp</strong> (<a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries"><em>Timeseries</em></a><em>, </em><em>optional</em>) – optional Timeseries containing atmospheric pressure data to be plotted in an extra subplot, defaults to None</p></li>
+<li><p><strong>rainfall</strong> (<a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries"><em>Timeseries</em></a><em>, </em><em>optional</em>) – optional Timeseries containing rainfall data to be plotted in an extra subplot.  will also plot cumsum of rainfall during time window. defaults to None</p></li>
+<li><p><strong>save_as</strong> (<em>str</em><em>, </em><em>optional</em>) – filename to save as, defaults to None</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.remove_999999s">
+<span class="sig-name descname"><span class="pre">remove_999999s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interpolate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'both'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.remove_999999s" title="Link to this definition"></a></dt>
+<dd><p>remove 999999 gap fill values from data, options to either replace with nans or interpolate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interpolate</strong> (<em>bool</em><em>, </em><em>optional</em>) – boolean of whether to interpolate across gaps using pd.DataFrame.interpolate(), defaults to False</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – interpolation method from pd.DataFrame.interpolate(), defaults to “linear”</p></li>
+<li><p><strong>limit_direction</strong> (<em>str</em><em>, </em><em>optional</em>) – limit direction from pd.DataFrame.interpolate(), defaults to “both”</p></li>
+<li><p><strong>limit</strong> (<em>any</em><em>, </em><em>optional</em>) – limit from pd.DataFrame.interpolate(), defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Timeseries with 999999 gap fills removed, and appropriate flags set</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.save_csv">
+<span class="sig-name descname"><span class="pre">save_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.save_csv" title="Link to this definition"></a></dt>
+<dd><p>save data attribute as csv.  flattens object, does not save quality flags, level, or version information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – name of csv file to save</p></li>
+<li><p><strong>datadir</strong> (<em>str</em><em>, </em><em>optional</em>) – path to local directory to save file, defaults to “./”</p></li>
+<li><p><strong>sep</strong> (<em>str</em><em>, </em><em>optional</em>) – separator to use in csv, defaults to “,”</p></li>
+<li><p><strong>compression</strong> (<em>str</em><em>, </em><em>optional</em>) – compression algorthim [‘infer’, ‘gzip’, ‘bz2’, ‘zip’, ‘xz’, ‘zstd’], defaults to None</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.set_data">
+<span class="sig-name descname"><span class="pre">set_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.set_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.set_initial_level_flags">
+<span class="sig-name descname"><span class="pre">set_initial_level_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.set_initial_level_flags" title="Link to this definition"></a></dt>
+<dd><p>used to set level flag</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>level</strong> (<em>str</em><em>, </em><em>optional</em>) – level of data [‘0’,’1’,’2a’,’2b’]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dataframe of level flags</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.set_initial_quality_flags">
+<span class="sig-name descname"><span class="pre">set_initial_quality_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">missing_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">999999</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.set_initial_quality_flags" title="Link to this definition"></a></dt>
+<dd><p>used to flag any missing data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>missing_data</strong> (<em>int</em><em>, </em><em>optional</em>) – value used to represent gaps, defaults to 999999</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dataframe of quality flags</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.set_initial_version">
+<span class="sig-name descname"><span class="pre">set_initial_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.set_initial_version" title="Link to this definition"></a></dt>
+<dd><p>adds a version timestamp to each data point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dataframe of version flags</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.set_local_tdb_uri">
+<span class="sig-name descname"><span class="pre">set_local_tdb_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_tdb_uri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.set_local_tdb_uri" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.set_period">
+<span class="sig-name descname"><span class="pre">set_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">period</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.set_period" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.set_s3_tdb_uri">
+<span class="sig-name descname"><span class="pre">set_s3_tdb_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s3_tdb_uri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.set_s3_tdb_uri" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.set_units">
+<span class="sig-name descname"><span class="pre">set_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.set_units" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.show_flagged_data">
+<span class="sig-name descname"><span class="pre">show_flagged_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.show_flagged_data" title="Link to this definition"></a></dt>
+<dd><p>returns dataframe containing any data with a flag other than ‘g’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>data that has been flagged</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.show_flags">
+<span class="sig-name descname"><span class="pre">show_flags</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.show_flags" title="Link to this definition"></a></dt>
+<dd><p>returns a dataframe with all flags that are not ‘g’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>times and channels with flagged data within the timeseries</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.stats">
+<span class="sig-name descname"><span class="pre">stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.stats" title="Link to this definition"></a></dt>
+<dd><p>displays summary information describing the Timeseries object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.plot_timeseries_comparison">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.timeseries.</span></span><span class="sig-name descname"><span class="pre">plot_timeseries_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_9s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'line'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_as</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.plot_timeseries_comparison" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>plot multiple Timeseries in the same plot to compare values.</dt><dd><p>useful for viewing uncorrected vs corrected data</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeseries</strong> (<em>list</em><em>, </em><em>optional</em>) – list of Timeseries to plot, defaults to []</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – plot title, defaults to None</p></li>
+<li><p><strong>names</strong> (<em>list</em><em>, </em><em>optional</em>) – list of names to use in legend, defaults to []</p></li>
+<li><p><strong>remove_9s</strong> (<em>bool</em><em>, </em><em>optional</em>) – option to remove gap fill values, defaults to False</p></li>
+<li><p><strong>zero</strong> (<em>bool</em><em>, </em><em>optional</em>) – option to zero against first_valid_index(), defaults to False</p></li>
+<li><p><strong>detrend</strong> (<em>str</em><em>, </em><em>optional</em>) – signal.detrend type, only ‘linear’ implented currently, defaults to None</p></li>
+<li><p><strong>type</strong> (<em>str</em><em>, </em><em>optional</em>) – matplotlib plot type. option of [‘scatter’,’line’], defaults to “line”</p></li>
+<li><p><strong>save_as</strong> (<em>str</em><em>, </em><em>optional</em>) – filename to save as, defaults to None</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.test">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.timeseries.</span></span><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.test" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 
 
@@ -127,6 +643,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="earthscopestraintools.tiledbtools.html" class="btn btn-neutral float-left" title="earthscopestraintools.tiledbtools module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="earthscopestraintools.edid.html" class="btn btn-neutral float-right" title="earthscopestraintools.edid module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -15,6 +15,7 @@ Welcome to the Earthscope Strain Tools documentation!
    pages/IntroductoryMaterial.md
    pages/DataAvailability.md
    notebooks/level2.ipynb
+   notebooks/plot_event.ipynb
    api
 
 .. note:: 

@@ -23,7 +23,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API documentation" href="../api.html" />
+    <link rel="next" title="Example of looking at high rate event data from a strainmeter" href="plot_event.html" />
     <link rel="prev" title="Data Availability" href="../pages/DataAvailability.html" /> 
 </head>
 
@@ -40,7 +40,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.19c
+                0.1.20
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,16 +55,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Example of running level 2 processing steps</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#Download-1hz-counts,-downsample-to-300s-and-convert-to-microstrain">Download 1hz counts, downsample to 300s and convert to microstrain</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Trend-correction">Trend correction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Tidal-correction">Tidal correction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Pressure-correction">Pressure correction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Offset-correction">Offset correction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Plot-corrections">Plot corrections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Convert-to-regional-strain,-apply-corrections">Convert to regional strain, apply corrections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Plot-corrected-data-against-rainfall-data">Plot corrected data against rainfall data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Acquire,-decimate,-convert-the-data-from-raw">Acquire, decimate, convert the data from raw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Corrections">Corrections</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Trend">Trend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Tides">Tides</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Atmospheric-Pressure">Atmospheric Pressure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Offset-correction">Offset correction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Plot-corrections">Plot corrections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Convert-to-regional-strain,-apply-corrections">Convert to regional strain, apply corrections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Plot-corrected-data-against-rainfall-data">Plot corrected data against rainfall data</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
 </ul>
 
@@ -94,17 +98,17 @@
              
   <section id="Example-of-running-level-2-processing-steps">
 <h1>Example of running level 2 processing steps<a class="headerlink" href="#Example-of-running-level-2-processing-steps" title="Link to this heading"></a></h1>
-<p>starts with 10 min RS* data to speed things up, but could use LS* and ts.decimate_1s_to_300s()</p>
+<p>In this notebook, the following steps are perfromed: - Acquire, decimate, convert the data - <a class="reference internal" href="#Corrections"><span class="std std-ref">Corrections</span></a> - <a class="reference internal" href="#Corrections"><span class="std std-ref">Trend</span></a> - <a class="reference internal" href="#Tides"><span class="std std-ref">Tides</span></a> - Atmospheric Pressure</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import relevant modules from the earscopestraintools package</span>
 <span class="kn">from</span> <span class="nn">earthscopestraintools.mseed_tools</span> <span class="kn">import</span> <span class="n">ts_from_mseed</span>
 <span class="kn">from</span> <span class="nn">earthscopestraintools.gtsm_metadata</span> <span class="kn">import</span> <span class="n">GtsmMetadata</span>
-<span class="kn">from</span> <span class="nn">earthscopestraintools.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span><span class="p">,</span> <span class="n">plot_timeseries_comparison</span>
+<span class="kn">from</span> <span class="nn">earthscopestraintools.timeseries</span> <span class="kn">import</span> <span class="n">plot_timeseries_comparison</span>
 
+<span class="c1"># Allow logged output to be printed in the notebook as code cells are run</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
@@ -113,25 +117,74 @@
 </pre></div>
 </div>
 </div>
-<section id="Download-1hz-counts,-downsample-to-300s-and-convert-to-microstrain">
-<h2>Download 1hz counts, downsample to 300s and convert to microstrain<a class="headerlink" href="#Download-1hz-counts,-downsample-to-300s-and-convert-to-microstrain" title="Link to this heading"></a></h2>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<section id="Acquire,-decimate,-convert-the-data-from-raw">
+<h2>Acquire, decimate, convert the data from raw<a class="headerlink" href="#Acquire,-decimate,-convert-the-data-from-raw" title="Link to this heading"></a></h2>
+<ul>
+<li><p>Download 1hz raw data (in counts) from the IRIS/EarthScope DMC</p>
+<p><em>This step also removes instrumental calibration pulses (999999 values in the raw data that occurr periodically).</em></p>
+</li>
+<li><p>Downsample to 300s</p>
+<p><em>Applies a low-pass, minimum-phase finite impulse response filter (Hodgkinson and Agnew, 2007) prior to decimating the timeseries. Note that coseismic steps can not be relieably determined from the filtered data. Longer period signals are accurately represented.</em></p>
+</li>
+<li><p>Convert the data to microstrain</p>
+<p><em>Raw data (in counts) represents a unit of electrical measurment from the gauge capacitance bridge, related to the diameter of the gauge. The raw data is converted to microstrain via linearization.</em></p>
+<p><em>(see the introductory materials for more information)</em></p>
+</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;PB&#39;</span>
-<span class="n">station</span> <span class="o">=</span> <span class="s1">&#39;B004&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the network and station using FDSN seed codes ()</span>
+<span class="c1"># then load the metadata for that station</span>
+<span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;IV&#39;</span> <span class="c1"># e.g. PB = Plate Boundary Observatory, IV = I</span>
+<span class="n">station</span> <span class="o">=</span> <span class="s1">&#39;TSM3&#39;</span> <span class="c1"># available stations listed here https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt</span>
 <span class="n">meta</span> <span class="o">=</span> <span class="n">GtsmMetadata</span><span class="p">(</span><span class="n">network</span><span class="p">,</span><span class="n">station</span><span class="p">)</span>
+<span class="c1"># Print the metadata contents</span>
+<span class="n">meta</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+network: IV
+fcid: TSM3
+latitude: 43.38298
+longitude: 12.354506
+gap: 0.0001
+orientation (CH0EofN): 312.1
+reference strains:
+ {&#39;linear_date&#39;: &#39;2021:326&#39;, &#39;CH0&#39;: 53675042, &#39;CH1&#39;: 50931471, &#39;CH2&#39;: 55603089, &#39;CH3&#39;: 53766332}
+lab:
+ [[ 0.2962963   0.51851852  0.2962963   0.22222222]
+ [ 0.16507151  0.30039401 -0.28522912 -0.1802364 ]
+ [-0.35550881  0.21665099  0.26884841 -0.12999059]]
+ER2010:
+ None
+CH_prelim:
+ [[-0.1119583  -3.53067728 -1.71579172 -2.33887458]
+ [ 0.28706561  0.97049489 -0.15622639  0.19415864]
+ [-0.42357925 -1.0862594  -0.5204608  -0.99985361]]
+atmp coefficients:
+ {&#39;CH0&#39;: -0.00452, &#39;CH1&#39;: -0.0053, &#39;CH2&#39;: -0.0074800000000000005, &#39;CH3&#39;: -0.0067599999999999995}
+tidal params:
+ {(&#39;CH0&#39;, &#39;M2&#39;, &#39;phz&#39;): &#39;63.412&#39;, (&#39;CH0&#39;, &#39;M2&#39;, &#39;amp&#39;): &#39;10.047&#39;, (&#39;CH0&#39;, &#39;M2&#39;, &#39;doodson&#39;): &#39;2 0 0 0 0 0&#39;, (&#39;CH0&#39;, &#39;O1&#39;, &#39;phz&#39;): &#39;-36.647&#39;, (&#39;CH0&#39;, &#39;O1&#39;, &#39;amp&#39;): &#39;5.027&#39;, (&#39;CH0&#39;, &#39;O1&#39;, &#39;doodson&#39;): &#39;1-1 0 0 0 0&#39;, (&#39;CH0&#39;, &#39;P1&#39;, &#39;phz&#39;): &#39;-36.926&#39;, (&#39;CH0&#39;, &#39;P1&#39;, &#39;amp&#39;): &#39;11.5&#39;, (&#39;CH0&#39;, &#39;P1&#39;, &#39;doodson&#39;): &#39;1 1-2 0 0 0&#39;, (&#39;CH0&#39;, &#39;K1&#39;, &#39;phz&#39;): &#39;-37.738&#39;, (&#39;CH0&#39;, &#39;K1&#39;, &#39;amp&#39;): &#39;14.495&#39;, (&#39;CH0&#39;, &#39;K1&#39;, &#39;doodson&#39;): &#39;1 1 0 0 0 0&#39;, (&#39;CH0&#39;, &#39;N2&#39;, &#39;phz&#39;): &#39;62.952&#39;, (&#39;CH0&#39;, &#39;N2&#39;, &#39;amp&#39;): &#39;1.962&#39;, (&#39;CH0&#39;, &#39;N2&#39;, &#39;doodson&#39;): &#39;2-1 0 1 0 0&#39;, (&#39;CH0&#39;, &#39;S2&#39;, &#39;phz&#39;): &#39;72.115&#39;, (&#39;CH0&#39;, &#39;S2&#39;, &#39;amp&#39;): &#39;4.824&#39;, (&#39;CH0&#39;, &#39;S2&#39;, &#39;doodson&#39;): &#39;2 2-2 0 0 0&#39;, (&#39;CH1&#39;, &#39;M2&#39;, &#39;phz&#39;): &#39;-149.154&#39;, (&#39;CH1&#39;, &#39;M2&#39;, &#39;amp&#39;): &#39;14.694&#39;, (&#39;CH1&#39;, &#39;M2&#39;, &#39;doodson&#39;): &#39;2 0 0 0 0 0&#39;, (&#39;CH1&#39;, &#39;O1&#39;, &#39;phz&#39;): &#39;102.046&#39;, (&#39;CH1&#39;, &#39;O1&#39;, &#39;amp&#39;): &#39;1.268&#39;, (&#39;CH1&#39;, &#39;O1&#39;, &#39;doodson&#39;): &#39;1-1 0 0 0 0&#39;, (&#39;CH1&#39;, &#39;P1&#39;, &#39;phz&#39;): &#39;106.832&#39;, (&#39;CH1&#39;, &#39;P1&#39;, &#39;amp&#39;): &#39;2.959&#39;, (&#39;CH1&#39;, &#39;P1&#39;, &#39;doodson&#39;): &#39;1 1-2 0 0 0&#39;, (&#39;CH1&#39;, &#39;K1&#39;, &#39;phz&#39;): &#39;97.616&#39;, (&#39;CH1&#39;, &#39;K1&#39;, &#39;amp&#39;): &#39;3.458&#39;, (&#39;CH1&#39;, &#39;K1&#39;, &#39;doodson&#39;): &#39;1 1 0 0 0 0&#39;, (&#39;CH1&#39;, &#39;N2&#39;, &#39;phz&#39;): &#39;-148.922&#39;, (&#39;CH1&#39;, &#39;N2&#39;, &#39;amp&#39;): &#39;2.815&#39;, (&#39;CH1&#39;, &#39;N2&#39;, &#39;doodson&#39;): &#39;2-1 0 1 0 0&#39;, (&#39;CH1&#39;, &#39;S2&#39;, &#39;phz&#39;): &#39;-150.144&#39;, (&#39;CH1&#39;, &#39;S2&#39;, &#39;amp&#39;): &#39;6.898&#39;, (&#39;CH1&#39;, &#39;S2&#39;, &#39;doodson&#39;): &#39;2 2-2 0 0 0&#39;, (&#39;CH2&#39;, &#39;M2&#39;, &#39;phz&#39;): &#39;18.047&#39;, (&#39;CH2&#39;, &#39;M2&#39;, &#39;amp&#39;): &#39;6.66&#39;, (&#39;CH2&#39;, &#39;M2&#39;, &#39;doodson&#39;): &#39;2 0 0 0 0 0&#39;, (&#39;CH2&#39;, &#39;O1&#39;, &#39;phz&#39;): &#39;-174.316&#39;, (&#39;CH2&#39;, &#39;O1&#39;, &#39;amp&#39;): &#39;2.905&#39;, (&#39;CH2&#39;, &#39;O1&#39;, &#39;doodson&#39;): &#39;1-1 0 0 0 0&#39;, (&#39;CH2&#39;, &#39;P1&#39;, &#39;phz&#39;): &#39;-174.682&#39;, (&#39;CH2&#39;, &#39;P1&#39;, &#39;amp&#39;): &#39;6.283&#39;, (&#39;CH2&#39;, &#39;P1&#39;, &#39;doodson&#39;): &#39;1 1-2 0 0 0&#39;, (&#39;CH2&#39;, &#39;K1&#39;, &#39;phz&#39;): &#39;-174.28&#39;, (&#39;CH2&#39;, &#39;K1&#39;, &#39;amp&#39;): &#39;8.755&#39;, (&#39;CH2&#39;, &#39;K1&#39;, &#39;doodson&#39;): &#39;1 1 0 0 0 0&#39;, (&#39;CH2&#39;, &#39;N2&#39;, &#39;phz&#39;): &#39;18.185&#39;, (&#39;CH2&#39;, &#39;N2&#39;, &#39;amp&#39;): &#39;1.265&#39;, (&#39;CH2&#39;, &#39;N2&#39;, &#39;doodson&#39;): &#39;2-1 0 1 0 0&#39;, (&#39;CH2&#39;, &#39;S2&#39;, &#39;phz&#39;): &#39;17.325&#39;, (&#39;CH2&#39;, &#39;S2&#39;, &#39;amp&#39;): &#39;3.048&#39;, (&#39;CH2&#39;, &#39;S2&#39;, &#39;doodson&#39;): &#39;2 2-2 0 0 0&#39;, (&#39;CH3&#39;, &#39;M2&#39;, &#39;phz&#39;): &#39;46.869&#39;, (&#39;CH3&#39;, &#39;M2&#39;, &#39;amp&#39;): &#39;11.359&#39;, (&#39;CH3&#39;, &#39;M2&#39;, &#39;doodson&#39;): &#39;2 0 0 0 0 0&#39;, (&#39;CH3&#39;, &#39;O1&#39;, &#39;phz&#39;): &#39;-65.655&#39;, (&#39;CH3&#39;, &#39;O1&#39;, &#39;amp&#39;): &#39;3.912&#39;, (&#39;CH3&#39;, &#39;O1&#39;, &#39;doodson&#39;): &#39;1-1 0 0 0 0&#39;, (&#39;CH3&#39;, &#39;P1&#39;, &#39;phz&#39;): &#39;-84.046&#39;, (&#39;CH3&#39;, &#39;P1&#39;, &#39;amp&#39;): &#39;4.309&#39;, (&#39;CH3&#39;, &#39;P1&#39;, &#39;doodson&#39;): &#39;1 1-2 0 0 0&#39;, (&#39;CH3&#39;, &#39;K1&#39;, &#39;phz&#39;): &#39;-84.728&#39;, (&#39;CH3&#39;, &#39;K1&#39;, &#39;amp&#39;): &#39;7.056&#39;, (&#39;CH3&#39;, &#39;K1&#39;, &#39;doodson&#39;): &#39;1 1 0 0 0 0&#39;, (&#39;CH3&#39;, &#39;N2&#39;, &#39;phz&#39;): &#39;48.929&#39;, (&#39;CH3&#39;, &#39;N2&#39;, &#39;amp&#39;): &#39;2.32&#39;, (&#39;CH3&#39;, &#39;N2&#39;, &#39;doodson&#39;): &#39;2-1 0 1 0 0&#39;, (&#39;CH3&#39;, &#39;S2&#39;, &#39;phz&#39;): &#39;45.878&#39;, (&#39;CH3&#39;, &#39;S2&#39;, &#39;amp&#39;): &#39;4.736&#39;, (&#39;CH3&#39;, &#39;S2&#39;, &#39;doodson&#39;): &#39;2 2-2 0 0 0&#39;}
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-01-01T00:00:00&quot;</span>
-<span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;2023-02-01T00:00:00&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Provide the start and end times for analysis</span>
+<span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-01-01T00:00:00&quot;</span>
+<span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;2023-01-10T00:00:00&quot;</span>
+<span class="c1"># ts_from_mseed will load data into a earthscopestraintools.timeseres.Timeseries object via obspy and dataselect</span>
+<span class="c1"># The location and channel codes follow SEED format</span>
 <span class="n">strain_raw</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;T0&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;LS*&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+<span class="c1"># Print some stats and plot the data</span>
 <span class="n">strain_raw</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
 <span class="n">strain_raw</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">)</span>
 </pre></div>
@@ -169,14 +222,39 @@ PB.B004.T0.LS*
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">decimated_counts</span> <span class="o">=</span> <span class="n">strain_raw</span><span class="o">.</span><span class="n">decimate_1s_to_300s</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s look at all available attributes and functions of strain_raw</span>
+<span class="c1">#</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Attributes:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="nb">vars</span><span class="p">(</span><span class="n">strain_raw</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">functs</span> <span class="o">=</span> <span class="p">[</span><span class="n">func</span> <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">strain_raw</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">strain_raw</span><span class="p">,</span><span class="n">func</span><span class="p">))</span> <span class="ow">and</span> <span class="n">func</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Functions:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">functs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Attributes:
+ dict_keys([&#39;data&#39;, &#39;columns&#39;, &#39;quality_df&#39;, &#39;series&#39;, &#39;units&#39;, &#39;level&#39;, &#39;period&#39;, &#39;network&#39;, &#39;station&#39;, &#39;name&#39;, &#39;nans&#39;, &#39;nines&#39;, &#39;epochs&#39;, &#39;gap_percentage&#39;])
+Functions:
+ [&#39;apply_calibration_matrix&#39;, &#39;apply_corrections&#39;, &#39;butterworth_filter&#39;, &#39;calculate_magnitude&#39;, &#39;calculate_offsets&#39;, &#39;calculate_pressure_correction&#39;, &#39;calculate_tide_correction&#39;, &#39;check_for_gaps&#39;, &#39;decimate_1s_to_300s&#39;, &#39;dynamic_strain&#39;, &#39;interpolate&#39;, &#39;linear_trend_correction&#39;, &#39;linearize&#39;, &#39;plot&#39;, &#39;remove_999999s&#39;, &#39;save_csv&#39;, &#39;set_data&#39;, &#39;set_initial_level_flags&#39;, &#39;set_initial_quality_flags&#39;, &#39;set_initial_version&#39;, &#39;set_local_tdb_uri&#39;, &#39;set_period&#39;, &#39;set_s3_tdb_uri&#39;, &#39;set_units&#39;, &#39;show_flagged_data&#39;, &#39;show_flags&#39;, &#39;stats&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[69]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use one of the functions to filter and decimate: calculate a 300s decimated Timeseries of raw counts</span>
+<span class="n">decimated_counts</span> <span class="o">=</span> <span class="n">strain_raw</span><span class="o">.</span><span class="n">decimate_1s_to_300s</span><span class="p">()</span>
+<span class="n">decimated_counts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
@@ -187,13 +265,136 @@ Interpolating data using method=linear and limit=3600
     Total missing data is 0.0%
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[69]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">.gauge.microstrain&quot;</span>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CH0</th>
+      <th>CH1</th>
+      <th>CH2</th>
+      <th>CH3</th>
+    </tr>
+    <tr>
+      <th>time</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2023-01-01 00:00:00</th>
+      <td>46649428</td>
+      <td>49621359</td>
+      <td>50772343</td>
+      <td>49478641</td>
+    </tr>
+    <tr>
+      <th>2023-01-01 00:05:00</th>
+      <td>46649428</td>
+      <td>49621358</td>
+      <td>50772343</td>
+      <td>49478641</td>
+    </tr>
+    <tr>
+      <th>2023-01-01 00:10:00</th>
+      <td>46649427</td>
+      <td>49621361</td>
+      <td>50772338</td>
+      <td>49478638</td>
+    </tr>
+    <tr>
+      <th>2023-01-01 00:15:00</th>
+      <td>46649427</td>
+      <td>49621367</td>
+      <td>50772330</td>
+      <td>49478630</td>
+    </tr>
+    <tr>
+      <th>2023-01-01 00:20:00</th>
+      <td>46649427</td>
+      <td>49621372</td>
+      <td>50772325</td>
+      <td>49478624</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2023-01-31 23:40:00</th>
+      <td>46647193</td>
+      <td>49621780</td>
+      <td>50773856</td>
+      <td>49478774</td>
+    </tr>
+    <tr>
+      <th>2023-01-31 23:45:00</th>
+      <td>46647202</td>
+      <td>49621789</td>
+      <td>50773851</td>
+      <td>49478773</td>
+    </tr>
+    <tr>
+      <th>2023-01-31 23:50:00</th>
+      <td>46647211</td>
+      <td>49621800</td>
+      <td>50773846</td>
+      <td>49478772</td>
+    </tr>
+    <tr>
+      <th>2023-01-31 23:55:00</th>
+      <td>46647214</td>
+      <td>49621806</td>
+      <td>50773838</td>
+      <td>49478766</td>
+    </tr>
+    <tr>
+      <th>2023-02-01 00:00:00</th>
+      <td>46647220</td>
+      <td>49621813</td>
+      <td>50773831</td>
+      <td>49478764</td>
+    </tr>
+  </tbody>
+</table>
+<p>8929 rows × 4 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert the raw counts into units of microstrain (1E-06)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">.gauge.microstrain&quot;</span> <span class="c1"># Plot name</span>
+<span class="c1"># The reference strains are standard values, but to zero to the first values of the time series, try:</span>
+<span class="c1"># reference_strains=decimated_counts.data.values[0]</span>
 <span class="n">gauge_microstrain</span> <span class="o">=</span> <span class="n">decimated_counts</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">reference_strains</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">reference_strains</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">gap</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+<span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -206,7 +407,7 @@ Interpolating data using method=linear and limit=3600
 Converting raw counts to microstrain
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
-PB.B004.gauge.microstrain
+IV.TSM3.gauge.microstrain
     | Channels: [&#39;CH0&#39;, &#39;CH1&#39;, &#39;CH2&#39;, &#39;CH3&#39;]
     | TimeRange: 2023-01-01 00:00:00 - 2023-02-01 00:00:00        | Period:           300s
     | Series: microstrain| Units:   microstrain| Level:          1| Gaps:             0.0%
@@ -214,24 +415,112 @@ PB.B004.gauge.microstrain
     | Samples:      35716| Good:          35712| Missing:        0| Interpolated:        4
 </pre></div></div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CH0</th>
+      <th>CH1</th>
+      <th>CH2</th>
+      <th>CH3</th>
+    </tr>
+    <tr>
+      <th>time</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2023-01-01 00:00:00</th>
+      <td>-326.746480</td>
+      <td>-60.917165</td>
+      <td>-254.058091</td>
+      <td>-210.994363</td>
+    </tr>
+    <tr>
+      <th>2023-01-01 00:05:00</th>
+      <td>-326.746480</td>
+      <td>-60.917211</td>
+      <td>-254.058091</td>
+      <td>-210.994363</td>
+    </tr>
+    <tr>
+      <th>2023-01-01 00:10:00</th>
+      <td>-326.746521</td>
+      <td>-60.917075</td>
+      <td>-254.058328</td>
+      <td>-210.994498</td>
+    </tr>
+    <tr>
+      <th>2023-01-01 00:15:00</th>
+      <td>-326.746521</td>
+      <td>-60.916803</td>
+      <td>-254.058707</td>
+      <td>-210.994858</td>
+    </tr>
+    <tr>
+      <th>2023-01-01 00:20:00</th>
+      <td>-326.746521</td>
+      <td>-60.916576</td>
+      <td>-254.058945</td>
+      <td>-210.995129</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_level2_6_1.png" src="../_images/notebooks_level2_6_1.png" />
+<img alt="../_images/notebooks_level2_7_2.png" src="../_images/notebooks_level2_7_2.png" />
 </div>
 </div>
 </section>
-<section id="Trend-correction">
-<h2>Trend correction<a class="headerlink" href="#Trend-correction" title="Link to this heading"></a></h2>
+<section id="Corrections">
+<h2>Corrections<a class="headerlink" href="#Corrections" title="Link to this heading"></a></h2>
+<section id="Trend">
+<h3>Trend<a class="headerlink" href="#Trend" title="Link to this heading"></a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gauge_microstrain</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">.gauge.trend_c&quot;</span>
-<span class="n">trend_c</span> <span class="o">=</span> <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">linear_trend_correction</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-<span class="c1">#trend_c.plot()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#calculate a linear trend correction and store it as a Timeseries</span>
+<span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">.gauge.trend_c&quot;</span>
+<span class="n">trend_c</span> <span class="o">=</span> <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">linear_trend_correction</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span> <span class="c1"># simple least squares trend</span>
+<span class="c1"># create a trend corrected Timeseries</span>
 <span class="n">corrected</span> <span class="o">=</span> <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">apply_corrections</span><span class="p">([</span><span class="n">trend_c</span><span class="p">])</span>
+<span class="c1"># compare uncorrected, trend correction, and trend corrected Timeseries</span>
 <span class="n">plot_timeseries_comparison</span><span class="p">([</span><span class="n">gauge_microstrain</span><span class="p">,</span> <span class="n">trend_c</span><span class="p">,</span> <span class="n">corrected</span><span class="p">],</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;uncorrected&#39;</span><span class="p">,</span> <span class="s1">&#39;trend&#39;</span><span class="p">,</span> <span class="s1">&#39;corrected&#39;</span><span class="p">],</span> <span class="n">zero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -255,21 +544,23 @@ Applying corrections
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_level2_8_1.png" src="../_images/notebooks_level2_8_1.png" />
+<img alt="../_images/notebooks_level2_11_1.png" src="../_images/notebooks_level2_11_1.png" />
 </div>
 </div>
 </section>
-<section id="Tidal-correction">
-<h2>Tidal correction<a class="headerlink" href="#Tidal-correction" title="Link to this heading"></a></h2>
+<section id="Tides">
+<h3>Tides<a class="headerlink" href="#Tides" title="Link to this heading"></a></h3>
+<p>The tidal amplitudes and phases for many of the largest tidal constituents (M2, O1, P1, K1, N2, S2) have been pre-determined for the stations in <a class="reference external" href="https://igppweb.ucsd.edu/~agnew/Baytap/baytap.html">BAYTAP08</a>, a Bayesian modelling procedure. These constituents are fed to <a class="reference external" href="https://igppweb.ucsd.edu/~agnew/Spotl/spotlmain.html">SPOTL</a> to create a forward model timeseries of tides for each gauge, which can then be removed from the data.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[78]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">.gauge.tide_c&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This step will run a docker container of SPOTL (https://igppweb.ucsd.edu/~agnew/Spotl/spotlmain.html) to calculate the tides.</span>
+<span class="c1"># If docker is not running on your computer, start docker.</span>
+<span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">.gauge.tide_c&quot;</span>
 <span class="n">tide_c</span> <span class="o">=</span> <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">calculate_tide_correction</span><span class="p">(</span><span class="n">tidal_parameters</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">tidal_params</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-<span class="n">tide_c</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-<span class="c1">#tide_corrected = gauge_microstrain.apply_corrections([tide_c])</span>
-<span class="c1">#plot_timeseries_comparison([gauge_microstrain, tide_corrected], names=[&#39;uncorrected&#39;, &#39;atmp_corrected&#39;], zero=True)</span>
+<span class="n">tide_corrected</span> <span class="o">=</span> <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">apply_corrections</span><span class="p">([</span><span class="n">tide_c</span><span class="p">])</span>
+<span class="n">plot_timeseries_comparison</span><span class="p">([</span><span class="n">gauge_microstrain</span><span class="p">,</span> <span class="n">tide_corrected</span><span class="p">],</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;uncorrected&#39;</span><span class="p">,</span> <span class="s1">&#39;atmp_corrected&#39;</span><span class="p">],</span> <span class="n">zero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -285,31 +576,35 @@ WARNING: The requested image&#39;s platform (linux/amd64) does not match the det
 WARNING: The requested image&#39;s platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
+Applying corrections
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_level2_10_1.png" src="../_images/notebooks_level2_10_1.png" />
+<img alt="../_images/notebooks_level2_13_1.png" src="../_images/notebooks_level2_13_1.png" />
 </div>
 </div>
 </section>
-<section id="Pressure-correction">
-<h2>Pressure correction<a class="headerlink" href="#Pressure-correction" title="Link to this heading"></a></h2>
+<section id="Atmospheric-Pressure">
+<h3>Atmospheric Pressure<a class="headerlink" href="#Atmospheric-Pressure" title="Link to this heading"></a></h3>
+<p>An atmospheric pressure correction coefficient was likewise calculated for each gauge in BAYTAP08. This coefficient is multiplied by the colocated surface barometric pressure sensor data to calculate a pressure correction time series. Note that many stations have pressure data at a sample period of 30 minutes, while some have 1 sps data available. In the case of 30 minute data, the correction is linearly interpolated to the time series of interest.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">atmp_raw</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;RDO&#39;</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Acquire pressure data, calculate and plot the correction</span>
+
+<span class="c1"># Pressure data from miniseed</span>
+<span class="c1"># note that channel code for 1 sps data, if available, is &#39;LDO&#39;</span>
+<span class="n">atmp_raw</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;RDO&#39;</span><span class="p">,</span>
                         <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">60</span><span class="o">*</span><span class="mi">30</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;hpa&#39;</span><span class="p">)</span>
-<span class="c1"># atmp_raw.stats()</span>
-<span class="c1"># atmp_raw.quality_stats()</span>
-<span class="c1"># atmp_raw.plot()</span>
+<span class="c1"># Interpolate the pressure data to the same time as the strain data</span>
+<span class="c1">### WHAT IS SERIES DOING?? NEW INDEX??</span>
 <span class="n">atmp</span> <span class="o">=</span> <span class="n">atmp_raw</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">new_index</span><span class="o">=</span><span class="n">strain_raw</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="s1">&#39;hpa&#39;</span><span class="p">)</span>
-<span class="c1"># atmp.stats()</span>
-<span class="c1"># atmp.quality_stats()</span>
-<span class="c1"># atmp.plot()</span>
 
 <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">.gauge.atmp_c&quot;</span>
 <span class="n">atmp_c</span> <span class="o">=</span> <span class="n">atmp</span><span class="o">.</span><span class="n">calculate_pressure_correction</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">atmp_response</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
@@ -345,12 +640,12 @@ Calculating pressure correction
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_level2_12_1.png" src="../_images/notebooks_level2_12_1.png" />
+<img alt="../_images/notebooks_level2_15_1.png" src="../_images/notebooks_level2_15_1.png" />
 </div>
 </div>
 </section>
 <section id="Offset-correction">
-<h2>Offset correction<a class="headerlink" href="#Offset-correction" title="Link to this heading"></a></h2>
+<h3>Offset correction<a class="headerlink" href="#Offset-correction" title="Link to this heading"></a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -376,12 +671,12 @@ Using offset limits of [0.003454, 0.00327, 0.003936, 0.002536]
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_level2_14_1.png" src="../_images/notebooks_level2_14_1.png" />
+<img alt="../_images/notebooks_level2_17_1.png" src="../_images/notebooks_level2_17_1.png" />
 </div>
 </div>
 </section>
 <section id="Plot-corrections">
-<h2>Plot corrections<a class="headerlink" href="#Plot-corrections" title="Link to this heading"></a></h2>
+<h3>Plot corrections<a class="headerlink" href="#Plot-corrections" title="Link to this heading"></a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -406,40 +701,50 @@ Applying corrections
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_level2_16_1.png" src="../_images/notebooks_level2_16_1.png" />
+<img alt="../_images/notebooks_level2_19_1.png" src="../_images/notebooks_level2_19_1.png" />
 </div>
 </div>
 </section>
 <section id="Convert-to-regional-strain,-apply-corrections">
-<h2>Convert to regional strain, apply corrections<a class="headerlink" href="#Convert-to-regional-strain,-apply-corrections" title="Link to this heading"></a></h2>
+<h3>Convert to regional strain, apply corrections<a class="headerlink" href="#Convert-to-regional-strain,-apply-corrections" title="Link to this heading"></a></h3>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calibration_matrix</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">strain_matrices</span><span class="p">[</span><span class="s1">&#39;lab_strain_matrix&#39;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calibration_matrix</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">strain_matrices</span><span class="p">[</span><span class="s1">&#39;lab&#39;</span><span class="p">]</span>
 <span class="n">regional_microstrain</span> <span class="o">=</span> <span class="n">gauge_microstrain</span><span class="o">.</span><span class="n">apply_calibration_matrix</span><span class="p">(</span><span class="n">calibration_matrix</span><span class="p">)</span>
 <span class="n">regional_microstrain</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
 <span class="n">regional_microstrain</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Applying None matrix: [[ 0.2967  0.5185  0.2958  0.2222]
+ [-0.2887  0.2983  0.1688 -0.1784]
+ [-0.266  -0.2196  0.3531  0.1325]]
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+PB.B004.gauge.microstrain.calibrated
+    | Channels: [&#39;Eee+Enn&#39;, &#39;Eee-Enn&#39;, &#39;2Ene&#39;]
+    | TimeRange: 2023-01-01 00:00:00 - 2023-02-01 00:00:00        | Period:           300s
+    | Series: microstrain| Units:   microstrain| Level:         2a| Gaps:             0.0%
+    | Epochs:        8929| Good:         8929.0| Missing:      0.0| Interpolated:      0.0
+    | Samples:      26787| Good:          26787| Missing:        0| Interpolated:        0
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">KeyError</span>                                  Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[11], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> calibration_matrix <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">meta</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">strain_matrices</span><span class="ansi-yellow-bg">[</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">lab_strain_matrix</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">]</span>
-<span class="ansi-green-intense-fg ansi-bold">      2</span> regional_microstrain <span style="color: rgb(98,98,98)">=</span> gauge_microstrain<span style="color: rgb(98,98,98)">.</span>apply_calibration_matrix(calibration_matrix)
-<span class="ansi-green-intense-fg ansi-bold">      3</span> regional_microstrain<span style="color: rgb(98,98,98)">.</span>stats()
-
-<span class="ansi-red-fg">KeyError</span>: &#39;lab_strain_matrix&#39;
-</pre></div></div>
+<img alt="../_images/notebooks_level2_21_1.png" src="../_images/notebooks_level2_21_1.png" />
+</div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">regional_tide_c</span> <span class="o">=</span> <span class="n">tide_c</span><span class="o">.</span><span class="n">apply_calibration_matrix</span><span class="p">(</span><span class="n">calibration_matrix</span><span class="p">)</span>
@@ -452,20 +757,32 @@ Cell <span class="ansi-green-fg">In[11], line 1</span>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area docutils container">
+<div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[12], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> regional_tide_c <span style="color: rgb(98,98,98)">=</span> tide_c<span style="color: rgb(98,98,98)">.</span>apply_calibration_matrix(<span class="ansi-yellow-bg">calibration_matrix</span>)
-<span class="ansi-green-intense-fg ansi-bold">      2</span> regional_trend_c <span style="color: rgb(98,98,98)">=</span> trend_c<span style="color: rgb(98,98,98)">.</span>apply_calibration_matrix(calibration_matrix)
-<span class="ansi-green-intense-fg ansi-bold">      3</span> regional_atmp_c <span style="color: rgb(98,98,98)">=</span> atmp_c<span style="color: rgb(98,98,98)">.</span>apply_calibration_matrix(calibration_matrix)
-
-<span class="ansi-red-fg">NameError</span>: name &#39;calibration_matrix&#39; is not defined
+Applying None matrix: [[ 0.2967  0.5185  0.2958  0.2222]
+ [-0.2887  0.2983  0.1688 -0.1784]
+ [-0.266  -0.2196  0.3531  0.1325]]
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Applying None matrix: [[ 0.2967  0.5185  0.2958  0.2222]
+ [-0.2887  0.2983  0.1688 -0.1784]
+ [-0.266  -0.2196  0.3531  0.1325]]
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Applying None matrix: [[ 0.2967  0.5185  0.2958  0.2222]
+ [-0.2887  0.2983  0.1688 -0.1784]
+ [-0.266  -0.2196  0.3531  0.1325]]
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Applying None matrix: [[ 0.2967  0.5185  0.2958  0.2222]
+ [-0.2887  0.2983  0.1688 -0.1784]
+ [-0.266  -0.2196  0.3531  0.1325]]
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -474,26 +791,28 @@ Cell <span class="ansi-green-fg">In[12], line 1</span>
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Applying corrections
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[13], line 2</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> title<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>network<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)">.</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>station<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)">&#34;</span>
-<span class="ansi-green-fg">----&gt; 2</span> regional_corrected <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">regional_microstrain</span><span style="color: rgb(98,98,98)">.</span>apply_corrections([regional_tide_c, regional_atmp_c, regional_offset_c, regional_trend_c])
-<span class="ansi-green-intense-fg ansi-bold">      3</span> plot_timeseries_comparison([regional_microstrain, regional_corrected], title<span style="color: rgb(98,98,98)">=</span>title, names<span style="color: rgb(98,98,98)">=</span>[<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">uncorrected</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">corrected</span><span style="color: rgb(175,0,0)">&#39;</span>], zero<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>)
-
-<span class="ansi-red-fg">NameError</span>: name &#39;regional_microstrain&#39; is not defined
-</pre></div></div>
+<img alt="../_images/notebooks_level2_23_1.png" src="../_images/notebooks_level2_23_1.png" />
+</div>
 </div>
 </section>
 <section id="Plot-corrected-data-against-rainfall-data">
-<h2>Plot corrected data against rainfall data<a class="headerlink" href="#Plot-corrected-data-against-rainfall-data" title="Link to this heading"></a></h2>
+<h3>Plot corrected data against rainfall data<a class="headerlink" href="#Plot-corrected-data-against-rainfall-data" title="Link to this heading"></a></h3>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rainfall</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;RRO&#39;</span><span class="p">,</span>
@@ -516,23 +835,20 @@ Converting missing data from 999999 to nan
   Converting 999999 values to nan
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
+PB.B004.gauge.microstrain.calibrated.corrected
+    | Channels: [&#39;Eee+Enn&#39;, &#39;Eee-Enn&#39;, &#39;2Ene&#39;]
+    | TimeRange: 2023-01-01 00:00:00 - 2023-02-01 00:00:00        | Period:           300s
+    | Series:   corrected| Units:   microstrain| Level:         2a| Gaps:             0.0%
+    | Epochs:        8929| Good:         8929.0| Missing:      0.0| Interpolated:      0.0
+    | Samples:      26787| Good:          26787| Missing:        0| Interpolated:        0
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[14], line 3</span>
-<span class="ansi-green-intense-fg ansi-bold">      1</span> rainfall <span style="color: rgb(98,98,98)">=</span> ts_from_mseed(network<span style="color: rgb(98,98,98)">=</span>network, station<span style="color: rgb(98,98,98)">=</span>station, location<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">*</span><span style="color: rgb(175,0,0)">&#39;</span>, channel<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">RRO</span><span style="color: rgb(175,0,0)">&#39;</span>,
-<span class="ansi-green-intense-fg ansi-bold">      2</span>                          start<span style="color: rgb(98,98,98)">=</span>start, end<span style="color: rgb(98,98,98)">=</span>end, period<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">60</span><span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">30</span>, scale_factor<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(98,98,98)">0.0001</span>, units<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">mm/30m</span><span style="color: rgb(175,0,0)">&#39;</span>)
-<span class="ansi-green-fg">----&gt; 3</span> <span class="ansi-yellow-bg">regional_corrected</span><span style="color: rgb(98,98,98)">.</span>plot(rainfall<span style="color: rgb(98,98,98)">=</span>rainfall)
-<span class="ansi-green-intense-fg ansi-bold">      4</span> regional_corrected<span style="color: rgb(98,98,98)">.</span>stats()
-
-<span class="ansi-red-fg">NameError</span>: name &#39;regional_corrected&#39; is not defined
-</pre></div></div>
+<img alt="../_images/notebooks_level2_25_1.png" src="../_images/notebooks_level2_25_1.png" />
+</div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -544,13 +860,14 @@ Cell <span class="ansi-green-fg">In[14], line 3</span>
 </div>
 </section>
 </section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../pages/DataAvailability.html" class="btn btn-neutral float-left" title="Data Availability" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../api.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="plot_event.html" class="btn btn-neutral float-right" title="Example of looking at high rate event data from a strainmeter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -37,7 +37,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.19c
+                0.1.20
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="earthscopestraintools.html">earthscopestraintools package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="earthscopestraintools.html#submodules">Submodules</a><ul class="current">
@@ -60,7 +61,7 @@
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
@@ -79,13 +80,20 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.tdb2ascii module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.tdb2ascii module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tdb2ascii.read_date_range"><code class="docutils literal notranslate"><span class="pre">read_date_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tdb2ascii.to_date"><code class="docutils literal notranslate"><span class="pre">to_date()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tdb2ascii.write_ascii"><code class="docutils literal notranslate"><span class="pre">write_ascii()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tdb2ascii.write_date_range"><code class="docutils literal notranslate"><span class="pre">write_date_range()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html">earthscopestraintools.tiledbtools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.timeseries.html">earthscopestraintools.timeseries module</a></li>
@@ -119,8 +127,28 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="earthscopestraintools-tdb2ascii-module">
-<h1>earthscopestraintools.tdb2ascii module<a class="headerlink" href="#earthscopestraintools-tdb2ascii-module" title="Link to this heading"></a></h1>
+  <section id="module-earthscopestraintools.tdb2ascii">
+<span id="earthscopestraintools-tdb2ascii-module"></span><h1>earthscopestraintools.tdb2ascii module<a class="headerlink" href="#module-earthscopestraintools.tdb2ascii" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.tdb2ascii.read_date_range">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tdb2ascii.</span></span><span class="sig-name descname"><span class="pre">read_date_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tdb2ascii.read_date_range" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.tdb2ascii.to_date">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tdb2ascii.</span></span><span class="sig-name descname"><span class="pre">to_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datetime64</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tdb2ascii.to_date" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.tdb2ascii.write_ascii">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tdb2ascii.</span></span><span class="sig-name descname"><span class="pre">write_ascii</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_range_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tdb2ascii.write_ascii" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.tdb2ascii.write_date_range">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tdb2ascii.</span></span><span class="sig-name descname"><span class="pre">write_date_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tdb2ascii.write_date_range" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 
 

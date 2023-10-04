@@ -34,7 +34,7 @@
               <img src="_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.19c
+                0.1.20
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 </ul>
 
@@ -79,12 +80,14 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#B"><strong>B</strong></a>
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
@@ -93,19 +96,48 @@
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.apply_calibration_matrix">apply_calibration_matrix() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.apply_calibration_matrix">(in module earthscopestraintools.processing)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.apply_corrections">apply_corrections() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle">Bottle (class in earthscopestraintools.bottle)</a>
 </li>
+      <li><a href="api/earthscopestraintools.bottle2mseed.html#earthscopestraintools.bottle2mseed.bottle2mseed">bottle2mseed() (in module earthscopestraintools.bottle2mseed)</a>
+</li>
+      <li><a href="api/earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.bottle2tdb">bottle2tdb() (in module earthscopestraintools.bottle2tdb)</a>
+</li>
+      <li><a href="api/earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.build_ancillary_buffer">build_ancillary_buffer() (in module earthscopestraintools.bottle2tdb)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/earthscopestraintools.bottle2mseed.html#earthscopestraintools.bottle2mseed.bottle2mseed">bottle2mseed() (in module earthscopestraintools.bottle2mseed)</a>
+      <li><a href="api/earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.build_strain_buffer">build_strain_buffer() (in module earthscopestraintools.bottle2tdb)</a>
 </li>
       <li><a href="api/earthscopestraintools.bottle2mseed.html#earthscopestraintools.bottle2mseed.build_stream">build_stream() (in module earthscopestraintools.bottle2mseed)</a>
 </li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.butterworth_filter">butterworth_filter() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.butterworth_filter">(in module earthscopestraintools.processing)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -114,24 +146,100 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.calc_hypocentral_dist">calc_hypocentral_dist() (in module earthscopestraintools.event_processing)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.calculate_magnitude">calculate_magnitude() (in module earthscopestraintools.event_processing)</a>
+      <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_linear_trend_correction">calculate_linear_trend_correction() (in module earthscopestraintools.processing)</a>
 </li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_magnitude">calculate_magnitude() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.calculate_magnitude">(in module earthscopestraintools.event_processing)</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_offsets">calculate_offsets() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_offsets">(in module earthscopestraintools.processing)</a>
+</li>
+      </ul></li>
       <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.calculate_p_s_arrival">calculate_p_s_arrival() (in module earthscopestraintools.event_processing)</a>
 </li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_pressure_correction">calculate_pressure_correction() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_pressure_correction">(in module earthscopestraintools.processing)</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_tide_correction">calculate_tide_correction() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_tide_correction">(in module earthscopestraintools.processing)</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.check_for_gaps">check_for_gaps() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader.check_query_result">check_query_result() (earthscopestraintools.tiledbtools.ProcessedStrainReader method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader.check_query_result">(earthscopestraintools.tiledbtools.RawStrainReader method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.check_result">check_result() (in module earthscopestraintools.bottle2tdb)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.cleanup">cleanup() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.cleanup_meta">cleanup_meta() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.consolidate_array_meta">consolidate_array_meta() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.consolidate_fragment_meta">consolidate_fragment_meta() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.consolidate_fragments">consolidate_fragments() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tdb2tdb.html#earthscopestraintools.tdb2tdb.convert_time_to_unix_ms">convert_time_to_unix_ms() (in module earthscopestraintools.tdb2tdb)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter.create">create() (earthscopestraintools.tiledbtools.ProcessedStrainWriter method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter.create">(earthscopestraintools.tiledbtools.RawStrainWriter method)</a>
+</li>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.create">(earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar.delete_bottles_from_disk">delete_bottles_from_disk() (earthscopestraintools.bottletar.GtsmBottleTar method)</a>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.decimate_1s_to_300s">decimate_1s_to_300s() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.decimate_1s_to_300s">(in module earthscopestraintools.processing)</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.decimate_to_hourly">decimate_to_hourly() (in module earthscopestraintools.processing)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.default_config">default_config() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.delete">delete() (earthscopestraintools.tiledbtools.StrainArray method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.dynamic_strain">dynamic_strain() (in module earthscopestraintools.event_processing)</a>
+      <li><a href="api/earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar.delete_bottles_from_disk">delete_bottles_from_disk() (earthscopestraintools.bottletar.GtsmBottleTar method)</a>
 </li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter.df_2_tiledb">df_2_tiledb() (earthscopestraintools.tiledbtools.ProcessedStrainWriter method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter.df_2_tiledb">(earthscopestraintools.tiledbtools.RawStrainWriter method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.dynamic_strain">dynamic_strain() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.dynamic_strain">(in module earthscopestraintools.event_processing)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -145,6 +253,13 @@
 
       <ul>
         <li><a href="api/earthscopestraintools.html#module-earthscopestraintools">module</a>
+</li>
+      </ul></li>
+      <li>
+    earthscopestraintools.ascii2tdb
+
+      <ul>
+        <li><a href="api/earthscopestraintools.ascii2tdb.html#module-earthscopestraintools.ascii2tdb">module</a>
 </li>
       </ul></li>
       <li>
@@ -162,19 +277,24 @@
 </li>
       </ul></li>
       <li>
+    earthscopestraintools.bottle2tdb
+
+      <ul>
+        <li><a href="api/earthscopestraintools.bottle2tdb.html#module-earthscopestraintools.bottle2tdb">module</a>
+</li>
+      </ul></li>
+      <li>
     earthscopestraintools.bottletar
 
       <ul>
         <li><a href="api/earthscopestraintools.bottletar.html#module-earthscopestraintools.bottletar">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    earthscopestraintools.edid
+    earthscopestraintools.datasources_api_interact
 
       <ul>
-        <li><a href="api/earthscopestraintools.edid.html#module-earthscopestraintools.edid">module</a>
+        <li><a href="api/earthscopestraintools.datasources_api_interact.html#module-earthscopestraintools.datasources_api_interact">module</a>
 </li>
       </ul></li>
       <li>
@@ -184,6 +304,8 @@
         <li><a href="api/earthscopestraintools.event.html#module-earthscopestraintools.event">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     earthscopestraintools.event_processing
 
@@ -198,6 +320,47 @@
         <li><a href="api/earthscopestraintools.gtsm_metadata.html#module-earthscopestraintools.gtsm_metadata">module</a>
 </li>
       </ul></li>
+      <li>
+    earthscopestraintools.processing
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#module-earthscopestraintools.processing">module</a>
+</li>
+      </ul></li>
+      <li>
+    earthscopestraintools.tdb2ascii
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tdb2ascii.html#module-earthscopestraintools.tdb2ascii">module</a>
+</li>
+      </ul></li>
+      <li>
+    earthscopestraintools.tdb2tdb
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tdb2tdb.html#module-earthscopestraintools.tdb2tdb">module</a>
+</li>
+      </ul></li>
+      <li>
+    earthscopestraintools.tiledbtools
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#module-earthscopestraintools.tiledbtools">module</a>
+</li>
+      </ul></li>
+      <li>
+    earthscopestraintools.timeseries
+
+      <ul>
+        <li><a href="api/earthscopestraintools.timeseries.html#module-earthscopestraintools.timeseries">module</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.ascii2tdb.html#earthscopestraintools.ascii2tdb.etl_yearly_ascii_file">etl_yearly_ascii_file() (in module earthscopestraintools.ascii2tdb)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.exists">exists() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tdb2tdb.html#earthscopestraintools.tdb2tdb.export_date_range">export_date_range() (in module earthscopestraintools.tdb2tdb)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -212,17 +375,21 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/earthscopestraintools.edid.html#earthscopestraintools.edid.get_all_sessions_in_network">get_all_sessions_in_network() (in module earthscopestraintools.edid)</a>
+      <li><a href="api/earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_all_sessions_in_network">get_all_sessions_in_network() (in module earthscopestraintools.datasources_api_interact)</a>
 </li>
-      <li><a href="api/earthscopestraintools.edid.html#earthscopestraintools.edid.get_all_stations_in_network">get_all_stations_in_network() (in module earthscopestraintools.edid)</a>
+      <li><a href="api/earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_all_stations_in_network">get_all_stations_in_network() (in module earthscopestraintools.datasources_api_interact)</a>
 </li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_atmp_response">get_atmp_response() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
 </li>
-      <li><a href="api/earthscopestraintools.edid.html#earthscopestraintools.edid.get_bnum_list">get_bnum_list() (in module earthscopestraintools.edid)</a>
+      <li><a href="api/earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_bnum_list">get_bnum_list() (in module earthscopestraintools.datasources_api_interact)</a>
 </li>
       <li><a href="api/earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar.get_bottle_names">get_bottle_names() (earthscopestraintools.bottletar.GtsmBottleTar method)</a>
 </li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_ch_prelim_strain_matrix">get_ch_prelim_strain_matrix() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_channels">get_channels() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_data_types">get_data_types() (earthscopestraintools.tiledbtools.StrainArray method)</a>
 </li>
       <li><a href="api/earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle.get_datetime_timestamps">get_datetime_timestamps() (earthscopestraintools.bottle.Bottle method)</a>
 </li>
@@ -244,31 +411,43 @@
 </li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_longitude">get_longitude() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_meta_table">get_meta_table() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
 </li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.get_metadata_df">get_metadata_df() (in module earthscopestraintools.gtsm_metadata)</a>
 </li>
-      <li><a href="api/earthscopestraintools.edid.html#earthscopestraintools.edid.get_network_edid">get_network_edid() (in module earthscopestraintools.edid)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_network">get_network() (earthscopestraintools.tiledbtools.StrainArray method)</a>
 </li>
-      <li><a href="api/earthscopestraintools.edid.html#earthscopestraintools.edid.get_network_name">get_network_name() (in module earthscopestraintools.edid)</a>
+      <li><a href="api/earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_network_edid">get_network_edid() (in module earthscopestraintools.datasources_api_interact)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_nonempty_domain">get_nonempty_domain() (earthscopestraintools.tiledbtools.StrainArray method)</a>
 </li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_orientation">get_orientation() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
 </li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_period">get_period() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_reference_strains">get_reference_strains() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_schema">get_schema() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_schema_from_s3">get_schema_from_s3() (earthscopestraintools.tiledbtools.StrainArray method)</a>
 </li>
       <li><a href="api/earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle.get_seed_codes">get_seed_codes() (earthscopestraintools.bottle.Bottle method)</a>
 </li>
-      <li><a href="api/earthscopestraintools.edid.html#earthscopestraintools.edid.get_session_edid">get_session_edid() (in module earthscopestraintools.edid)</a>
+      <li><a href="api/earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_session_edid">get_session_edid() (in module earthscopestraintools.datasources_api_interact)</a>
 </li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_start_date">get_start_date() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
 </li>
-      <li><a href="api/earthscopestraintools.edid.html#earthscopestraintools.edid.get_station_edid">get_station_edid() (in module earthscopestraintools.edid)</a>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_station">get_station() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.get_station_edid">get_station_edid() (in module earthscopestraintools.datasources_api_interact)</a>
 </li>
       <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.get_stations_in_radius">get_stations_in_radius() (in module earthscopestraintools.event_processing)</a>
 </li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.get_tidal_params">get_tidal_params() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.get_timeseries">get_timeseries() (earthscopestraintools.tiledbtools.StrainArray method)</a>
 </li>
       <li><a href="api/earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle.get_timestamps">get_timestamps() (earthscopestraintools.bottle.Bottle method)</a>
 </li>
@@ -281,9 +460,29 @@
   </ul></td>
 </tr></table>
 
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.interpolate">interpolate() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.interpolate">(in module earthscopestraintools.processing)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.linear_trend_correction">linear_trend_correction() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.linearize">linearize() (earthscopestraintools.timeseries.Timeseries method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.processing.html#earthscopestraintools.processing.linearize">(in module earthscopestraintools.processing)</a>
+</li>
+      </ul></li>
       <li><a href="api/earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar.list_bottle_dir">list_bottle_dir() (earthscopestraintools.bottletar.GtsmBottleTar method)</a>
 </li>
       <li><a href="api/earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar.list_bottles">list_bottles() (earthscopestraintools.bottletar.GtsmBottleTar method)</a>
@@ -297,6 +496,12 @@
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.load_site_terms">load_site_terms() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
 </li>
       <li><a href="api/earthscopestraintools.event.html#earthscopestraintools.event.Earthquake.load_url_data">load_url_data() (earthscopestraintools.event.Earthquake method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.datasources_api_interact.html#earthscopestraintools.datasources_api_interact.lookup_fdsn_network_from_bnum">lookup_fdsn_network_from_bnum() (in module earthscopestraintools.datasources_api_interact)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.lookup_s3_uri">lookup_s3_uri() (in module earthscopestraintools.tiledbtools)</a>
+</li>
+      <li><a href="api/earthscopestraintools.ascii2tdb.html#earthscopestraintools.ascii2tdb.loop_through_ts">loop_through_ts() (in module earthscopestraintools.ascii2tdb)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -314,19 +519,33 @@
       <ul>
         <li><a href="api/earthscopestraintools.html#module-earthscopestraintools">earthscopestraintools</a>
 </li>
+        <li><a href="api/earthscopestraintools.ascii2tdb.html#module-earthscopestraintools.ascii2tdb">earthscopestraintools.ascii2tdb</a>
+</li>
         <li><a href="api/earthscopestraintools.bottle.html#module-earthscopestraintools.bottle">earthscopestraintools.bottle</a>
 </li>
         <li><a href="api/earthscopestraintools.bottle2mseed.html#module-earthscopestraintools.bottle2mseed">earthscopestraintools.bottle2mseed</a>
 </li>
+        <li><a href="api/earthscopestraintools.bottle2tdb.html#module-earthscopestraintools.bottle2tdb">earthscopestraintools.bottle2tdb</a>
+</li>
         <li><a href="api/earthscopestraintools.bottletar.html#module-earthscopestraintools.bottletar">earthscopestraintools.bottletar</a>
 </li>
-        <li><a href="api/earthscopestraintools.edid.html#module-earthscopestraintools.edid">earthscopestraintools.edid</a>
+        <li><a href="api/earthscopestraintools.datasources_api_interact.html#module-earthscopestraintools.datasources_api_interact">earthscopestraintools.datasources_api_interact</a>
 </li>
         <li><a href="api/earthscopestraintools.event.html#module-earthscopestraintools.event">earthscopestraintools.event</a>
 </li>
         <li><a href="api/earthscopestraintools.event_processing.html#module-earthscopestraintools.event_processing">earthscopestraintools.event_processing</a>
 </li>
         <li><a href="api/earthscopestraintools.gtsm_metadata.html#module-earthscopestraintools.gtsm_metadata">earthscopestraintools.gtsm_metadata</a>
+</li>
+        <li><a href="api/earthscopestraintools.processing.html#module-earthscopestraintools.processing">earthscopestraintools.processing</a>
+</li>
+        <li><a href="api/earthscopestraintools.tdb2ascii.html#module-earthscopestraintools.tdb2ascii">earthscopestraintools.tdb2ascii</a>
+</li>
+        <li><a href="api/earthscopestraintools.tdb2tdb.html#module-earthscopestraintools.tdb2tdb">earthscopestraintools.tdb2tdb</a>
+</li>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#module-earthscopestraintools.tiledbtools">earthscopestraintools.tiledbtools</a>
+</li>
+        <li><a href="api/earthscopestraintools.timeseries.html#module-earthscopestraintools.timeseries">earthscopestraintools.timeseries</a>
 </li>
       </ul></li>
   </ul></td>
@@ -337,11 +556,21 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle.parse_filename">parse_filename() (earthscopestraintools.bottle.Bottle method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.plot">plot() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
       <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.plot_coseismic_offset">plot_coseismic_offset() (in module earthscopestraintools.event_processing)</a>
 </li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.plot_timeseries_comparison">plot_timeseries_comparison() (in module earthscopestraintools.timeseries)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/earthscopestraintools.event_processing.html#earthscopestraintools.event_processing.pre_event_trend_correction">pre_event_trend_correction() (in module earthscopestraintools.event_processing)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.print_schema">print_schema() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader">ProcessedStrainReader (class in earthscopestraintools.tiledbtools)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter">ProcessedStrainWriter (class in earthscopestraintools.tiledbtools)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -349,11 +578,29 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader">RawStrainReader (class in earthscopestraintools.tiledbtools)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter">RawStrainWriter (class in earthscopestraintools.tiledbtools)</a>
+</li>
       <li><a href="api/earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle.read_data">read_data() (earthscopestraintools.bottle.Bottle method)</a>
 </li>
+      <li><a href="api/earthscopestraintools.tdb2ascii.html#earthscopestraintools.tdb2ascii.read_date_range">read_date_range() (in module earthscopestraintools.tdb2ascii)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tdb2tdb.html#earthscopestraintools.tdb2tdb.read_date_range">(in module earthscopestraintools.tdb2tdb)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/earthscopestraintools.bottle.html#earthscopestraintools.bottle.Bottle.read_header">read_header() (earthscopestraintools.bottle.Bottle method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader.reindex_df">reindex_df() (earthscopestraintools.tiledbtools.ProcessedStrainReader method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader.reindex_df">(earthscopestraintools.tiledbtools.RawStrainReader method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.remove_999999s">remove_999999s() (earthscopestraintools.timeseries.Timeseries method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -361,7 +608,41 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.save_csv">save_csv() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.set_array_meta">set_array_meta() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_data">set_data() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.set_default_ctx">set_default_ctx() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_initial_level_flags">set_initial_level_flags() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_initial_quality_flags">set_initial_quality_flags() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_initial_version">set_initial_version() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_local_tdb_uri">set_local_tdb_uri() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_period">set_period() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_s3_tdb_uri">set_s3_tdb_uri() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.set_units">set_units() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
       <li><a href="api/earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.GtsmMetadata.show">show() (earthscopestraintools.gtsm_metadata.GtsmMetadata method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.show_flagged_data">show_flagged_data() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.show_flags">show_flags() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.stats">stats() (earthscopestraintools.timeseries.Timeseries method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.str_to_unix_ms">str_to_unix_ms() (in module earthscopestraintools.tiledbtools)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray">StrainArray (class in earthscopestraintools.tiledbtools)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -370,7 +651,35 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar.test">test() (earthscopestraintools.bottletar.GtsmBottleTar method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.test">(in module earthscopestraintools.timeseries)</a>
 </li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries">Timeseries (class in earthscopestraintools.timeseries)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tdb2ascii.html#earthscopestraintools.tdb2ascii.to_date">to_date() (in module earthscopestraintools.tdb2ascii)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader.to_df">to_df() (earthscopestraintools.tiledbtools.ProcessedStrainReader method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader.to_df">(earthscopestraintools.tiledbtools.RawStrainReader method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainReader.to_ts">to_ts() (earthscopestraintools.tiledbtools.ProcessedStrainReader method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainReader.to_ts">(earthscopestraintools.tiledbtools.RawStrainReader method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter.ts_2_tiledb">ts_2_tiledb() (earthscopestraintools.tiledbtools.ProcessedStrainWriter method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter.ts_2_tiledb">(earthscopestraintools.tiledbtools.RawStrainWriter method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -380,13 +689,45 @@
       <li><a href="api/earthscopestraintools.bottletar.html#earthscopestraintools.bottletar.GtsmBottleTar.untar_files">untar_files() (earthscopestraintools.bottletar.GtsmBottleTar method)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.update_array_meta">update_array_meta() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.vacuum_array_meta">vacuum_array_meta() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.vacuum_fragment_meta">vacuum_fragment_meta() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.StrainArray.vacuum_fragments">vacuum_fragments() (earthscopestraintools.tiledbtools.StrainArray method)</a>
+</li>
       <li><a href="api/earthscopestraintools.event.html#earthscopestraintools.event.version">version() (in module earthscopestraintools.event)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tdb2ascii.html#earthscopestraintools.tdb2ascii.write_ascii">write_ascii() (in module earthscopestraintools.tdb2ascii)</a>
+</li>
+      <li><a href="api/earthscopestraintools.bottle2tdb.html#earthscopestraintools.bottle2tdb.write_buffer">write_buffer() (in module earthscopestraintools.bottle2tdb)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/earthscopestraintools.tdb2ascii.html#earthscopestraintools.tdb2ascii.write_date_range">write_date_range() (in module earthscopestraintools.tdb2ascii)</a>
+</li>
+      <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.ProcessedStrainWriter.write_df_to_tiledb">write_df_to_tiledb() (earthscopestraintools.tiledbtools.ProcessedStrainWriter method)</a>
+
+      <ul>
+        <li><a href="api/earthscopestraintools.tiledbtools.html#earthscopestraintools.tiledbtools.RawStrainWriter.write_df_to_tiledb">(earthscopestraintools.tiledbtools.RawStrainWriter method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 

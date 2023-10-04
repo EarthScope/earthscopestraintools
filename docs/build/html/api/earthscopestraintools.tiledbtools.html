@@ -37,7 +37,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.19c
+                0.1.20
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="earthscopestraintools.html">earthscopestraintools package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="earthscopestraintools.html#submodules">Submodules</a><ul class="current">
@@ -60,7 +61,7 @@
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
@@ -79,6 +80,7 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2mseed.html">earthscopestraintools.bottle2mseed module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
@@ -87,7 +89,67 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.tiledbtools module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.tiledbtools module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader.check_query_result"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader.check_query_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader.reindex_df"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader.reindex_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader.to_df"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader.to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader.to_ts"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainReader.to_ts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter.create"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter.df_2_tiledb"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter.df_2_tiledb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter.ts_2_tiledb"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter.ts_2_tiledb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter.write_df_to_tiledb"><code class="docutils literal notranslate"><span class="pre">ProcessedStrainWriter.write_df_to_tiledb()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainReader"><code class="docutils literal notranslate"><span class="pre">RawStrainReader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainReader.check_query_result"><code class="docutils literal notranslate"><span class="pre">RawStrainReader.check_query_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainReader.reindex_df"><code class="docutils literal notranslate"><span class="pre">RawStrainReader.reindex_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainReader.to_df"><code class="docutils literal notranslate"><span class="pre">RawStrainReader.to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainReader.to_ts"><code class="docutils literal notranslate"><span class="pre">RawStrainReader.to_ts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainWriter"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainWriter.create"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainWriter.df_2_tiledb"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter.df_2_tiledb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainWriter.ts_2_tiledb"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter.ts_2_tiledb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.RawStrainWriter.write_df_to_tiledb"><code class="docutils literal notranslate"><span class="pre">RawStrainWriter.write_df_to_tiledb()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray"><code class="docutils literal notranslate"><span class="pre">StrainArray</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.cleanup"><code class="docutils literal notranslate"><span class="pre">StrainArray.cleanup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.cleanup_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.cleanup_meta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.consolidate_array_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.consolidate_array_meta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.consolidate_fragment_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.consolidate_fragment_meta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.consolidate_fragments"><code class="docutils literal notranslate"><span class="pre">StrainArray.consolidate_fragments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.create"><code class="docutils literal notranslate"><span class="pre">StrainArray.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.default_config"><code class="docutils literal notranslate"><span class="pre">StrainArray.default_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.delete"><code class="docutils literal notranslate"><span class="pre">StrainArray.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.exists"><code class="docutils literal notranslate"><span class="pre">StrainArray.exists()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_channels"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_channels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_data_types"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_network"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_network()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_nonempty_domain"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_nonempty_domain()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_period"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_period()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_schema"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_schema()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_schema_from_s3"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_schema_from_s3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_station"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.get_timeseries"><code class="docutils literal notranslate"><span class="pre">StrainArray.get_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.print_schema"><code class="docutils literal notranslate"><span class="pre">StrainArray.print_schema()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.set_array_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.set_array_meta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.set_default_ctx"><code class="docutils literal notranslate"><span class="pre">StrainArray.set_default_ctx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.update_array_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.update_array_meta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.vacuum_array_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.vacuum_array_meta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.vacuum_fragment_meta"><code class="docutils literal notranslate"><span class="pre">StrainArray.vacuum_fragment_meta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.tiledbtools.StrainArray.vacuum_fragments"><code class="docutils literal notranslate"><span class="pre">StrainArray.vacuum_fragments()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tiledbtools.lookup_s3_uri"><code class="docutils literal notranslate"><span class="pre">lookup_s3_uri()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tiledbtools.str_to_unix_ms"><code class="docutils literal notranslate"><span class="pre">str_to_unix_ms()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.timeseries.html">earthscopestraintools.timeseries module</a></li>
 </ul>
 </li>
@@ -119,8 +181,264 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="earthscopestraintools-tiledbtools-module">
-<h1>earthscopestraintools.tiledbtools module<a class="headerlink" href="#earthscopestraintools-tiledbtools-module" title="Link to this heading"></a></h1>
+  <section id="module-earthscopestraintools.tiledbtools">
+<span id="earthscopestraintools-tiledbtools-module"></span><h1>earthscopestraintools.tiledbtools module<a class="headerlink" href="#module-earthscopestraintools.tiledbtools" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tiledbtools.</span></span><span class="sig-name descname"><span class="pre">ProcessedStrainReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainReader.check_query_result">
+<span class="sig-name descname"><span class="pre">check_query_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader.check_query_result" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainReader.reindex_df">
+<span class="sig-name descname"><span class="pre">reindex_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader.reindex_df" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainReader.to_df">
+<span class="sig-name descname"><span class="pre">to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_array_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader.to_df" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainReader.to_ts">
+<span class="sig-name descname"><span class="pre">to_ts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'timeseries'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_array_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_na</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainReader.to_ts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tiledbtools.</span></span><span class="sig-name descname"><span class="pre">ProcessedStrainWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainWriter.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'s3'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter.create" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainWriter.df_2_tiledb">
+<span class="sig-name descname"><span class="pre">df_2_tiledb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter.df_2_tiledb" title="Link to this definition"></a></dt>
+<dd><p>prepares a dataframe to write to array schema
+df - dataframe with time index, columns are timeseries data (one column per data_type)
+uri - string. which tiledb array to write to
+data_types - list of strings. data_types to map columns into.  ie CH0, 2Ene, pressure, time_index
+timeseries - string. name of timeseries.  counts, microstrain, offset_c, tide_c, atmp_c, atmp, pore, mjd, doy
+level - 2char string.  ‘0a’, ‘1a’, ‘2a’, ‘2b’
+quality_df- dataframe, optional.  if not included, quality flags will be set to ‘g’
+print_it - bool, optional.  show the constructed dataframe as it is being written to tiledb.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainWriter.ts_2_tiledb">
+<span class="sig-name descname"><span class="pre">ts_2_tiledb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries"><span class="pre">Timeseries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleanup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter.ts_2_tiledb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.ProcessedStrainWriter.write_df_to_tiledb">
+<span class="sig-name descname"><span class="pre">write_df_to_tiledb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.ProcessedStrainWriter.write_df_to_tiledb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tiledbtools.</span></span><span class="sig-name descname"><span class="pre">RawStrainReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainReader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainReader.check_query_result">
+<span class="sig-name descname"><span class="pre">check_query_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainReader.check_query_result" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainReader.reindex_df">
+<span class="sig-name descname"><span class="pre">reindex_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainReader.reindex_df" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainReader.to_df">
+<span class="sig-name descname"><span class="pre">to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_array_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainReader.to_df" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainReader.to_ts">
+<span class="sig-name descname"><span class="pre">to_ts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_nan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainReader.to_ts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tiledbtools.</span></span><span class="sig-name descname"><span class="pre">RawStrainWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'int'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainWriter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainWriter.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'s3'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainWriter.create" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainWriter.df_2_tiledb">
+<span class="sig-name descname"><span class="pre">df_2_tiledb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainWriter.df_2_tiledb" title="Link to this definition"></a></dt>
+<dd><p>prepares a dataframe to write to array schema
+df - dataframe with time index, columns are timeseries data (one column per channel)
+print_it - bool, optional.  show the constructed dataframe as it is being written to tiledb.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainWriter.ts_2_tiledb">
+<span class="sig-name descname"><span class="pre">ts_2_tiledb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries"><span class="pre">Timeseries</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleanup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainWriter.ts_2_tiledb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.RawStrainWriter.write_df_to_tiledb">
+<span class="sig-name descname"><span class="pre">write_df_to_tiledb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.RawStrainWriter.write_df_to_tiledb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tiledbtools.</span></span><span class="sig-name descname"><span class="pre">StrainArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.cleanup" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.cleanup_meta">
+<span class="sig-name descname"><span class="pre">cleanup_meta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.cleanup_meta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.consolidate_array_meta">
+<span class="sig-name descname"><span class="pre">consolidate_array_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.consolidate_array_meta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.consolidate_fragment_meta">
+<span class="sig-name descname"><span class="pre">consolidate_fragment_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.consolidate_fragment_meta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.consolidate_fragments">
+<span class="sig-name descname"><span class="pre">consolidate_fragments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.consolidate_fragments" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'s3'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.create" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.default_config">
+<span class="sig-name descname"><span class="pre">default_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.default_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.delete" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.exists" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_channels">
+<span class="sig-name descname"><span class="pre">get_channels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_channels" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_data_types">
+<span class="sig-name descname"><span class="pre">get_data_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_data_types" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_network">
+<span class="sig-name descname"><span class="pre">get_network</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_network" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_nonempty_domain">
+<span class="sig-name descname"><span class="pre">get_nonempty_domain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_nonempty_domain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_period">
+<span class="sig-name descname"><span class="pre">get_period</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_period" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_schema">
+<span class="sig-name descname"><span class="pre">get_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_schema" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_schema_from_s3">
+<span class="sig-name descname"><span class="pre">get_schema_from_s3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_schema_from_s3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_station">
+<span class="sig-name descname"><span class="pre">get_station</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_station" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.get_timeseries">
+<span class="sig-name descname"><span class="pre">get_timeseries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.get_timeseries" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.print_schema">
+<span class="sig-name descname"><span class="pre">print_schema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.print_schema" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.set_array_meta">
+<span class="sig-name descname"><span class="pre">set_array_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.set_array_meta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.set_default_ctx">
+<span class="sig-name descname"><span class="pre">set_default_ctx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.set_default_ctx" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.update_array_meta">
+<span class="sig-name descname"><span class="pre">update_array_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.update_array_meta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.vacuum_array_meta">
+<span class="sig-name descname"><span class="pre">vacuum_array_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.vacuum_array_meta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.vacuum_fragment_meta">
+<span class="sig-name descname"><span class="pre">vacuum_fragment_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.vacuum_fragment_meta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.StrainArray.vacuum_fragments">
+<span class="sig-name descname"><span class="pre">vacuum_fragments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.StrainArray.vacuum_fragments" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.lookup_s3_uri">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tiledbtools.</span></span><span class="sig-name descname"><span class="pre">lookup_s3_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.lookup_s3_uri" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="earthscopestraintools.tiledbtools.str_to_unix_ms">
+<span class="sig-prename descclassname"><span class="pre">earthscopestraintools.tiledbtools.</span></span><span class="sig-name descname"><span class="pre">str_to_unix_ms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.tiledbtools.str_to_unix_ms" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 
 
