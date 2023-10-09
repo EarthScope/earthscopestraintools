@@ -1,51 +1,22 @@
-This repo contains the code associated with a library on pypi
-https://pypi.org/project/earthscopestraintools/
-M. Gottlieb 1-20-23
+Welcome to earthscopestraintools, an open source python package for working with strainmeter data.  This project is actively under development and should not be considered stable at this time. 
+M. Gottlieb 10-3-2023
 
-It can be installed with 
+Documentation can be found at https://earthscopestraintools.readthedocs.io/en/latest/ 
+
+Pypi releases available from
+https://pypi.org/project/earthscopestraintools/
+
+earthscopestraintools can be installed with 
     
 > pip install earthscopestraintools
 
 Or with optional dependencies:
+```
+pip install 'earthscopestraintools[mseed]'
+pip install 'earthscopestraintools[tiledb]'
+pip install 'earthscopestraintools[mseed,tiledb]'
+```
 
-> pip install 'earthscopestraintools[mseed]'
-> 
-> pip install 'earthscopestraintools[tiledb]'
-> 
-> pip install 'earthscopestraintools[mseed,tiledb]'
+It is currently recommendeed to install the mseed optional dependencies, which includes obspy and some tools for loading data from the EarthScope miniseed archive.  The tiledb functionality, as of version 0.1.21, is not yet well implemented.  
 
-
-### straintiledbarray.py
-class with methods and metadata to interact with strain tiledb arrays.  
-Methods include create, delete, consolidate, vacuum, read, write.  it also 
-includes the current schema definition.
-
-### ascii2tdb.py
-ETL script to read level 2 ascii files and write them to tiledb local arrays.  then need to
-> aws s3 sync arrayname s3://tiledb-strain/arrayname
-
-### tdb2ascii.py
-distrubution script to generate level 2 ascii files based on a time query
-back from tiledb and package as tarball
-
-### tdb2tdb.py
-distribution script to generate a subset tdb array based on a time query and 
-package as tarball
-
-### bottle.py
-library for reading gtsm bottle files
-
-### bottletar.py
-wrapper class for reading 5 cases of tarballs of bottle files and writing to tiledb
-
-### bottle2mseed.py
-add on functionality around bottletar to use obspy to write mseed files
-
-### bottle2tiledb.py
-add on functionality around bottletar to use straintiledbarray to write to tiledb
-
-### mseed_tools.py
-functions to download miniseed from DataSelect and load into pandas dataframes
-
-### gtsm_metadata.py
-class to load GTSM metadata 
+Some functionality (tidal analysis and corrections) depends on BAYTAP-08 and SPOTL, two legacy FORTRAN programs, which have been containerized for use by this library.  In order to run these processing methods, you must have Docker installed and running on your computer.  When required, the library will then fetch the required images and be able to run these processing steps.

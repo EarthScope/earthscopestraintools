@@ -3,13 +3,10 @@ import pandas as pd
 import math
 import urllib.request as request
 
-# from obspy.clients.fdsn import Client
 from importlib.resources import files
 from datetime import datetime
 from earthscopestraintools.datasources_api_interact import lookup_fdsn_network_from_bnum
 import requests
-
-# inv_client = Client("IRIS")
 
 import logging
 
@@ -23,10 +20,35 @@ class GtsmMetadata:
     https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt \n
     and individual station pages ie \n
     http://bsm.unavco.org/bsm/level2/B001/B001.README.txt 
+    
+    :param network: 2 character FDSN network code
+    :type network: str
+    :param station: 4 character FDSN station code
+    :type station: str
+    :param gauge_weights: optional list of 'good' channels, where 1 is good and 0 is bad, defaults to [1, 1, 1, 1]
+    :type gauge_weights: list, optional
+    
+    :ivar network: str
+    :ivar station: str
+    :ivar latitude: float
+    :ivar longitude: float
+    :ivar elevation: float
+    :ivar gap: float, instrument gap in meters
+    :ivar diameter: float, instrument sensing diameter in meters
+    :ivar start_date: str, formatted as "%Y-%m-%d"
+    :ivar orientation: float, degrees East of North for CH0
+    :ivar reference_strains: dict, containing 'linear_date':'YYYY:DOY' and each channel ie 'CH0':reference counts 
+    :ivar strain_matrices: dict, contains one or more calibration matrices, keyed to the name of the calibration.  
+    :ivar atmp_response: dict, reponse coefficients for each channel
+    :ivar tidal_params: dict, keys are tuple of (channel, tidal constituent, phz/amp/doodson)
+
     """
-    def __init__(self, network, fcid, gauge_weights=None):
+    def __init__(self, network, station, gauge_weights=None):
+        """
+        Loads metadata for given station.  
+        """
         self.network = network
-        self.fcid = fcid  # todo: change to 'station' and fix usages
+        self.station = station  
         self.meta_df = self.get_meta_table()
         self.latitude = self.get_latitude()
         self.longitude = self.get_longitude()
@@ -52,8 +74,8 @@ class GtsmMetadata:
 
     # def get_xml(self):
     #     metadir = "../xml/"
-    #     xml_path = "ftp://bsm.unavco.org/pub/bsm/level2/" + self.fcid + "/"
-    #     xml_file = self.fcid + ".xml"
+    #     xml_path = "ftp://bsm.unavco.org/pub/bsm/level2/" + self.station + "/"
+    #     xml_file = self.station + ".xml"
     #     with closing(request.urlopen(xml_path + xml_file)) as r:
     #         with open(metadir + xml_file, "wb") as f:
     #             shutil.copyfileobj(r, f)
@@ -77,7 +99,7 @@ class GtsmMetadata:
         """
         try:
             lats = self.meta_df["LAT"]
-            return float(lats[self.fcid])
+            return float(lats[self.station])
         except:
             logger.info("no latitude found")
             exit(1)
@@ -90,7 +112,7 @@ class GtsmMetadata:
         """
         try:
             longs = self.meta_df["LONG"]
-            return float(longs[self.fcid])
+            return float(longs[self.station])
         except:
             logger.info("no longitude found")
             exit(1)
@@ -103,7 +125,7 @@ class GtsmMetadata:
         """
         try:
             elevations = self.meta_df["ELEV(m)"]
-            return float(elevations[self.fcid])
+            return float(elevations[self.station])
         except:
             logger.info("no elevation found")
             exit(1)
@@ -116,9 +138,9 @@ class GtsmMetadata:
         """
         try:
             gaps = self.meta_df["GAP(m)"]
-            return float(gaps[self.fcid])
+            return float(gaps[self.station])
         except:
-            logger.info("no gap found for %s, using .0001" % self.fcid)
+            logger.info("no gap found for %s, using .0001" % self.station)
             return 0.0001
 
     def get_orientation(self):
@@ -129,20 +151,20 @@ class GtsmMetadata:
         """
         try:
             orientations = self.meta_df["CH0(EofN)"]
-            return float(orientations[self.fcid])
+            return float(orientations[self.station])
         except Exception as e:
             logger.error(e)
-            logger.error("No orientation found for %s, using 0 deg" % self.fcid)
+            logger.error("No orientation found for %s, using 0 deg" % self.station)
             return 0
 
     def get_start_date(self):
         """parse data start date from metadata table
 
-        :return: start date
-        :rtype: datetime.datetime
+        :return: start date string as "%Y-%m-%d"
+        :rtype: str
         """
         try:
-            start_date = self.meta_df.loc[self.fcid]["DATA_START"]
+            start_date = self.meta_df.loc[self.station]["DATA_START"]
             return datetime.strptime(start_date, "%Y:%j").strftime("%Y-%m-%d")
 
         except Exception as e:
@@ -163,7 +185,7 @@ class GtsmMetadata:
     #         return orientation
     #     except Exception as e:
     #         logger.error(e)
-    #         logger.error("No orientation found for %s, using 0 deg" % self.fcid)
+    #         logger.error("No orientation found for %s, using 0 deg" % self.station)
     #         return 0
 
     def make_weighted_strain_matrix(self, gauge_weights=[1, 1, 1, 1]):
@@ -239,7 +261,7 @@ class GtsmMetadata:
         :rtype: np.array
         """
         try:
-            url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
+            url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
 
             with request.urlopen(url) as response:
                 lines = response.readlines()
@@ -266,7 +288,7 @@ class GtsmMetadata:
         :return: ER2010 calibration matrix
         :rtype: np.array
         """
-        url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
+        url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
         try:
             with request.urlopen(url) as response:
                 lines = response.readlines()
@@ -293,7 +315,7 @@ class GtsmMetadata:
         :return: CH_PRELIM calibration matrix
         :rtype: np.array
         """
-        url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
+        url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
         try:
             with request.urlopen(url) as response:
                 lines = response.readlines()
@@ -320,11 +342,11 @@ class GtsmMetadata:
         :rtype: dict
         """
         reference_strains = {}
-        reference_strains["linear_date"] = self.meta_df.loc[self.fcid]["L_DATE"]
-        reference_strains["CH0"] = int(self.meta_df.loc[self.fcid]["L0(cnts)"])
-        reference_strains["CH1"] = int(self.meta_df.loc[self.fcid]["L1(cnts)"])
-        reference_strains["CH2"] = int(self.meta_df.loc[self.fcid]["L2(cnts)"])
-        reference_strains["CH3"] = int(self.meta_df.loc[self.fcid]["L3(cnts)"])
+        reference_strains["linear_date"] = self.meta_df.loc[self.station]["L_DATE"]
+        reference_strains["CH0"] = int(self.meta_df.loc[self.station]["L0(cnts)"])
+        reference_strains["CH1"] = int(self.meta_df.loc[self.station]["L1(cnts)"])
+        reference_strains["CH2"] = int(self.meta_df.loc[self.station]["L2(cnts)"])
+        reference_strains["CH3"] = int(self.meta_df.loc[self.station]["L3(cnts)"])
         return reference_strains
 
     # def get_linearization_params_xml(self):
@@ -387,7 +409,7 @@ class GtsmMetadata:
         :return: atmospheric response coefficients
         :rtype: dict
         """
-        url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
+        url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
         try:
             with request.urlopen(url) as response:
                 lines = response.readlines()
@@ -416,7 +438,7 @@ class GtsmMetadata:
         :return: tidal coefficients
         :rtype: dict
         """
-        url = f"http://bsm.unavco.org/bsm/level2/{self.fcid}/{self.fcid}.README.txt"
+        url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
         try:
             with request.urlopen(url) as response:
                 lines = response.readlines()
@@ -463,8 +485,8 @@ class GtsmMetadata:
         These terms are used for event magnitude estimation.
         """
         site_terms = self.load_site_terms()
-        if self.fcid in site_terms.Station.values:
-            self.site_term = site_terms[site_terms.Station == self.fcid].delta_s.item()
+        if self.station in site_terms.Station.values:
+            self.site_term = site_terms[site_terms.Station == self.station].delta_s.item()
         else:
             self.site_term = 0
         if self.longitude < -124:
@@ -477,21 +499,21 @@ class GtsmMetadata:
         """
         # pp = pprint.PrettyPrinter()
         logger.info(f"network: {self.network}")
-        logger.info(f"fcid: {self.fcid}")
+        logger.info(f"station: {self.station}")
         logger.info(f"latitude: {self.latitude}")
         logger.info(f"longitude: {self.longitude}")
         logger.info(f"gap: {self.gap}")
         logger.info(f"orientation (CH0EofN): {self.orientation}")
-        logger.info(f"reference strains:\n {self.reference_strains}")
-        # logger.info(self.linearization)
+        logger.info(f"reference_strains:\n {self.reference_strains}")
+        logger.info("strain_matrices:")
         if len(self.strain_matrices):
             for key in self.strain_matrices:
                 logger.info(f"{key}:\n {self.strain_matrices[key]}")
                 # logger.info(self.strain_matrices[key])
                 # pp.pprint(self.strain_matrices[key])
-        logger.info(f"atmp coefficients:\n {self.atmp_response}")
+        logger.info(f"atmp_response:\n {self.atmp_response}")
         # logger.info(self.atmp_response)
-        logger.info(f"tidal params:\n {self.tidal_params}")
+        logger.info(f"tidal_params:\n {self.tidal_params}")
         # logger.info(self.tidal_params)
 
         # print("reference strains:")
