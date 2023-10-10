@@ -658,10 +658,11 @@ class Timeseries:
         return ts
 
     def linear_trend_correction(
-        self, trend_start=None, trend_end=None, name: str = None
+        self, method='linear',trend_start=None, trend_end=None, name: str = None
     ):
         """Generate a linear trend correction
-
+        :param method: linear or median
+        :type method: str, defaults to linear
         :param trend_start: start of window to calculate trend, defaults to first_valid_index()
         :type trend_start: datetime.datetime, optional
         :param trend_end: end of window to calculate trend, defaults to last_valid_index()
@@ -671,7 +672,7 @@ class Timeseries:
         :return: trend correction timeseries for each column/channel in input data
         :rtype: Timeseries
         """
-        data = calculate_linear_trend_correction(self.data, trend_start, trend_end)
+        data = calculate_linear_trend_correction(self.data, method, trend_start, trend_end)
         if not name:
             name = f"{self.name}.trend_c"
         ts = Timeseries(

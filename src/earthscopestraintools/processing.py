@@ -367,11 +367,13 @@ def calculate_pressure_correction(df: pd.DataFrame, response_coefficients: dict)
     return data_df
 
 
-def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
-    """Generate a linear trend correction
+def calculate_linear_trend_correction(df, method='linear',trend_start=None, trend_end=None):
+    """Generate a linear trend correction via either a linear least squares calculation or a median trend calculation. The median trend calculation (based on MIDAS in Blewitt et al., 2016 for GNSS time series analysis) uses the median slope value from all points separated by roughly one lunar day, calculated after outliers beyond 2 median absolute deviations are removed. It will only work with > 3 days of data.
 
     :param df: uncorrected data, as dataframe with datetime index and 1 channel per column
     :type df: pd.DataFrame
+    :param method: linear or median
+    :type method: str, default is linear
     :param trend_start: start of window to calculate trend, defaults to first_valid_index()
     :type trend_start: datetime.datetime, optional
     :param trend_end: end of window to calculate trend, defaults to last_valid_index()
@@ -387,12 +389,30 @@ def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
     logger.info(f"    Trend Start: {trend_start}")
     logger.info(f"    Trend Start: {trend_end}")
     df_trend_c = pd.DataFrame(data=df.index)
-    windowed_df = df.copy()[trend_start:trend_end].interpolate().reset_index()
-    for ch in df.columns:
-        slope, intercept, r_value, p_value, std_err = stats.linregress(
-            windowed_df.index, windowed_df[ch]
-        )
-        df_trend_c[ch] = df_trend_c.index * slope
+    windowed_df = df.copy()[trend_start:trend_end].interpolate()
+    if method == 'linear':
+        for ch in df.columns:
+            slope, intercept, r_value, p_value, std_err = stats.linregress(
+                windowed_df.index, windowed_df[ch]
+            )
+            df_trend_c[ch] = df_trend_c.index * slope
+    elif method == 'median':
+        # Goal time difference
+        # Mean syndonic month, divided by lunar cycles (so 1 day)
+        tdiff = (29*24*60*60+12*60*60+44*60)/30 # seconds
+        end = pd.to_datetime(windowed_df.index[-1].timestamp() - tdiff,unit='s')
+        df1 = windowed_df[:end]
+        df2 = windowed_df[len(windowed_df)-len(df1):]
+        # actual time difference after shifting dataframes
+        new_tdiff = df2.index[0].timestamp()-df1.index[0].timestamp() # seconds
+        logger.info(f"  Median trend calculated with points {new_tdiff/60/60} hr apart.")
+        for ch in df.columns:
+            med = (df2[ch].values - df1[ch].values)/new_tdiff
+            medmad_std_dev1 = stats.median_abs_deviation(med)*1.4826 # See Blewitt et al. 2016 and Wilcox 2005
+            tmp = med[med<(np.median(med)+medmad_std_dev1*2)]
+            med_2sig = tmp[tmp>(np.median(med)-medmad_std_dev1*2)]
+            slope = np.median(med_2sig)
+            df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - df.index[0].timestamp())*slope
     # print("df_trend_c", df_trend_c)
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
@@ -457,3 +477,11 @@ def calculate_tide_correction(df, period, tidal_parameters, longitude):
         df2[ch] = np.fromstring(output, dtype=float, sep="\n")
     df2 = df2 * 1e-3
     return df2
+
+#def baytap_analysis(df,atmp_df,dmin=0.04,igrp=0):
+#    '''
+#    This function accesses a docker container to run BAYTAP08 ()
+#    :return:
+#    :rtype:
+#    '''
+#    return baytap_results
