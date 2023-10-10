@@ -7,7 +7,7 @@ src/earthscopestraintools/bottle.py
 src/earthscopestraintools/bottle2mseed.py
 src/earthscopestraintools/bottle2tdb.py
 src/earthscopestraintools/bottletar.py
-src/earthscopestraintools/edid.py
+src/earthscopestraintools/datasources_api_interact.py
 src/earthscopestraintools/event.py
 src/earthscopestraintools/event_processing.py
 src/earthscopestraintools/event_site_terms.txt

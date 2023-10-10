@@ -95,7 +95,7 @@ def butterworth_filter(
     :type filter_type: str
     :param filter_order: the order of the filter
     :type filter_order: int
-    :param filter_cutoff_s: the filter cutoff in seconds
+    :param filter_cutoff_s: the filter cutoff frequency in seconds
     :type filter_cutoff_s: float
     :return: butterworth filtered data
     :rtype: pandas.DataFrame
@@ -140,7 +140,7 @@ def interpolate(
 
 
 def decimate_to_hourly(df: pd.DataFrame):
-    """decimates a timeseries to hourly by selecting the first minute of each hour
+    """decimates a timeseries to hourly by selecting the first and second and minute of each hour
 
     :param df: time series data to decimate
     :type df: pd.DataFrame
@@ -148,11 +148,13 @@ def decimate_to_hourly(df: pd.DataFrame):
     :rtype: pd.DataFrame
     """
     logger.info(f"Decimating to hourly")
-    return df[df.index.minute == 0]
+    df1 = df[df.index.minute == 0]
+    df2 = df1[df1.index.second == 0]
+    return df2
 
 
 def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3600):
-    """decimate 1hz data to 5 min data using \n
+    """Filter and decimate 1hz data to 5 min data using \n
     Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
     low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99
 
@@ -312,7 +314,7 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
 def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float = 0.75):
     """Calculate offsets using first differencing method (add more details).  
 
-    :param df: uncorrected data, as dataframe with datetime index and 1 channel per column
+    :param df: uncorrected data, as dataframe with datetime (in seconds) index and 1 channel per column
     :type df: pandas.DataFrame
     :param limit_multiplier: _description_, defaults to 10
     :type limit_multiplier: int, optional

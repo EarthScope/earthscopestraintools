@@ -8,6 +8,7 @@ from earthscopestraintools.processing import (
     interpolate,
     decimate_1s_to_300s,
     butterworth_filter,
+    decimate_to_hourly,
     apply_calibration_matrix,
     calculate_offsets,
     calculate_pressure_correction,
@@ -483,6 +484,45 @@ class Timeseries:
             level=self.level,
             name=name,
         )
+
+    def decimate_to_hourly(
+        self, name: str = None
+    ):
+        """ Decimates a timeseries to hourly by selecting the first and second and minute of each hour
+
+        :param df: time series data to decimate
+        :type df: pd.DataFrame
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: Timeseries containing hourly decimated data
+        :rtype: Timeseries
+        """
+        data = decimate_to_hourly(self.data)
+        quality_df = self.quality_df.copy().reindex(data.index)
+        quality_df[quality_df.isna()] = "i"
+        # find any differences using the original data index
+        mask1 = (data.reindex(self.data.index) != self.data).any(axis=1)
+
+        # any nans from the original index
+        mask2 = self.data[mask1].isna()
+        quality_df[mask2] = "i"
+
+        # any 999999s from the original index
+        mask3 = self.data[mask1] == 999999
+        quality_df[mask3] = "i"
+        # quality_df = self.quality_df.reindex(data.index)
+        if not name:
+            name = f"{self.name}.decimated"
+        ts2 = Timeseries(
+            data=data,
+            quality_df=quality_df,
+            series=self.series,
+            units=self.units,
+            level="1",
+            period=3600,
+            name=name,
+        )
+        return ts2
 
     def calculate_offsets(
         self,

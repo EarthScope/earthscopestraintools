@@ -19,7 +19,7 @@ def calc_hypocentral_dist(
         station_latitude,
         station_longitude):
     """
-    Function calculates hypocentral distance (km) between lat,long and earthquake
+    Function calculates hypocentral distance (km) between lat,long and earthquake. Note that the distance calculation does not account for Earth's curvature with depth, and should be used for regional earthquakes only.
 
     :param eq_latitude: latitude of earthquake
     :type eq_latitude: float
