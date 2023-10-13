@@ -36,7 +36,7 @@
               <img src="_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.20
+                0.1.21
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -50,8 +50,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pages/DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/DataStructures.html">Data Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/level2.html">Example of running level 2 processing steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/TidalCalibrationEarthscopestraintools.html">Tidal Calibration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 </ul>
 
@@ -94,9 +97,20 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pages/DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/DataStructures.html">Data Structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pages/DataStructures.html#pandas-dataframes">Pandas DataFrames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/DataStructures.html#on-disk">On Disk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/DataStructures.html#timeseries-objects">Timeseries Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Metadata.html">Metadata</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pages/Metadata.html#earthscopestraintools-gtsm-metadata-gtsmmetadata">earthscopestraintools.gtsm_metadata.GtsmMetadata</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/level2.html">Example of running level 2 processing steps</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Acquire,-decimate,-convert-the-data-from-raw">Acquire, decimate, convert the data from raw</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Corrections">Corrections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/level2.html#Additional-Comparisons:">Additional Comparisons:</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a><ul>
@@ -108,6 +122,15 @@
 <li class="toctree-l2"><a class="reference internal" href="notebooks/plot_event.html#Plot-any-co-seismic-offsets-in-regional-strains">Plot any co-seismic offsets in regional strains</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/TidalCalibrationEarthscopestraintools.html">Tidal Calibration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/TidalCalibrationEarthscopestraintools.html#Aquire-station-metadata-and-decimated-timeseries">Aquire station metadata and decimated timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/TidalCalibrationEarthscopestraintools.html#Offset-correction">Offset correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/TidalCalibrationEarthscopestraintools.html#Observed-tidal-analysis">Observed tidal analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/TidalCalibrationEarthscopestraintools.html#Predicted-tides">Predicted tides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/TidalCalibrationEarthscopestraintools.html#Orientation-matrix">Orientation matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/TidalCalibrationEarthscopestraintools.html#References">References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.html">earthscopestraintools package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.ascii2tdb.html">earthscopestraintools.ascii2tdb module</a></li>
@@ -116,7 +139,6 @@
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>

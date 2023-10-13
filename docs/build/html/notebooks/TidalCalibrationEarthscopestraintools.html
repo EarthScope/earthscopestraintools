@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tidal Calibration &mdash; Earthscope Strain Tools 1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API documentation" href="../api.html" />
+    <link rel="prev" title="Example of looking at high rate event data from a strainmeter" href="plot_event.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Earthscope Strain Tools
+              <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.1.21
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/DataStructures.html">Data Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tidal Calibration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Aquire-station-metadata-and-decimated-timeseries">Aquire station metadata and decimated timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Offset-correction">Offset correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Observed-tidal-analysis">Observed tidal analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Predicted-tides">Predicted tides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Orientation-matrix">Orientation matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Earthscope Strain Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tidal Calibration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/notebooks/TidalCalibrationEarthscopestraintools.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Tidal-Calibration">
+<h1>Tidal Calibration<a class="headerlink" href="#Tidal-Calibration" title="Link to this heading"></a></h1>
+<p>This notebook is intended to demonstrate tidal calibration process for the Gladwin Tensor borehole Strainmeters (GTSM) following the methodology outlined in Hodgkinson et al. (2013) and applied in Hanagan et al. (In Prep). Note that tidal calibration requires a careful eye to the data for processing, so, when available, the tidal calibrations provided in the metadata are suggested unless the user has a strong reason to belive the calibration requires an update.</p>
+<p>The workflow in this notebook can be summarized to data aquisition, offset correction, and tidal time series analysis and modelling to acquire the final tidal calibration matrix. We correct the data for spurious offsets or pulses prior to tidal analysis because they are known to hinder accurate characterization of the tides and barometric pressure repsonse. An additional benefit of the workflow implemented here, is that we will also estimate the gauge response to barometric pressure.</p>
+<p>The first portion of this notebook includes steps from the level 2 processing notebook. Then, new steps specific to the calibraiton process are completed. Sections in this notebook include: - Aquire station metadata and decimated timeseries - Offset correction - Observed tidal analysis - Predicted tides - Orientation matrix - <a class="reference internal" href="#References"><span class="std std-ref">References</span></a></p>
+<section id="Aquire-station-metadata-and-decimated-timeseries">
+<h2>Aquire station metadata and decimated timeseries<a class="headerlink" href="#Aquire-station-metadata-and-decimated-timeseries" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import relevant modules from the earscopestraintools package</span>
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+<span class="kn">from</span> <span class="nn">earthscopestraintools.mseed_tools</span> <span class="kn">import</span> <span class="n">ts_from_mseed</span>
+<span class="kn">from</span> <span class="nn">earthscopestraintools.gtsm_metadata</span> <span class="kn">import</span> <span class="n">GtsmMetadata</span>
+<span class="kn">from</span> <span class="nn">earthscopestraintools.timeseries</span> <span class="kn">import</span> <span class="n">plot_timeseries_comparison</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Allow logged output to be printed in the notebook as code cells are run</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[196]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Linearize 1 hz strain from the IRIS/EarthScope DMC, filter/decimate to 5 min</span>
+<span class="c1"># and acquire 30 min pressure data</span>
+
+<span class="c1"># (Store 999999 calibraion timestamps [NANs] for later use in BAYTAP08 for tidal analysis</span>
+
+<span class="c1"># Metadata</span>
+<span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;IV&#39;</span>
+<span class="n">station</span> <span class="o">=</span> <span class="s1">&#39;TSM6&#39;</span>
+<span class="n">meta</span> <span class="o">=</span> <span class="n">GtsmMetadata</span><span class="p">(</span><span class="n">network</span><span class="p">,</span><span class="n">station</span><span class="p">)</span>
+
+<span class="c1"># Provide the start and end times for calibration</span>
+<span class="n">start</span> <span class="o">=</span> <span class="s2">&quot;2022-10-21T00:00:00.000000&quot;</span>
+<span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;2023-03-09T23:59:59.000000&quot;</span>
+
+<span class="c1"># load data</span>
+<span class="n">strain_raw</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;T0&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;LS*&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+<span class="c1"># Print some stats and plot the data</span>
+<span class="n">strain_raw</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+<span class="n">strain_raw</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+IV TSM6 Loading T0 LS* from 2022-10-21T00:00:00.000000 to 2023-03-09T23:59:50.000000 from Earthscope DMC miniseed
+    Trace 1. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:50.000000Z mapping LS1 to CH0
+    Trace 2. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:50.000000Z mapping LS2 to CH1
+    Trace 3. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:50.000000Z mapping LS3 to CH2
+    Trace 4. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:50.000000Z mapping LS4 to CH3
+    Found 0 epochs with nans, 29.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Converting missing data from 999999 to nan
+  Converting 999999 values to nan
+    Found 29 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+IV.TSM6.T0.LS*
+    | Channels: [&#39;CH0&#39;, &#39;CH1&#39;, &#39;CH2&#39;, &#39;CH3&#39;]
+    | TimeRange: 2022-10-21 00:00:00 - 2023-03-09 23:59:50        | Period:             1s
+    | Series:         raw| Units:        counts| Level:          0| Gaps:             0.0%
+    | Epochs:    12095991| Good:     12095962.0| Missing:     29.0| Interpolated:      0.0
+    | Samples:   48383964| Good:       48383848| Missing:      116| Interpolated:        0
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_TidalCalibrationEarthscopestraintools_3_1.png" src="../_images/notebooks_TidalCalibrationEarthscopestraintools_3_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[197]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter to 5 min, then to hourly in a 2 step filter for strain and convert to nstrain</span>
+<span class="c1"># Save the hourly data in a separate dataframe with a datetime seconds index</span>
+
+<span class="c1"># filter and decimate to 5 min</span>
+<span class="n">decimated_counts</span> <span class="o">=</span> <span class="n">strain_raw</span><span class="o">.</span><span class="n">decimate_1s_to_300s</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<span class="n">filt_cutoff_s</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span> <span class="c1"># 2 hr cutoff period</span>
+<span class="c1"># Applies a lowpass butterworth filter via the scipy butterworth filter function</span>
+<span class="n">filtered_hr_counts</span> <span class="o">=</span> <span class="n">decimated_counts</span><span class="o">.</span><span class="n">butterworth_filter</span><span class="p">(</span><span class="n">filter_type</span><span class="o">=</span><span class="s1">&#39;lowpass&#39;</span><span class="p">,</span><span class="n">filter_order</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                                          <span class="n">filter_cutoff_s</span><span class="o">=</span><span class="n">filt_cutoff_s</span><span class="p">)</span>
+<span class="c1"># Decimates the data to hourly by taking the first minute/second of each hour</span>
+<span class="n">decimated_hr_counts</span> <span class="o">=</span> <span class="n">filtered_hr_counts</span><span class="o">.</span><span class="n">decimate_to_hourly</span><span class="p">()</span>
+<span class="c1"># Linearize to microstrain</span>
+<span class="n">decimated_hr_strain</span> <span class="o">=</span> <span class="n">decimated_hr_counts</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">reference_strains</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_reference_strains</span><span class="p">(),</span><span class="n">gap</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_gap</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Decimating to 300s
+Interpolating data using method=linear and limit=3600
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+</pre></div></div>
+</div>
+</section>
+<section id="Offset-correction">
+<h2>Offset correction<a class="headerlink" href="#Offset-correction" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[199]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Acquire atmospheric pressure data and filter to hourly</span>
+
+<span class="c1"># Pressure data from miniseed</span>
+<span class="n">atmp_raw</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;RDO&#39;</span><span class="p">,</span>
+                        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">60</span><span class="o">*</span><span class="mi">30</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;hpa&#39;</span><span class="p">)</span>
+<span class="c1"># Interpolate, filter and decimate to hourly</span>
+<span class="n">atmp_interp</span> <span class="o">=</span> <span class="n">atmp_raw</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()</span>
+<span class="n">atmp_filt</span> <span class="o">=</span> <span class="n">atmp_interp</span><span class="o">.</span><span class="n">butterworth_filter</span><span class="p">(</span><span class="n">filter_type</span><span class="o">=</span><span class="s1">&#39;lowpass&#39;</span><span class="p">,</span><span class="n">filter_order</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                        <span class="n">filter_cutoff_s</span><span class="o">=</span><span class="n">filt_cutoff_s</span><span class="p">)</span>
+<span class="n">atmp</span> <span class="o">=</span> <span class="n">atmp_filt</span><span class="o">.</span><span class="n">decimate_to_hourly</span><span class="p">()</span>
+<span class="c1"># Compute a preliminary pressure correction</span>
+<span class="n">atmp_c</span> <span class="o">=</span> <span class="n">atmp</span><span class="o">.</span><span class="n">calculate_pressure_correction</span><span class="p">(</span><span class="n">response_coefficients</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_atmp_response</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+IV TSM6 Loading * RDO from 2022-10-21T00:00:00.000000 to 2023-03-09T23:59:50.000000 from Earthscope DMC miniseed
+    Trace 1. 2022-10-21T00:00:00.000000Z:2023-03-09T23:30:00.000000Z mapping RDO to atmp
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Converting missing data from 999999 to nan
+  Converting 999999 values to nan
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Interpolating data using method=linear and limit=2
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Applying Butterworth Filter
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Decimating to hourly
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Calculating pressure correction
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[200]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Other corrections prior to offset correcteion</span>
+<span class="n">trend_c</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">linear_trend_correction</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
+<span class="n">tide_c</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">calculate_tide_correction</span><span class="p">(</span><span class="n">tidal_parameters</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_tidal_params</span><span class="p">(),</span><span class="n">longitude</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_longitude</span><span class="p">())</span>
+<span class="n">pre_offset_corrected</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">apply_corrections</span><span class="p">([</span><span class="n">trend_c</span><span class="p">,</span><span class="n">tide_c</span><span class="p">,</span><span class="n">atmp_c</span><span class="p">])</span>
+<span class="n">offset_c</span> <span class="o">=</span> <span class="n">pre_offset_corrected</span><span class="o">.</span><span class="n">calculate_offsets</span><span class="p">(</span><span class="n">limit_multiplier</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">offset_corrected</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">apply_corrections</span><span class="p">([</span><span class="n">offset_c</span><span class="p">])</span>
+<span class="n">plot_timeseries_comparison</span><span class="p">([</span><span class="n">decimated_hr_strain</span><span class="p">,</span><span class="n">offset_corrected</span><span class="p">],</span><span class="n">zero</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">detrend</span><span class="o">=</span><span class="s1">&#39;Linear&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Calculating linear trend correction
+    Trend Start: 2022-10-21 00:00:00
+    Trend Start: 2023-03-09 23:00:00
+  Median trend calculated with points 24.0 hr apart.
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Calculating tide correction
+WARNING: The requested image&#39;s platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+WARNING: The requested image&#39;s platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+WARNING: The requested image&#39;s platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+WARNING: The requested image&#39;s platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Applying corrections
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Calculating offsets using cutoff percentile of 0.75 and limit multiplier of 10.
+Using offset limits of [0.009739, 0.019143, 0.008324, 0.010778]
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Applying corrections
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Only linear detrend implemented
+Only linear detrend implemented
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_TidalCalibrationEarthscopestraintools_7_1.png" src="../_images/notebooks_TidalCalibrationEarthscopestraintools_7_1.png" />
+</div>
+</div>
+</section>
+<section id="Observed-tidal-analysis">
+<h2>Observed tidal analysis<a class="headerlink" href="#Observed-tidal-analysis" title="Link to this heading"></a></h2>
+<p>The tidal constituents (amplitudes and phases of daily and bi-daily tides) will be determined from the observed strain timeseries in a program called BAYTAP08 (Tamura 1991; Tamura and Agnew 2008). The original BAYTAP-G program was rewritten by Duncan Agnew in the BAYTAP08 iteration: <a class="reference external" href="http://igppweb.ucsd.edu/~agnew/Baytap/baytap.html">http://igppweb.ucsd.edu/~agnew/Baytap/baytap.html</a>. The primary function of BAYTAP08 is to isolate distinct tidal amplitudes and phases from data streams contaminated by other signals through assuming a smoothly
+varying drift, which is empirically inferred by minimizing Akaike’s Bayesian Information Criterion (ABIC).</p>
+<p>To summarize, the program assumes a strain signal (<span class="math notranslate nohighlight">\(y_i\)</span>) composed of the following components:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[y_i = t_i + d_i + c_i + s_i\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(t_i\)</span>: tidal signal - <span class="math notranslate nohighlight">\(d_i\)</span>: long term trend (instrument drift) - <span class="math notranslate nohighlight">\(c_i\)</span>: response to other effects (e.g., barometric pressure) - <span class="math notranslate nohighlight">\(s_i\)</span>: data offsets</p></li>
+</ul>
+</div></blockquote>
+<p>The tidal signal is composed of the tidal amplitudes and phases we seek (<span class="math notranslate nohighlight">\(A_m\)</span> and <span class="math notranslate nohighlight">\(B_m\)</span>), and the known theoretical tidal group values (<span class="math notranslate nohighlight">\(C_{mi}\)</span> and <span class="math notranslate nohighlight">\(S_{mi}\)</span>) that are the sum of the constituents with similar frequencies: &gt;</p>
+<div class="math notranslate nohighlight">
+\[t_i =\sum_{m=1}^{M} (A_m C_{mi}+B_m S_{mi})\]</div>
+<p>The barometric response is considered linear with the barometric pressure change. Where, <span class="math notranslate nohighlight">\(b_i\)</span> is the barometric response coefficient: &gt;</p>
+<div class="math notranslate nohighlight">
+\[c_i=b_i y_i\]</div>
+<p>The residual time series is left once these signals are removed: &gt;</p>
+<div class="math notranslate nohighlight">
+\[r_i = y_i - (t_i + d_i + c_i + s_i)\]</div>
+<p>BAYTAP solves for the model parameters by minimizing S: &gt;</p>
+<div class="math notranslate nohighlight">
+\[S = \sum_{i=1}^{N}r_i^2+ D^2 \sum_{i=1}^{n} (d_i - 2d_{i-1} + d_{i-2})^2 + W^2 \sum_{m=2}^{M}(A_m - A_{m-1})^2+(B_m-B_{m-1})^2\]</div>
+<ul class="simple">
+<li><p>D (drift) is an input smoothness parameter, where a very large D provides a linear drift with time. - W is an input parameter that controls how much the tidal admittance can vary over frequency bands.</p></li>
+</ul>
+<p>Typically, the strainmeters have already been analyzed with BAYTAP, and those outputs are what we used to perform the preliminary corrections prior to detecting offsets and pulses in the previous step. Here, the goal is to reanalyze the tidal amplitudes and phases to perform tidal calibration. More specifically, we are interested in the M2 and O1 tidal constituent amplitudes and phases per gauge.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[201]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run baytap to retrieve the pressure response and tidal amplitudes and phases for the full metadata suite</span>
+<span class="n">baytap_results</span><span class="o">=</span> <span class="n">offset_corrected</span><span class="o">.</span><span class="n">baytap_analysis</span><span class="p">(</span><span class="n">atmp</span><span class="p">,</span><span class="n">latitude</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span><span class="n">longitude</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span><span class="n">elevation</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">elevation</span><span class="p">,</span><span class="n">dmin</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Docker container started.
+7dc565c4e42aae721fcd02b5f5c3da1778f95380746d2bd3299be70d395f7b8c
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+docker: Error response from daemon: Conflict. The container name &#34;/baytap&#34; is already in use by container &#34;7dc565c4e42aae721fcd02b5f5c3da1778f95380746d2bd3299be70d395f7b8c&#34;. You have to remove (or rename) that container to be able to reuse that name.
+See &#39;docker run --help&#39;.
+docker: Error response from daemon: Conflict. The container name &#34;/baytap&#34; is already in use by container &#34;7dc565c4e42aae721fcd02b5f5c3da1778f95380746d2bd3299be70d395f7b8c&#34;. You have to remove (or rename) that container to be able to reuse that name.
+See &#39;docker run --help&#39;.
+docker: Error response from daemon: Conflict. The container name &#34;/baytap&#34; is already in use by container &#34;7dc565c4e42aae721fcd02b5f5c3da1778f95380746d2bd3299be70d395f7b8c&#34;. You have to remove (or rename) that container to be able to reuse that name.
+See &#39;docker run --help&#39;.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+baytap
+Docker processes finished. Container removed.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[202]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print the results for the M2 and O1 tidal constituents</span>
+<span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">offset_corrected</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;M2 amp (nstrain) and phase (degree):&#39;</span><span class="p">,</span>
+          <span class="n">baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">][(</span><span class="n">ch</span><span class="p">,</span><span class="s1">&#39;M2&#39;</span><span class="p">,</span><span class="s1">&#39;amp&#39;</span><span class="p">)],</span><span class="n">baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">][(</span><span class="n">ch</span><span class="p">,</span><span class="s1">&#39;M2&#39;</span><span class="p">,</span><span class="s1">&#39;phz&#39;</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;O1 amp (nstrain) and phase (degree):&#39;</span><span class="p">,</span>
+          <span class="n">baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">][(</span><span class="n">ch</span><span class="p">,</span><span class="s1">&#39;O1&#39;</span><span class="p">,</span><span class="s1">&#39;amp&#39;</span><span class="p">)],</span><span class="n">baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">][(</span><span class="n">ch</span><span class="p">,</span><span class="s1">&#39;O1&#39;</span><span class="p">,</span><span class="s1">&#39;phz&#39;</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+CH0:
+M2 amp (nstrain) and phase (degree): 5.931 -46.133
+O1 amp (nstrain) and phase (degree): 3.802 132.222
+CH1:
+M2 amp (nstrain) and phase (degree): 8.581 63.764
+O1 amp (nstrain) and phase (degree): 4.589 -116.438
+CH2:
+M2 amp (nstrain) and phase (degree): 13.152 -165.700
+O1 amp (nstrain) and phase (degree): 2.561 10.531
+CH3:
+M2 amp (nstrain) and phase (degree): 8.050 -120.416
+O1 amp (nstrain) and phase (degree): 3.678 60.458
+</pre></div></div>
+</div>
+</section>
+<section id="Predicted-tides">
+<h2>Predicted tides<a class="headerlink" href="#Predicted-tides" title="Link to this heading"></a></h2>
+<p>In this section, we will gather the predicted M2 and O1 tidal amplitudes and phases for the areal, differential shear, and engineering shear strains for the station using SPOTL (Some Programs for Ocean Tide Loading; Agnew, 2013). SPOTL, like BAYTAP, will be run from a Docker container.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[210]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">earthscopestraintools.processing</span> <span class="kn">import</span> <span class="n">spotl_predict_tides</span>
+
+<span class="c1"># Parameters for the tidal model</span>
+<span class="n">latitude</span><span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">latitude</span>
+<span class="n">longitude</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">longitude</span>
+<span class="n">elevation</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">elevation</span>
+<span class="c1"># Regional ocean load model, global ocean load model, and Green&#39;s functions to decribe the elastic Earth</span>
+<span class="c1"># available from the SPOTL package</span>
+<span class="n">reg_oc</span> <span class="o">=</span> <span class="s1">&#39;osu.mediterranean.2011&#39;</span>
+<span class="n">glob_oc</span><span class="o">=</span> <span class="s1">&#39;osu.tpxo72.2010&#39;</span> <span class="c1"># change to osu.tpxo72atlas.2011 ?</span>
+<span class="n">greenf</span> <span class="o">=</span> <span class="s1">&#39;green.contap.std&#39;</span>
+
+<span class="n">pred_tides</span> <span class="o">=</span> <span class="n">spotl_predict_tides</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span><span class="n">longitude</span><span class="p">,</span><span class="n">elevation</span><span class="p">,</span><span class="n">glob_oc</span><span class="p">,</span><span class="n">reg_oc</span><span class="p">,</span><span class="n">greenf</span><span class="p">)</span>
+<span class="n">pred_tides</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+spotl
+Docker started
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+WARNING: The requested image&#39;s platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+spotl
+Docker container stopped and removed.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[210]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;M2&#39;: {&#39;areal&#39;: (15.260654206772385+1.559118536665793j),
+  &#39;differential&#39;: (-10.46438760598575-3.393253671866749j),
+  &#39;engineering&#39;: (0.9177684867587321-5.360603600781594j)},
+ &#39;O1&#39;: {&#39;areal&#39;: (11.46017566155345+0.08470101319819293j),
+  &#39;differential&#39;: (2.8783089246691294+0.03687517960914067j),
+  &#39;engineering&#39;: (-0.24828220829683426+3.638939777606006j)}}
+</pre></div></div>
+</div>
+</section>
+<section id="Orientation-matrix">
+<h2>Orientation matrix<a class="headerlink" href="#Orientation-matrix" title="Link to this heading"></a></h2>
+<p>The orientation matrix is determined through simple least squares with the M2 and O1 tidal results in the code cells below, as described in Hodgkinson et al., (2013). Essentially, the orientation matrix that transforms the observed tidal to match the predicted tides is determined.</p>
+<p>The forward problem, with gauge strains <span class="math notranslate nohighlight">\(e_i\)</span>, regional strains <span class="math notranslate nohighlight">\(E_j\)</span>, and the coupling matrix <span class="math notranslate nohighlight">\(A_{ij}\)</span> has the form:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[e_{i} = A_{ij} E_{j}\]</div>
+<p></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{pmatrix} e_{0} \\ e_{1} \\ e_{2} \\ e_{3} \end{pmatrix} = \begin{pmatrix} a_{11} &amp; a_{12} &amp; a_{13} &amp; a_{14} \\ a_{21} &amp; a_{22} &amp; a_{23} &amp; a_{24} \\ a_{31} &amp; a_{32} &amp; a_{33} &amp; a_{34} \end{pmatrix} \begin{pmatrix} e_{EE} + e_{NN} \\ e_{EE} - e_{NN} \\ 2e_{EN} \end{pmatrix} = \begin{pmatrix} E_A \\ E_D \\ E_S \end{pmatrix}\end{split}\]</div>
+</div></blockquote>
+<p>The orientation matrix is the Moore-Penrose pseudoinverse of the coupling matrix, and is applied to the gauge strains as follows to attain the regional areal, differential, and engineering shear strains:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[A^{-1}_{ij} e_{i} = E_{j}\]</div>
+<p></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{pmatrix} a_{11} &amp; a_{12} &amp; a_{13} &amp; a_{14} \\ a_{21} &amp; a_{22} &amp; a_{23} &amp; a_{24} \\ a_{31} &amp; a_{32} &amp; a_{33} &amp; a_{34} \end{pmatrix}^{-1} \begin{pmatrix} e_{0} \\ e_{1} \\ e_{2} \\ e_{3} \end{pmatrix} = \begin{pmatrix} e_{EE} + e_{NN} \\ e_{EE} - e_{NN} \\ 2e_{EN} \end{pmatrix} = \begin{pmatrix} E_A \\ E_D \\ E_S \end{pmatrix}\end{split}\]</div>
+</div></blockquote>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[211]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute the observed real and imaginary components of the tidal amplitudes and phases,</span>
+<span class="c1"># and place in a 4x4 matrix</span>
+<span class="k">def</span> <span class="nf">make_complex</span><span class="p">(</span><span class="n">ampstr</span><span class="p">,</span> <span class="n">phzstr</span><span class="p">):</span>
+    <span class="n">amp</span><span class="p">,</span> <span class="n">phz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ampstr</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">phzstr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">complex</span><span class="p">(</span><span class="n">amp</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phz</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">),</span><span class="n">amp</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phz</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">obs_tide_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">offset_corrected</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+    <span class="n">m2</span> <span class="o">=</span> <span class="n">make_complex</span><span class="p">(</span><span class="n">baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">][(</span><span class="n">ch</span><span class="p">,</span><span class="s1">&#39;M2&#39;</span><span class="p">,</span><span class="s1">&#39;amp&#39;</span><span class="p">)],</span> <span class="n">baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">][(</span><span class="n">ch</span><span class="p">,</span><span class="s1">&#39;M2&#39;</span><span class="p">,</span><span class="s1">&#39;phz&#39;</span><span class="p">)])</span>
+    <span class="n">o1</span> <span class="o">=</span> <span class="n">make_complex</span><span class="p">(</span><span class="n">baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">][(</span><span class="n">ch</span><span class="p">,</span><span class="s1">&#39;O1&#39;</span><span class="p">,</span><span class="s1">&#39;amp&#39;</span><span class="p">)],</span> <span class="n">baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">][(</span><span class="n">ch</span><span class="p">,</span><span class="s1">&#39;O1&#39;</span><span class="p">,</span><span class="s1">&#39;phz&#39;</span><span class="p">)])</span>
+    <span class="n">obs_tide_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">m2</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">o1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">o1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Observed tidal matrix:&#39;</span><span class="p">)</span>
+<span class="n">obs_tide_matrix</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[211]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[  4.11010415,  -4.2759566 ,  -2.55496297,   2.81555825],
+       [  3.79339863,   7.69699213,  -2.04315652,  -4.1090671 ],
+       [-12.7444949 ,  -3.24853102,   2.51786294,   0.46806754],
+       [ -4.07551056,  -6.94209721,   1.81347995,   3.19983976]])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[215]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For the predicted tide matrix, 3x4</span>
+<span class="n">pred_tide_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;M2&#39;</span><span class="p">][</span><span class="s1">&#39;areal&#39;</span><span class="p">]),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;M2&#39;</span><span class="p">][</span><span class="s1">&#39;areal&#39;</span><span class="p">]),</span>
+                              <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;O1&#39;</span><span class="p">][</span><span class="s1">&#39;areal&#39;</span><span class="p">]),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;O1&#39;</span><span class="p">][</span><span class="s1">&#39;areal&#39;</span><span class="p">])],</span>
+                             <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;M2&#39;</span><span class="p">][</span><span class="s1">&#39;differential&#39;</span><span class="p">]),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;M2&#39;</span><span class="p">][</span><span class="s1">&#39;differential&#39;</span><span class="p">]),</span>
+                              <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;O1&#39;</span><span class="p">][</span><span class="s1">&#39;differential&#39;</span><span class="p">]),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;O1&#39;</span><span class="p">][</span><span class="s1">&#39;differential&#39;</span><span class="p">])],</span>
+                             <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;M2&#39;</span><span class="p">][</span><span class="s1">&#39;engineering&#39;</span><span class="p">]),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;M2&#39;</span><span class="p">][</span><span class="s1">&#39;engineering&#39;</span><span class="p">]),</span>
+                              <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;O1&#39;</span><span class="p">][</span><span class="s1">&#39;engineering&#39;</span><span class="p">]),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pred_tides</span><span class="p">[</span><span class="s1">&#39;O1&#39;</span><span class="p">][</span><span class="s1">&#39;engineering&#39;</span><span class="p">])]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Predicted tidal matrix:&#39;</span><span class="p">)</span>
+<span class="n">pred_tide_matrix</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Predicted tidal matrix:
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[215]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[ 15.26065421,   1.55911854,  11.46017566,   0.08470101],
+       [-10.46438761,  -3.39325367,   2.87830892,   0.03687518],
+       [  0.91776849,  -5.3606036 ,  -0.24828221,   3.63893978]])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[217]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate the orentation matrix from the coupling matrix</span>
+<span class="n">coupling_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">pred_tide_matrix</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">obs_tide_matrix</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">rcond</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+<span class="n">res2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">pred_tide_matrix</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">obs_tide_matrix</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">rcond</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">orient_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">coupling_mat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Coupling Matrix:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">coupling_mat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;****************************&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tidal Orientation Matrix:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">orient_mat</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;****************************&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Residuals (obs-modelled)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obs_tides</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">coupling_mat</span><span class="p">,</span><span class="n">pred_tide_matrix</span><span class="p">))</span>
+<span class="c1"># Sum of squared residuals,</span>
+<span class="c1"># divided by number of data (4 per gauge)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;RMSE, per gauge:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">res2</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;RMSE:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">res2</span><span class="p">)</span><span class="o">/</span><span class="mi">16</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Coupling Matrix:
+ [[-0.08768021 -0.4255514   0.96202279]
+ [-0.06332504 -0.55153723 -1.11030715]
+ [-0.06623311  1.10791286 -0.04355453]
+ [ 0.04523509  0.54143254  0.9372729 ]]
+****************************
+Tidal Orientation Matrix:
+ [[-5.20459372 -2.7831816  -4.2866582   1.84583163]
+ [-0.29496767 -0.14156385  0.6383292   0.16472085]
+ [ 0.43438867 -0.30592907 -0.10936836  0.25357554]]
+****************************
+Residuals (obs-modelled)
+[[ 4.22549806  8.25265375  2.24726768 -5.30729136]
+ [-5.0872427  -7.01938155  9.2869124   2.19473697]
+ [11.92493261 -0.37161444 -4.68011578  3.04215113]
+ [ 9.41722048  6.56019924 -5.4244892  -2.1733429 ]]
+RMSE, per gauge:
+ [0.40001328 0.02599496 0.35726657 0.14176508]
+RMSE:
+ 0.2776792663582271
+</pre></div></div>
+</div>
+</section>
+<section id="References">
+<h2>References<a class="headerlink" href="#References" title="Link to this heading"></a></h2>
+<p>Agnew, D. C. (2012). SPOTL: Some Programs for Ocean-Tide Loading, SIO Technical Report, Scripps Institution of Oceanography. From <a class="reference external" href="https://igppweb.ucsd.edu/~agnew/Spotl/spotlmain.html">https://igppweb.ucsd.edu/~agnew/Spotl/spotlmain.html</a></p>
+<p>Hodgkinson, K., J. Langbein, B. Henderson, D. Mencin, and A. Borsa (2013), Tidal calibration of plate boundary observatory borehole strainmeters, J. Geophys. Res. Solid Earth, 118, 447–458, doi:10.1029/2012JB009651.</p>
+<p>Tamura, Y., &amp; Agnew, D. C. (2008). Baytap08 User’s Manual. UC San Diego: Library – Scripps Digital Collection. From <a class="reference external" href="https://escholarship.org/uc/item/4c27740c">https://escholarship.org/uc/item/4c27740c</a></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="plot_event.html" class="btn btn-neutral float-left" title="Example of looking at high rate event data from a strainmeter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Earthscope Consortium.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

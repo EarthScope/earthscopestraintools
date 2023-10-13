@@ -20,7 +20,6 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="earthscopestraintools.edid module" href="earthscopestraintools.edid.html" />
     <link rel="prev" title="earthscopestraintools.tiledbtools module" href="earthscopestraintools.tiledbtools.html" /> 
 </head>
 
@@ -37,7 +36,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.20
+                0.1.21
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -51,8 +50,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/DataStructures.html">Data Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TidalCalibrationEarthscopestraintools.html">Tidal Calibration</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="earthscopestraintools.html">earthscopestraintools package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="earthscopestraintools.html#submodules">Submodules</a><ul class="current">
@@ -81,7 +83,6 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
@@ -94,6 +95,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.apply_calibration_matrix"><code class="docutils literal notranslate"><span class="pre">Timeseries.apply_calibration_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.apply_corrections"><code class="docutils literal notranslate"><span class="pre">Timeseries.apply_corrections()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.baytap_analysis"><code class="docutils literal notranslate"><span class="pre">Timeseries.baytap_analysis()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.butterworth_filter"><code class="docutils literal notranslate"><span class="pre">Timeseries.butterworth_filter()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.calculate_magnitude"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_magnitude()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.calculate_offsets"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_offsets()</span></code></a></li>
@@ -101,6 +103,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.calculate_tide_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_tide_correction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.check_for_gaps"><code class="docutils literal notranslate"><span class="pre">Timeseries.check_for_gaps()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.decimate_1s_to_300s"><code class="docutils literal notranslate"><span class="pre">Timeseries.decimate_1s_to_300s()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.decimate_to_hourly"><code class="docutils literal notranslate"><span class="pre">Timeseries.decimate_to_hourly()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.dynamic_strain"><code class="docutils literal notranslate"><span class="pre">Timeseries.dynamic_strain()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.interpolate"><code class="docutils literal notranslate"><span class="pre">Timeseries.interpolate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.linear_trend_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.linear_trend_correction()</span></code></a></li>
@@ -216,6 +219,24 @@ defaults to network.station</p></li>
 <dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.baytap_analysis">
+<span class="sig-name descname"><span class="pre">baytap_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atmp_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elevation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.baytap_analysis" title="Link to this definition"></a></dt>
+<dd><p>This function accesses a docker container to run BAYTAP08 (Tamura 1991; Tamura and Agnew 2008) for tidal analysis. Time series (e.g. strain) and additional auxiliary input (e.g. pressure) are analyzed together to determine the amplitudes and phases of a combination of tidal constituents (M2, O1, P1, K1, N2, S2) in the time series, as well as a coefficient for the auxiliary input response.
+:param atmp_ts: Atmospheric pressure time series with same sample period and time frame as the strain data.
+:type atmp_ts: Timeseries
+:param latitude: latitude of the station
+:type latitude: float
+:param longitude: longitude of the station
+:type longitude: float
+:param elevation: elevation of the station
+:type elevation: float
+:param dmin: Drift parameter for the program. Large drift expects a linear trend. Small drift allows for rapid changes in the residual time series.
+:type dmin: float
+:return: Dictionary of amplitudes and phases for each tidal constituent per gauge, and atmospheric pressure coefficient.
+:rtype: dict</p>
 </dd></dl>
 
 <dl class="py method">
@@ -349,6 +370,26 @@ low-frequency strainmeter data , Bulletin Of The Seismological Society Of Americ
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.decimate_to_hourly">
+<span class="sig-name descname"><span class="pre">decimate_to_hourly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.decimate_to_hourly" title="Link to this definition"></a></dt>
+<dd><p>Decimates a timeseries to hourly by selecting the first and second and minute of each hour</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – time series data to decimate</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Timeseries containing hourly decimated data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.dynamic_strain">
 <span class="sig-name descname"><span class="pre">dynamic_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gauge_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dynamic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.dynamic_strain" title="Link to this definition"></a></dt>
 <dd><p>calculates dynamic strain for a given Timeseries as RMS of gauge strains</p>
@@ -398,23 +439,18 @@ low-frequency strainmeter data , Bulletin Of The Seismological Society Of Americ
 
 <dl class="py method">
 <dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.linear_trend_correction">
-<span class="sig-name descname"><span class="pre">linear_trend_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trend_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.linear_trend_correction" title="Link to this definition"></a></dt>
-<dd><p>Generate a linear trend correction</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>trend_start</strong> (<em>datetime.datetime</em><em>, </em><em>optional</em>) – start of window to calculate trend, defaults to first_valid_index()</p></li>
-<li><p><strong>trend_end</strong> (<em>datetime.datetime</em><em>, </em><em>optional</em>) – end of window to calculate trend, defaults to last_valid_index()</p></li>
-<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name for new Timeseries, defaults to None</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>trend correction timeseries for each column/channel in input data</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries" title="earthscopestraintools.timeseries.Timeseries">Timeseries</a></p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">linear_trend_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.linear_trend_correction" title="Link to this definition"></a></dt>
+<dd><p>Generate a linear trend correction
+:param method: linear or median
+:type method: str, defaults to linear
+:param trend_start: start of window to calculate trend, defaults to first_valid_index()
+:type trend_start: datetime.datetime, optional
+:param trend_end: end of window to calculate trend, defaults to last_valid_index()
+:type trend_end: datetime.datetime, optional
+:param name: name for new Timeseries, defaults to None
+:type name: str, optional
+:return: trend correction timeseries for each column/channel in input data
+:rtype: Timeseries</p>
 </dd></dl>
 
 <dl class="py method">
@@ -643,7 +679,6 @@ low-frequency strainmeter data , Bulletin Of The Seismological Society Of Americ
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="earthscopestraintools.tiledbtools.html" class="btn btn-neutral float-left" title="earthscopestraintools.tiledbtools module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="earthscopestraintools.edid.html" class="btn btn-neutral float-right" title="earthscopestraintools.edid module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
