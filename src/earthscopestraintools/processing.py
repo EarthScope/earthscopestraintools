@@ -412,7 +412,7 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
             tmp = med[med<(np.median(med)+medmad_std_dev1*2)]
             med_2sig = tmp[tmp>(np.median(med)-medmad_std_dev1*2)]
             slope = np.median(med_2sig)
-            df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - df.index[0].timestamp())*slope
+            df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - windowed_df.index[0].timestamp())*slope
     # print("df_trend_c", df_trend_c)
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
@@ -592,3 +592,76 @@ def baytap_analysis(df,atmp_df,quality_df,units,atmp_quality_df,atmp_units,
     print('Docker processes finished. Container removed.')
             
     return baytap_results
+
+def spotl_predict_tides(latitude,longitude,elevation,glob_oc,reg_oc,greenf):
+    '''
+    Returns the complex numbers (from amplitude and phase)
+    for the predicted areal and shear strains using spotl
+
+    Expects regional model polygons to have already been constructed in the working directory (in this case, in the Docker container).
+
+    :param latitude: Station latitude
+    :type latitude: float
+    :param longitude: Station longitude
+    :type longitude: float
+    :param elevation: Station elevation (m)
+    :type elevation: float
+    :param glob_oc: Global ocean model from SPOTL. e.g. osu.tpxo72.2010
+    :type glob_oc: str
+    :param reg_oc: Regional ocean model from SPOTL. e.g. osu.usawest.2010
+    :type reg_oc: str
+    :param greenf: Green's functions for the elastic earth structure from SPOTL. e.g. green.contap.std
+    :type greenf: str
+    :return: Areal, differential, and shear strain complex numbers for the M2 and O1 tides. (eEE+eNN)m2, (eEE-eNN)m2, (2EN)m2, (eEE+eNN)o1, (eEE-eNN)o1, (2EN)o1
+    :rtype: dict
+    '''
+    # Start Docker container
+    subprocess.run('docker rm -f spotl',shell=True)
+    command = f'docker run --rm -w /opt/spotl/working/ --mount type=tmpfs,destination=/opt/spotl/work --name spotl -i -d ghcr.io/earthscope/spotl bash'
+    print('Docker started')
+    subprocess.check_output(command,shell=True)
+    # # Run polymake for regional models of interest
+    command = f'docker exec -i spotl /bin/bash -c "polymake << EOF > ../work/poly.{reg_oc} \n- {reg_oc} \nEOF"'
+    subprocess.check_output(command,shell=True)
+    # # M2 ocean load for the ocean model but exclude the area in specified polygon
+    command = f'docker exec -i spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1m2.f1"'
+    subprocess.check_output(command,shell=True)
+    # # M2 ocean load for the regional ocean model in the area in specified polygon
+    command = f'docker exec -i spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1m2.f2"'
+    subprocess.check_output(command,shell=True)
+    # #  Add the M2 loads computed above together
+    command = f'docker exec -i spotl /bin/bash -c "cat ../work/ex1m2.f1 ../work/ex1m2.f2 | loadcomb c >  ../work/tide.m2"'
+    subprocess.check_output(command,shell=True)
+    # # O1 ocean load for the ocean model but exclude the area in specified polygon
+    command = f'docker exec -i spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1o1.f1"'
+    subprocess.check_output(command,shell=True)
+    # # O1 ocean load for the regional ocean model in the area in specified polygon
+    command = f'docker exec -i spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1o1.f2"'
+    subprocess.check_output(command,shell=True)
+    # # Add the O1 loads computed above together
+    command = f'docker exec -i spotl /bin/bash -c "cat ../work/ex1o1.f1 ../work/ex1o1.f2 | loadcomb c >  ../work/tide.o1"'
+    subprocess.check_output(command,shell=True)
+    # # Compute solid earth wides and combine with above ocean loads
+    command = f'docker exec -i spotl /bin/bash -c "cat ../work/tide.m2 | loadcomb t >  ../work/m2.tide.total"'
+    subprocess.check_output(command,shell=True)
+    command = f'docker exec -i spotl /bin/bash -c "cat ../work/tide.o1 | loadcomb t >  ../work/o1.tide.total"'
+    subprocess.check_output(command,shell=True)
+    # # Find the amps and phases, compute complex numbers:
+    command = f'docker exec -i spotl /bin/bash -c "cat ../work/m2.tide.total"'
+    out = subprocess.check_output(command,shell=True,text=True)
+    outlist = list(filter(lambda x: x.startswith('s'), out.split('\n')))[0].split(' ')
+    Eamp, Ephase, Namp, Nphase, ENamp, ENphase = np.float64(list(filter(lambda x: x != '' and x != 's' , outlist)))
+    m2E, m2N, m2EN = complex(Eamp*np.cos(Ephase*np.pi/180),Eamp*np.sin(Ephase*np.pi/180)), complex(Namp*np.cos(Nphase*np.pi/180),Namp*np.sin(Nphase*np.pi/180)), complex(ENamp*np.cos(ENphase*np.pi/180),ENamp*np.sin(ENphase*np.pi/180))
+    command = f'docker exec -i spotl /bin/bash -c "cat ../work/o1.tide.total"'
+    out = subprocess.check_output(command,shell=True,text=True)
+    outlist = list(filter(lambda x: x.startswith('s'), out.split('\n')))[0].split(' ')
+    Eamp, Ephase, Namp, Nphase, ENamp, ENphase = np.float64(list(filter(lambda x: x != '' and x != 's' , outlist)))
+    o1E, o1N, o1EN = complex(Eamp*np.cos(Ephase*np.pi/180),Eamp*np.sin(Ephase*np.pi/180)), complex(Namp*np.cos(Nphase*np.pi/180),Namp*np.sin(Nphase*np.pi/180)), complex(ENamp*np.cos(ENphase*np.pi/180),ENamp*np.sin(ENphase*np.pi/180))
+    # Combine into areal and shear (differential and engineering) real and imaginary parts
+    arealm2, diffm2, engm2 = m2E+m2N, m2E-m2N, 2*m2EN
+    arealo1, diffo1, engo1 = o1E+o1N, o1E-o1N, 2*o1EN
+    pred_tides = {'M2':{'areal':arealm2,'differential':diffm2,'engineering':engm2},
+                    'O1':{'areal':arealo1,'differential':diffo1,'engineering':engo1}}
+    subprocess.run('docker rm -f spotl',shell=True)
+    print('Docker container stopped and removed.')
+    return pred_tides
