@@ -478,10 +478,117 @@ def calculate_tide_correction(df, period, tidal_parameters, longitude):
     df2 = df2 * 1e-3
     return df2
 
-#def baytap_analysis(df,atmp_df,dmin=0.04,igrp=0):
-#    '''
-#    This function accesses a docker container to run BAYTAP08 ()
-#    :return:
-#    :rtype:
-#    '''
-#    return baytap_results
+def baytap_analysis(df,atmp_df,quality_df,units,atmp_quality_df,atmp_units,
+                    latitude=None,longitude=None,elevation=None,dmin=0.001):
+    '''
+    This function accesses a docker container to run BAYTAP08 (Tamura 1991; Tamura and Agnew 2008) for tidal analysis. Time series (e.g. strain) and additional auxiliary input (e.g. pressure) are analyzed together to determine the amplitudes and phases of a combination of tidal constituents (M2, O1, P1, K1, N2, S2) in the time series, as well as a coefficient for the auxiliary input response. Please refer to the Baytap08 manual for more details, included suggested length of the time series for full detemination of the tidal constituent suite returned here (365+ days).
+    :param df: DataFrame of timeseries with datetime index and one channel per column. Strain should be in microstrain, and pressure in hPa. 
+    :type df: pd.DataFrame
+    :param atmp_df: DataFrame with atmospheric pressure data and datetime index
+    :type atmp_df: pd.DataFrame
+    :param quality_df: DataFrame with flags designating the quality of the data. Any points that are not good (g) are ignores in the time series analysis. 
+    :type quality_df: pd.DataFrame
+    :param units: Units of strain, should match microstrain or nanostrain
+    :type units: str
+    :param atmp_quality_df: DataFrame with flags designating the quality of the pressure data. Any points that are not good (g) are ignores in the time series analysis. 
+    :type atmp_quality_df: pd.DataFrame
+    :param atmp_units: Units of atmospheric pressure data, should be hpa
+    :type atmp_units: str
+    :param latitude: latitude of the station
+    :type latitude: float
+    :param longitude: longitude of the station
+    :type longitude: float
+    :param elevation: elevation of the station
+    :type elevation: float
+    :param dmin: Drift parameter for the program. Large drift expects a linear trend. Small drift allows for rapid changes in the residual time series. 
+    :type dmin: float
+    :return: Dictionary of amplitudes and phases for each tidal constituent per gauge, and atmospheric pressure coefficient.
+    :rtype: dict
+    '''
+    if units == 'microstrain' and atmp_units == 'hpa':
+        df = df*1e3 # convert to nanostrain
+    elif units == 'nanostrain' and atmp_units == 'hpa':
+        None
+    else:
+        print('Make sure data are in nanostrain and/or microstrain and hpa.')
+        
+    # Control file text
+    span = shift = ndata = int(len(df))
+    samp = ((df.index[-1].timestamp() - df.index[0].timestamp())/60/60)/(ndata-1)
+    # Check that pressure data is same length 
+    atmp_samp = ((atmp_df.index[-1].timestamp() - atmp_df.index[0].timestamp())/60/60)/(ndata-1)
+    if atmp_samp != samp:
+        print('Pressure data and strain data are not the same length, make sure they have the same sample rate and time frame.')
+    yr = str(df.index[0].year); mo = str(df.index[0].month).zfill(2)
+    day = str(df.index[0].day).zfill(2); hr = str(df.index[0].hour).zfill(2)
+    control_str = f'&param \nkind=7, \n'
+    control_str += f'span={span} , shift={shift} , \n'
+    control_str += f'dmin={dmin}, \n'
+    control_str += f'lpout=0, filout=1, \n'
+    control_str += f'iaug=1, lagp=0,\n'
+    control_str += f'maxitr=50,\n'
+    control_str += f'igrp=5, \n'
+    control_str += f'ndata={ndata},\n'
+    control_str += f'inform=3, \n'
+    control_str += f'year={yr},mon={mo},day={day},hr={hr},delta={samp},\n'
+    control_str += f'lat={latitude},long={longitude},ht={elevation},grav=0.0,\n'
+    control_str += f'rlim=999990.D0,spectw=3,\n'
+    control_str += f'&end\n'
+    control_str += f'BSM Strain {df.index[0]} to {df.index[-1]}\n'
+    control_str += f'----\n'
+    control_str += f'{"Station": <40} STATION NAME\n'
+    control_str += f'{"PBO GTSM21": <40} INSTRUMENT NAME\n'
+    control_str += f'----\n'
+    control_str += f'{"Strain (counts or nstrain)": <40} UNIT OF TIDAL DATA\n'
+    control_str += f'{"Barometric Pressure (mbar)": <40} TITLE OF ASSOSIATED DATASET\n'
+    
+    # Pressure data, auxiliary input    
+    atmp_df[atmp_quality_df != 'g'] = 999999
+    aux_dstr = 'hpa\n'+np.array2string(atmp_df.values.flatten(),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+    
+    baytap_results = {}
+    baytap_results['atmp_response'] = {}
+    baytap_results['tidal_params'] = {}
+
+    # Start container with temp file system in the docker memory
+    cmd1 = f'docker run --rm --mount type=tmpfs,destination=/tmp:exec --name baytap -i -d ghcr.io/earthscope/baytap08 bash'
+    print('Docker container started.')
+    
+    for ch in df.columns:
+            
+        df[quality_df[ch] != 'g'] = 999999
+        dstr = ch+'\n'+np.array2string(df[ch].values,separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+    
+        # Write files for baytap
+        cmd2 = f'docker exec -i baytap /bin/bash -c "echo -e \'{dstr}\' > /tmp/data.txt"'
+        cmd3 = f'docker exec -i baytap /bin/bash -c "echo -e \'{control_str}\' > /tmp/control.txt"'
+        cmd4 = f'docker exec -i baytap /bin/bash -c "echo -e \'{aux_dstr}\' > /tmp/aux.txt"'
+        # Run baytap
+        cmd5 = f'docker exec -i baytap /bin/bash -c "cat /tmp/data.txt | baytap08 /tmp/control.txt /tmp/results.txt /tmp/aux.txt >> /tmp/decomp.txt"'
+        # Read results
+        cmd6 = f'docker exec -i baytap /bin/bash -c "cat /tmp/results.txt"'
+    
+        # Actually execute the commands
+        subprocess.run(cmd1, shell=True,text=True)
+        subprocess.run(cmd2, shell=True,text=True)
+        subprocess.run(cmd3, shell=True,text=True)
+        subprocess.run(cmd4, shell=True,text=True)
+        subprocess.run(cmd5, shell=True,text=True)
+        output = subprocess.run(cmd6,capture_output=True,shell=True,text=True)
+        res = (output.stdout).split('\n')
+
+        # save the results
+        resp = list(filter(lambda x: 'respc' in x, res))
+        baytap_results['atmp_response'][ch] = float(resp[0].split(' ')[-1].replace('D','E'))
+        dood_list = ['2 0 0 0 0 0','1-1 0 0 0 0','1 1-2 0 0 0',
+                    '1 1 0 0 0 0','2-1 0 1 0 0','2 2-2 0 0 0']
+        for const,dood in zip(['M2','O1','P1','K1','N2','S2'],dood_list):
+            tid = list(filter(lambda x: '>' in x and const in x, res))
+            baytap_results['tidal_params'][(ch, const, 'phz')] =  list(filter(lambda x: x != '', tid[0].split(' ')))[-4]
+            baytap_results['tidal_params'][(ch, const, 'amp')] =  list(filter(lambda x: x != '', tid[0].split(' ')))[-2]
+            baytap_results['tidal_params'][(ch, const, 'doodson')] = dood
+
+    subprocess.run('docker rm -f baytap', shell=True)
+    print('Docker processes finished. Container removed.')
+            
+    return baytap_results

@@ -14,6 +14,7 @@ from earthscopestraintools.processing import (
     calculate_pressure_correction,
     calculate_tide_correction,
     calculate_linear_trend_correction,
+    baytap_analysis
 )
 from earthscopestraintools.event_processing import dynamic_strain, calculate_magnitude
 from scipy import signal, stats
@@ -780,6 +781,28 @@ class Timeseries:
             level=self.level,
             name=name,
         )
+
+    def baytap_analysis(self,atmp_ts,latitude=None,longitude=None,elevation=None,dmin=0.001):
+        '''
+        This function accesses a docker container to run BAYTAP08 (Tamura 1991; Tamura and Agnew 2008) for tidal analysis. Time series (e.g. strain) and additional auxiliary input (e.g. pressure) are analyzed together to determine the amplitudes and phases of a combination of tidal constituents (M2, O1, P1, K1, N2, S2) in the time series, as well as a coefficient for the auxiliary input response. 
+        :param atmp_ts: Atmospheric pressure time series with same sample period and time frame as the strain data.
+        :type atmp_ts: Timeseries
+        :param latitude: latitude of the station
+        :type latitude: float
+        :param longitude: longitude of the station
+        :type longitude: float
+        :param elevation: elevation of the station
+        :type elevation: float
+        :param dmin: Drift parameter for the program. Large drift expects a linear trend. Small drift allows for rapid changes in the residual time series. 
+        :type dmin: float
+        :return: Dictionary of amplitudes and phases for each tidal constituent per gauge, and atmospheric pressure coefficient.
+        :rtype: dict
+        '''
+
+        baytap_results = baytap_analysis(self.data,atmp_ts.data,self.quality_df,self.units,atmp_ts.quality_df,atmp_ts.units,
+                    latitude=latitude,longitude=longitude,elevation=elevation,dmin=0.001)
+
+        return baytap_results
 
     def plot(
         self,
