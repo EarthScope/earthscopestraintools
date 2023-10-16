@@ -13,7 +13,7 @@ from earthscopestraintools.processing import (
     calculate_offsets,
     calculate_pressure_correction,
     calculate_tide_correction,
-    calculate_linear_trend_correction,
+    linear_trend_correction,
     baytap_analysis
 )
 from earthscopestraintools.event_processing import dynamic_strain, calculate_magnitude

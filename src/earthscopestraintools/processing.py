@@ -387,9 +387,9 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
     if not trend_end:
         trend_end = df.last_valid_index()
     logger.info(f"    Trend Start: {trend_start}")
-    logger.info(f"    Trend Start: {trend_end}")
+    logger.info(f"    Trend End: {trend_end}")
     df_trend_c = pd.DataFrame(data=df.index)
-    windowed_df = df.copy()[trend_start:trend_end].interpolate()
+    windowed_df = df.copy()[trend_start:trend_end].interpolate().reset_index()
     if method == 'linear':
         for ch in df.columns:
             slope, intercept, r_value, p_value, std_err = stats.linregress(
@@ -412,7 +412,7 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
             tmp = med[med<(np.median(med)+medmad_std_dev1*2)]
             med_2sig = tmp[tmp>(np.median(med)-medmad_std_dev1*2)]
             slope = np.median(med_2sig)
-            df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - windowed_df.index[0].timestamp())*slope
+            df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - df.index[0].timestamp())*slope
     # print("df_trend_c", df_trend_c)
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
