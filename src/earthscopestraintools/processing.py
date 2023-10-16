@@ -326,7 +326,7 @@ def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float =
     logger.info(
         f"Calculating offsets using cutoff percentile of {cutoff_percentile} and limit multiplier of {limit_multiplier}."
     )
-    first_diffs = df.diff()
+    first_diffs = df.interpolate(method='linear',limit=3600,limit_direction='both').diff()
     #  drop a percentage of 1st differences to estimate an offset cutoff
     drop = round(len(first_diffs) * (1 - cutoff_percentile))
     offset_limit = []
