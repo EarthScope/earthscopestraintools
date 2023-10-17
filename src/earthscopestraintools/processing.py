@@ -400,6 +400,8 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
         # Goal time difference
         # Mean syndonic month, divided by lunar cycles (so 1 day)
         tdiff = (29*24*60*60+12*60*60+44*60)/30 # seconds
+        windowed_df.index = windowed_df.time 
+        windowed_df.drop(['time'],axis=1,inplace=True)
         end = pd.to_datetime(windowed_df.index[-1].timestamp() - tdiff,unit='s')
         df1 = windowed_df[:end]
         df2 = windowed_df[len(windowed_df)-len(df1):]
