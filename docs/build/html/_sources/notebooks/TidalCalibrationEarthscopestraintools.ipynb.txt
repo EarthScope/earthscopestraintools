@@ -479,7 +479,7 @@
     "The orientation matrix is the Moore-Penrose pseudoinverse of the coupling matrix, and is applied to the gauge strains as follows to attain the regional areal, differential, and engineering shear strains:\n",
     "\n",
     "\n",
-    ">$$A^{-1}_{ij} e_{i} = E_{j}$$ <br>\n",
+    ">$$A^{-1}_{ji} e_{i} = E_{j}$$ <br>\n",
     ">$$\\begin{pmatrix} a_{11} & a_{12} & a_{13} & a_{14} \\\\ a_{21} & a_{22} & a_{23} & a_{24} \\\\ a_{31} & a_{32} & a_{33} & a_{34} \\end{pmatrix}^{-1} \\begin{pmatrix} e_{0} \\\\ e_{1} \\\\ e_{2} \\\\ e_{3} \\end{pmatrix} = \\begin{pmatrix} e_{EE} + e_{NN} \\\\ e_{EE} - e_{NN} \\\\ 2e_{EN} \\end{pmatrix} = \\begin{pmatrix} E_A \\\\ E_D \\\\ E_S \\end{pmatrix}$$\n",
     "\n"
    ]
