@@ -133,31 +133,30 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="earthscopestraintools.strain_visualization.map_strain">
 <span class="sig-prename descclassname"><span class="pre">earthscopestraintools.strain_visualization.</span></span><span class="sig-name descname"><span class="pre">map_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">areal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">differential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shear</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lons</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.strain_visualization.map_strain" title="Link to this definition"></a></dt>
-<dd><p>Creates a map of the principal strain axes. Supply area, differential, and shear strains with optional location information.
-:param areal: Array of areal (Eee+Enn) strains
-:type areal: np.array
-:param differential: Array of differential (Eee-Enn) strains
-:type differential: np.array
-:param shear: Array of engineering shear (2Een) strains
-:type shear: np.array
-:param lats: (Optional) Array of latitudes or y-axis locations
-:type lats:np.array
-:param lons: (Optional) Array of longitudes or y-axis locations
-:type lons: np.array
-:param station_list: (Optional) List of station names to label.
-:type station_list: list
-:param colors: (Optional) List of colors for the strain axes
-:type colors: list
-:param units: (Optional) Units to label strain
-:type units: str
-:param scale_length: (Optional) Length to make the scale bar. Will plot a default scale based on magnitude of the data none is provided.
-:type scale_length: float
-:param title: Plot title
-:type title: str
-:param savefig: Save figure with the input string as the filename. Extension will determine format (png, svg, pdf, eps, ps).
-:type savefig: str
-:return: Map/Figure of strain axes
-:rtype: matplotlib.pyplot.figure</p>
+<dd><p>Creates a map of the principal strain axes. Supply area, differential, and shear strains with optional location information and plot parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>areal</strong> (<em>np.array</em>) – Array of areal (Eee+Enn) strains</p></li>
+<li><p><strong>differential</strong> (<em>np.array</em>) – Array of differential (Eee-Enn) strains</p></li>
+<li><p><strong>shear</strong> (<em>np.array</em>) – Array of engineering shear (2Een) strains</p></li>
+<li><p><strong>lats</strong> (<em>np.array</em>) – (Optional) Array of latitudes or y-axis locations</p></li>
+<li><p><strong>lons</strong> (<em>np.array</em>) – (Optional) Array of longitudes or y-axis locations</p></li>
+<li><p><strong>station_list</strong> (<em>list</em>) – (Optional) List of station names to label.</p></li>
+<li><p><strong>colors</strong> (<em>list</em>) – (Optional) List of colors for the strain axes</p></li>
+<li><p><strong>units</strong> (<em>str</em>) – (Optional) Units to label strain</p></li>
+<li><p><strong>scale_length</strong> (<em>float</em>) – (Optional) Length to make the scale bar. Will plot a default scale based on magnitude of the data none is provided.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – Plot title</p></li>
+<li><p><strong>savefig</strong> (<em>str</em>) – Save figure with the input string as the filename. Extension will determine format (png, svg, pdf, eps, ps).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Map/Figure of strain axes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.pyplot.figure</p>
+</dd>
+</dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">earthscopestraintools.strain_visualization</span> <span class="kn">import</span> <span class="n">map_strain</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
