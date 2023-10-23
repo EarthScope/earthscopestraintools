@@ -17,6 +17,7 @@ from earthscopestraintools.processing import (
     baytap_analysis
 )
 from earthscopestraintools.event_processing import dynamic_strain, calculate_magnitude
+from earthscopestraintools.strain_visualization import strain_video
 from scipy import signal, stats
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -803,6 +804,48 @@ class Timeseries:
                     latitude=latitude,longitude=longitude,elevation=elevation,dmin=0.001)
 
         return baytap_results
+
+    def strain_video(
+        self,
+        interval:float=None,
+        title:str=None,
+        units:str=None,
+        savegif:str=None
+        ):
+        """Displays a gif of the strain time series provided, with time series and strain axes displayed. Strain is shown relative to the first data point. 
+
+        :param interval: (Optional) Time between frames (in microseconds). 
+        :type interval:
+        :param title: (Optional) Plot title
+        :type title: str
+        :param units: (Optional) Units to label strain
+        :type units: str 
+        :return: Gif of the strain time series
+        :rtype: matplotlib.animation
+
+        Example
+        -------
+        >>> # Import relevant modules from the earscopestraintools package
+        >>> from earthscopestraintools.mseed_tools import ts_from_mseed
+        >>> from earthscopestraintools.gtsm_metadata import GtsmMetadata
+        >>> # Metadata
+        >>> network = 'PB'
+        >>> station = 'B004' 
+        >>> meta = GtsmMetadata(network,station)
+        >>> # Provide the start and end times 
+        >>> start = '2019-07-01'
+        >>> end = '2019-07-07'
+        >>> 
+        >>> # load data
+        >>> strain_raw = ts_from_mseed(network=network, station=station, location='T0', channel='RS*', start=start, end=end)
+        >>> strain_linearized = strain_raw.linearize(reference_strains=meta.reference_strains,gap=meta.gap)
+        >>> strain_reg = strain_linearized.apply_calibration_matrix(calibration_matrix=meta.strain_matrices['ER2010'])
+        >>> # make video, save .gif
+        >>> %matplotlib widget 
+        >>> anim = strain_reg.strain_video(interval=1, title=f'{station}, One Week',units='ms',savegif=f'{station}.{start}.{end}.gif')
+        """
+        anim = strain_video(self.data,interval=interval,title=title,units=units,savegif=savegif)
+        return anim
 
     def plot(
         self,

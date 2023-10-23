@@ -168,7 +168,7 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
     :rtype: pd.DataFrame
     """
     logger.info(f"Decimating to 300s")
-    df2 = interpolate(df, method="linear", limit=3600)
+    df2 = interpolate(df, method="linear", limit=limit)
 
     # zero the data to the first value prior to filtering
     initial_values = df2.iloc[0]
@@ -335,7 +335,7 @@ def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float =
         # Offset limit is a multiplier x the average absolute value of first differences
         # within 2 st_dev of the first differences
         offset_limit.append(
-            np.mean(abs(first_diffs[ch].sort_values().iloc[0:-drop])) * limit_multiplier
+            np.mean(first_diffs[ch].abs().sort_values().iloc[0:-drop]) * limit_multiplier
         )
 
         # CH edit. Calculate offsets from the detrended series
@@ -512,7 +512,7 @@ def baytap_analysis(df,atmp_df,quality_df,units,atmp_quality_df,atmp_units,
     elif units == 'nanostrain' and atmp_units == 'hpa':
         None
     else:
-        print('Make sure data are in nanostrain and/or microstrain and hpa.')
+        print('Make sure data are in nanostrain or microstrain and hpa.')
         
     # Control file text
     span = shift = ndata = int(len(df))
@@ -553,25 +553,25 @@ def baytap_analysis(df,atmp_df,quality_df,units,atmp_quality_df,atmp_units,
     baytap_results['tidal_params'] = {}
 
     # Start container with temp file system in the docker memory
-    cmd1 = f'docker run --rm --mount type=tmpfs,destination=/tmp:exec --name baytap -i -d ghcr.io/earthscope/baytap08 bash'
+    cmd1 = f'docker run --rm -i -d --name baytap ghcr.io/earthscope/baytap08 /bin/bash'
+    subprocess.run(cmd1, shell=True,text=True)
     print('Docker container started.')
     
     for ch in df.columns:
             
         df[quality_df[ch] != 'g'] = 999999
         dstr = ch+'\n'+np.array2string(df[ch].values,separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
-    
+        
         # Write files for baytap
-        cmd2 = f'docker exec -i baytap /bin/bash -c "echo -e \'{dstr}\' > /tmp/data.txt"'
-        cmd3 = f'docker exec -i baytap /bin/bash -c "echo -e \'{control_str}\' > /tmp/control.txt"'
-        cmd4 = f'docker exec -i baytap /bin/bash -c "echo -e \'{aux_dstr}\' > /tmp/aux.txt"'
+        cmd2 = f'docker exec baytap /bin/bash -c "echo -e \'{dstr}\' > data.txt"'
+        cmd3 = f'docker exec baytap /bin/bash -c "echo -e \'{control_str}\' > control.txt"'
+        cmd4 = f'docker exec baytap /bin/bash -c "echo -e \'{aux_dstr}\' > aux.txt"'
         # Run baytap
-        cmd5 = f'docker exec -i baytap /bin/bash -c "cat /tmp/data.txt | baytap08 /tmp/control.txt /tmp/results.txt /tmp/aux.txt >> /tmp/decomp.txt"'
+        cmd5 = f'docker exec baytap /bin/bash -c "cat data.txt | baytap08 control.txt results.txt aux.txt >> decomp.txt"'
         # Read results
-        cmd6 = f'docker exec -i baytap /bin/bash -c "cat /tmp/results.txt"'
+        cmd6 = f'docker exec baytap /bin/bash -c "cat results.txt"'
     
         # Actually execute the commands
-        subprocess.run(cmd1, shell=True,text=True)
         subprocess.run(cmd2, shell=True,text=True)
         subprocess.run(cmd3, shell=True,text=True)
         subprocess.run(cmd4, shell=True,text=True)
@@ -581,7 +581,7 @@ def baytap_analysis(df,atmp_df,quality_df,units,atmp_quality_df,atmp_units,
 
         # save the results
         resp = list(filter(lambda x: 'respc' in x, res))
-        baytap_results['atmp_response'][ch] = float(resp[0].split(' ')[-1].replace('D','E'))
+        baytap_results['atmp_response'][ch] = float(resp[0].split(' ')[-1].replace('D','E'))/1000
         dood_list = ['2 0 0 0 0 0','1-1 0 0 0 0','1 1-2 0 0 0',
                     '1 1 0 0 0 0','2-1 0 1 0 0','2 2-2 0 0 0']
         for const,dood in zip(['M2','O1','P1','K1','N2','S2'],dood_list):
@@ -589,8 +589,8 @@ def baytap_analysis(df,atmp_df,quality_df,units,atmp_quality_df,atmp_units,
             baytap_results['tidal_params'][(ch, const, 'phz')] =  list(filter(lambda x: x != '', tid[0].split(' ')))[-4]
             baytap_results['tidal_params'][(ch, const, 'amp')] =  list(filter(lambda x: x != '', tid[0].split(' ')))[-2]
             baytap_results['tidal_params'][(ch, const, 'doodson')] = dood
-
-    subprocess.run('docker rm -f baytap', shell=True)
+    print('Atmospheric pressure responses in microstrain/hPa) and tidal parameters in degrees/nanostrain ')
+    subprocess.run('docker rm -f baytap', shell=True,text=True)
     print('Docker processes finished. Container removed.')
             
     return baytap_results
@@ -618,43 +618,42 @@ def spotl_predict_tides(latitude,longitude,elevation,glob_oc,reg_oc,greenf):
     :rtype: dict
     '''
     # Start Docker container
-    subprocess.run('docker rm -f spotl',shell=True)
-    command = f'docker run --rm -w /opt/spotl/working/ --mount type=tmpfs,destination=/opt/spotl/work --name spotl -i -d ghcr.io/earthscope/spotl bash'
+    command = f'docker run --rm -w /opt/spotl/working/ --mount type=tmpfs,destination=/opt/spotl/work --name spotl -i -d ghcr.io/earthscope/spotl /bin/bash'
     print('Docker started')
     subprocess.check_output(command,shell=True)
     # # Run polymake for regional models of interest
-    command = f'docker exec -i spotl /bin/bash -c "polymake << EOF > ../work/poly.{reg_oc} \n- {reg_oc} \nEOF"'
+    command = f'docker exec spotl /bin/bash -c "polymake << EOF > ../work/poly.{reg_oc} \n- {reg_oc} \nEOF"'
     subprocess.check_output(command,shell=True)
     # # M2 ocean load for the ocean model but exclude the area in specified polygon
-    command = f'docker exec -i spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1m2.f1"'
+    command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1m2.f1"'
     subprocess.check_output(command,shell=True)
     # # M2 ocean load for the regional ocean model in the area in specified polygon
-    command = f'docker exec -i spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1m2.f2"'
+    command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1m2.f2"'
     subprocess.check_output(command,shell=True)
     # #  Add the M2 loads computed above together
-    command = f'docker exec -i spotl /bin/bash -c "cat ../work/ex1m2.f1 ../work/ex1m2.f2 | loadcomb c >  ../work/tide.m2"'
+    command = f'docker exec spotl /bin/bash -c "cat ../work/ex1m2.f1 ../work/ex1m2.f2 | loadcomb c >  ../work/tide.m2"'
     subprocess.check_output(command,shell=True)
     # # O1 ocean load for the ocean model but exclude the area in specified polygon
-    command = f'docker exec -i spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1o1.f1"'
+    command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1o1.f1"'
     subprocess.check_output(command,shell=True)
     # # O1 ocean load for the regional ocean model in the area in specified polygon
-    command = f'docker exec -i spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1o1.f2"'
+    command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1o1.f2"'
     subprocess.check_output(command,shell=True)
     # # Add the O1 loads computed above together
-    command = f'docker exec -i spotl /bin/bash -c "cat ../work/ex1o1.f1 ../work/ex1o1.f2 | loadcomb c >  ../work/tide.o1"'
+    command = f'docker exec spotl /bin/bash -c "cat ../work/ex1o1.f1 ../work/ex1o1.f2 | loadcomb c >  ../work/tide.o1"'
     subprocess.check_output(command,shell=True)
     # # Compute solid earth wides and combine with above ocean loads
-    command = f'docker exec -i spotl /bin/bash -c "cat ../work/tide.m2 | loadcomb t >  ../work/m2.tide.total"'
+    command = f'docker exec spotl /bin/bash -c "cat ../work/tide.m2 | loadcomb t >  ../work/m2.tide.total"'
     subprocess.check_output(command,shell=True)
-    command = f'docker exec -i spotl /bin/bash -c "cat ../work/tide.o1 | loadcomb t >  ../work/o1.tide.total"'
+    command = f'docker exec spotl /bin/bash -c "cat ../work/tide.o1 | loadcomb t >  ../work/o1.tide.total"'
     subprocess.check_output(command,shell=True)
     # # Find the amps and phases, compute complex numbers:
-    command = f'docker exec -i spotl /bin/bash -c "cat ../work/m2.tide.total"'
+    command = f'docker exec spotl /bin/bash -c "cat ../work/m2.tide.total"'
     out = subprocess.check_output(command,shell=True,text=True)
     outlist = list(filter(lambda x: x.startswith('s'), out.split('\n')))[0].split(' ')
     Eamp, Ephase, Namp, Nphase, ENamp, ENphase = np.float64(list(filter(lambda x: x != '' and x != 's' , outlist)))
     m2E, m2N, m2EN = complex(Eamp*np.cos(Ephase*np.pi/180),Eamp*np.sin(Ephase*np.pi/180)), complex(Namp*np.cos(Nphase*np.pi/180),Namp*np.sin(Nphase*np.pi/180)), complex(ENamp*np.cos(ENphase*np.pi/180),ENamp*np.sin(ENphase*np.pi/180))
-    command = f'docker exec -i spotl /bin/bash -c "cat ../work/o1.tide.total"'
+    command = f'docker exec spotl /bin/bash -c "cat ../work/o1.tide.total"'
     out = subprocess.check_output(command,shell=True,text=True)
     outlist = list(filter(lambda x: x.startswith('s'), out.split('\n')))[0].split(' ')
     Eamp, Ephase, Namp, Nphase, ENamp, ENphase = np.float64(list(filter(lambda x: x != '' and x != 's' , outlist)))

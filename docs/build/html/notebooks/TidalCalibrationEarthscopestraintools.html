@@ -96,18 +96,25 @@
              
   <section id="Tidal-Calibration">
 <h1>Tidal Calibration<a class="headerlink" href="#Tidal-Calibration" title="Link to this heading"></a></h1>
-<p>This notebook is intended to demonstrate tidal calibration process for the Gladwin Tensor borehole Strainmeters (GTSM) following the methodology outlined in Hodgkinson et al. (2013) and applied in Hanagan et al. (In Prep). Note that tidal calibration requires a careful eye to the data for processing, so, when available, the tidal calibrations provided in the metadata are suggested unless the user has a strong reason to belive the calibration requires an update.</p>
-<p>The workflow in this notebook can be summarized to data aquisition, offset correction, and tidal time series analysis and modelling to acquire the final tidal calibration matrix. We correct the data for spurious offsets or pulses prior to tidal analysis because they are known to hinder accurate characterization of the tides and barometric pressure repsonse. An additional benefit of the workflow implemented here, is that we will also estimate the gauge response to barometric pressure.</p>
-<p>The first portion of this notebook includes steps from the level 2 processing notebook. Then, new steps specific to the calibraiton process are completed. Sections in this notebook include: - Aquire station metadata and decimated timeseries - Offset correction - Observed tidal analysis - Predicted tides - Orientation matrix - <a class="reference internal" href="#References"><span class="std std-ref">References</span></a></p>
+<p>This notebook is intended to demonstrate the tidal calibration process for Gladwin Tensor borehole Strainmeters (GTSM) following the methodology outlined in Hodgkinson et al. (2013) and applied in Hanagan et al. (In Prep). Note that tidal calibration requires a careful eye on the data for processing; so, when available, we suggest using the tidal calibrations provided in the metadata unless the user has a strong reason to belive the calibration requires an update.</p>
+<p>The workflow in this notebook can be summarized into three main parts: data aquisition, offset correction, and tidal time series analysis and modelling to acquire the final tidal calibration matrix. An additional benefit of the workflow implemented here is that we will also estimate the gauge response to barometric pressure. We correct the data for spurious offsets or pulses prior to tidal analysis because they are known to hinder accurate characterization of the tides and barometric pressure
+repsonse.</p>
+<p>The first portion of this notebook includes steps from the level 2 processing notebook. Then, new steps specific to the calibraiton process are completed. Sections in this notebook include:</p>
+<ul class="simple">
+<li><p>Aquire station metadata and decimated timeseries</p></li>
+<li><p>Offset correction</p></li>
+<li><p>Observed tidal analysis</p></li>
+<li><p>Predicted tides</p></li>
+<li><p>Orientation matrix</p></li>
+<li><p><a class="reference internal" href="#References"><span class="std std-ref">References</span></a></p></li>
+</ul>
 <section id="Aquire-station-metadata-and-decimated-timeseries">
 <h2>Aquire station metadata and decimated timeseries<a class="headerlink" href="#Aquire-station-metadata-and-decimated-timeseries" title="Link to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import relevant modules from the earscopestraintools package</span>
-<span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
 <span class="kn">from</span> <span class="nn">earthscopestraintools.mseed_tools</span> <span class="kn">import</span> <span class="n">ts_from_mseed</span>
 <span class="kn">from</span> <span class="nn">earthscopestraintools.gtsm_metadata</span> <span class="kn">import</span> <span class="n">GtsmMetadata</span>
 <span class="kn">from</span> <span class="nn">earthscopestraintools.timeseries</span> <span class="kn">import</span> <span class="n">plot_timeseries_comparison</span>
@@ -124,23 +131,12 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
-</pre></div></div>
-</div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[196]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Linearize 1 hz strain from the IRIS/EarthScope DMC, filter/decimate to 5 min</span>
 <span class="c1"># and acquire 30 min pressure data</span>
-
-<span class="c1"># (Store 999999 calibraion timestamps [NANs] for later use in BAYTAP08 for tidal analysis</span>
 
 <span class="c1"># Metadata</span>
 <span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;IV&#39;</span>
@@ -153,7 +149,7 @@ The autoreload extension is already loaded. To reload it, use:
 
 <span class="c1"># load data</span>
 <span class="n">strain_raw</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;T0&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;LS*&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
-<span class="c1"># Print some stats and plot the data</span>
+<span class="c1"># Print stats and plot the data</span>
 <span class="n">strain_raw</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
 <span class="n">strain_raw</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">)</span>
 </pre></div>
@@ -164,11 +160,11 @@ The autoreload extension is already loaded. To reload it, use:
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-IV TSM6 Loading T0 LS* from 2022-10-21T00:00:00.000000 to 2023-03-09T23:59:50.000000 from Earthscope DMC miniseed
-    Trace 1. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:50.000000Z mapping LS1 to CH0
-    Trace 2. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:50.000000Z mapping LS2 to CH1
-    Trace 3. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:50.000000Z mapping LS3 to CH2
-    Trace 4. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:50.000000Z mapping LS4 to CH3
+IV TSM6 Loading T0 LS* from 2022-10-21T00:00:00.000000 to 2023-03-09T23:59:59.000000 from Earthscope DMC miniseed
+    Trace 1. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:59.000000Z mapping LS1 to CH0
+    Trace 2. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:59.000000Z mapping LS2 to CH1
+    Trace 3. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:59.000000Z mapping LS3 to CH2
+    Trace 4. 2022-10-21T00:00:00.000000Z:2023-03-09T23:59:59.000000Z mapping LS4 to CH3
     Found 0 epochs with nans, 29.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
 Converting missing data from 999999 to nan
@@ -177,10 +173,10 @@ Converting missing data from 999999 to nan
     Total missing data is 0.0%
 IV.TSM6.T0.LS*
     | Channels: [&#39;CH0&#39;, &#39;CH1&#39;, &#39;CH2&#39;, &#39;CH3&#39;]
-    | TimeRange: 2022-10-21 00:00:00 - 2023-03-09 23:59:50        | Period:             1s
+    | TimeRange: 2022-10-21 00:00:00 - 2023-03-09 23:59:59        | Period:             1s
     | Series:         raw| Units:        counts| Level:          0| Gaps:             0.0%
-    | Epochs:    12095991| Good:     12095962.0| Missing:     29.0| Interpolated:      0.0
-    | Samples:   48383964| Good:       48383848| Missing:      116| Interpolated:        0
+    | Epochs:    12096000| Good:     12095971.0| Missing:     29.0| Interpolated:      0.0
+    | Samples:   48384000| Good:       48383884| Missing:      116| Interpolated:        0
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -191,11 +187,11 @@ IV.TSM6.T0.LS*
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[197]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter to 5 min, then to hourly in a 2 step filter for strain and convert to nstrain</span>
-<span class="c1"># Save the hourly data in a separate dataframe with a datetime seconds index</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter to 5 min, then to hourly in a 2 step filter and convert to nstrain</span>
+<span class="c1"># Save the hourly data in a separate Timeseries with an index in datetime seconds</span>
 
 <span class="c1"># filter and decimate to 5 min</span>
 <span class="n">decimated_counts</span> <span class="o">=</span> <span class="n">strain_raw</span><span class="o">.</span><span class="n">decimate_1s_to_300s</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
@@ -206,7 +202,7 @@ IV.TSM6.T0.LS*
 <span class="c1"># Decimates the data to hourly by taking the first minute/second of each hour</span>
 <span class="n">decimated_hr_counts</span> <span class="o">=</span> <span class="n">filtered_hr_counts</span><span class="o">.</span><span class="n">decimate_to_hourly</span><span class="p">()</span>
 <span class="c1"># Linearize to microstrain</span>
-<span class="n">decimated_hr_strain</span> <span class="o">=</span> <span class="n">decimated_hr_counts</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">reference_strains</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_reference_strains</span><span class="p">(),</span><span class="n">gap</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_gap</span><span class="p">())</span>
+<span class="n">decimated_hr_strain</span> <span class="o">=</span> <span class="n">decimated_hr_counts</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">reference_strains</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">reference_strains</span><span class="p">,</span><span class="n">gap</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">gap</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -219,13 +215,23 @@ Decimating to 300s
 Interpolating data using method=linear and limit=3600
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
+Applying Butterworth Filter
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Decimating to hourly
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
+Converting raw counts to microstrain
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
 </pre></div></div>
 </div>
 </section>
 <section id="Offset-correction">
 <h2>Offset correction<a class="headerlink" href="#Offset-correction" title="Link to this heading"></a></h2>
+<p>We will correct for offsets via a simple first differencing method. To enable better estimates of the offsets, we first correct the data for a “first estimate” of tides, trend, and pressure. For this time series, we use Baytap08 (more information on the program is described in the next section) to retreive an initial estimate of the tides and pressure response for the purpose of preliminary correction.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[199]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Acquire atmospheric pressure data and filter to hourly</span>
@@ -238,17 +244,18 @@ Interpolating data using method=linear and limit=3600
 <span class="n">atmp_filt</span> <span class="o">=</span> <span class="n">atmp_interp</span><span class="o">.</span><span class="n">butterworth_filter</span><span class="p">(</span><span class="n">filter_type</span><span class="o">=</span><span class="s1">&#39;lowpass&#39;</span><span class="p">,</span><span class="n">filter_order</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                                         <span class="n">filter_cutoff_s</span><span class="o">=</span><span class="n">filt_cutoff_s</span><span class="p">)</span>
 <span class="n">atmp</span> <span class="o">=</span> <span class="n">atmp_filt</span><span class="o">.</span><span class="n">decimate_to_hourly</span><span class="p">()</span>
-<span class="c1"># Compute a preliminary pressure correction</span>
-<span class="n">atmp_c</span> <span class="o">=</span> <span class="n">atmp</span><span class="o">.</span><span class="n">calculate_pressure_correction</span><span class="p">(</span><span class="n">response_coefficients</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_atmp_response</span><span class="p">())</span>
-</pre></div>
+
+<span class="c1"># Run baytap preliminarily to retrieve the pressure response and tidal amplitudes and phases for the full metadata suite</span>
+<span class="n">prelim_baytap_results</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">baytap_analysis</span><span class="p">(</span><span class="n">atmp</span><span class="p">,</span><span class="n">latitude</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span><span class="n">longitude</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span><span class="n">elevation</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">elevation</span><span class="p">,</span><span class="n">dmin</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+<br/></pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-IV TSM6 Loading * RDO from 2022-10-21T00:00:00.000000 to 2023-03-09T23:59:50.000000 from Earthscope DMC miniseed
+IV TSM6 Loading * RDO from 2022-10-21T00:00:00.000000 to 2023-03-09T23:59:59.000000 from Earthscope DMC miniseed
     Trace 1. 2022-10-21T00:00:00.000000Z:2023-03-09T23:30:00.000000Z mapping RDO to atmp
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
@@ -265,22 +272,33 @@ Applying Butterworth Filter
 Decimating to hourly
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
-Calculating pressure correction
-    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
-    Total missing data is 0.0%
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+bda488faa0b854188cbc29c5b15092d7d3f2a114022340fb6414b9875dab3f21
+Docker container started.
+Atmospheric pressure responses in microstrain/hPa) and tidal parameters in degrees/nanostrain
+baytap
+Docker processes finished. Container removed.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[200]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Other corrections prior to offset correcteion</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Corrections prior to offset correcteion</span>
+<span class="n">atmp_c</span> <span class="o">=</span> <span class="n">atmp</span><span class="o">.</span><span class="n">calculate_pressure_correction</span><span class="p">(</span><span class="n">response_coefficients</span><span class="o">=</span><span class="n">prelim_baytap_results</span><span class="p">[</span><span class="s1">&#39;atmp_response&#39;</span><span class="p">])</span>
 <span class="n">trend_c</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">linear_trend_correction</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
-<span class="n">tide_c</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">calculate_tide_correction</span><span class="p">(</span><span class="n">tidal_parameters</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_tidal_params</span><span class="p">(),</span><span class="n">longitude</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get_longitude</span><span class="p">())</span>
+<span class="n">tide_c</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">calculate_tide_correction</span><span class="p">(</span><span class="n">tidal_parameters</span><span class="o">=</span><span class="n">prelim_baytap_results</span><span class="p">[</span><span class="s1">&#39;tidal_params&#39;</span><span class="p">],</span><span class="n">longitude</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
 <span class="n">pre_offset_corrected</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">apply_corrections</span><span class="p">([</span><span class="n">trend_c</span><span class="p">,</span><span class="n">tide_c</span><span class="p">,</span><span class="n">atmp_c</span><span class="p">])</span>
 <span class="n">offset_c</span> <span class="o">=</span> <span class="n">pre_offset_corrected</span><span class="o">.</span><span class="n">calculate_offsets</span><span class="p">(</span><span class="n">limit_multiplier</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">offset_corrected</span> <span class="o">=</span> <span class="n">decimated_hr_strain</span><span class="o">.</span><span class="n">apply_corrections</span><span class="p">([</span><span class="n">offset_c</span><span class="p">])</span>
-<span class="n">plot_timeseries_comparison</span><span class="p">([</span><span class="n">decimated_hr_strain</span><span class="p">,</span><span class="n">offset_corrected</span><span class="p">],</span><span class="n">zero</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">detrend</span><span class="o">=</span><span class="s1">&#39;Linear&#39;</span><span class="p">)</span>
+<span class="n">offset_c</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plot_timeseries_comparison</span><span class="p">([</span><span class="n">decimated_hr_strain</span><span class="p">,</span><span class="n">offset_corrected</span><span class="p">],</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Original&#39;</span><span class="p">,</span><span class="s1">&#39;Offset Corrected&#39;</span><span class="p">],</span><span class="n">zero</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">detrend</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -289,9 +307,12 @@ Calculating pressure correction
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
+Calculating pressure correction
+    Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
+    Total missing data is 0.0%
 Calculating linear trend correction
     Trend Start: 2022-10-21 00:00:00
-    Trend Start: 2023-03-09 23:00:00
+    Trend End: 2023-03-09 23:00:00
   Median trend calculated with points 24.0 hr apart.
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
@@ -306,28 +327,33 @@ Applying corrections
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
 Calculating offsets using cutoff percentile of 0.75 and limit multiplier of 10.
-Using offset limits of [0.009739, 0.019143, 0.008324, 0.010778]
+Using offset limits of [0.008823, 0.013784, 0.008222, 0.008635]
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
 Applying corrections
     Found 0 epochs with nans, 0.0 epochs with 999999s, and 0 missing epochs.
     Total missing data is 0.0%
-Only linear detrend implemented
-Only linear detrend implemented
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/notebooks_TidalCalibrationEarthscopestraintools_7_1.png" src="../_images/notebooks_TidalCalibrationEarthscopestraintools_7_1.png" />
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_TidalCalibrationEarthscopestraintools_7_2.png" src="../_images/notebooks_TidalCalibrationEarthscopestraintools_7_2.png" />
+</div>
+</div>
 </section>
 <section id="Observed-tidal-analysis">
 <h2>Observed tidal analysis<a class="headerlink" href="#Observed-tidal-analysis" title="Link to this heading"></a></h2>
-<p>The tidal constituents (amplitudes and phases of daily and bi-daily tides) will be determined from the observed strain timeseries in a program called BAYTAP08 (Tamura 1991; Tamura and Agnew 2008). The original BAYTAP-G program was rewritten by Duncan Agnew in the BAYTAP08 iteration: <a class="reference external" href="http://igppweb.ucsd.edu/~agnew/Baytap/baytap.html">http://igppweb.ucsd.edu/~agnew/Baytap/baytap.html</a>. The primary function of BAYTAP08 is to isolate distinct tidal amplitudes and phases from data streams contaminated by other signals through assuming a smoothly
-varying drift, which is empirically inferred by minimizing Akaike’s Bayesian Information Criterion (ABIC).</p>
+<p>The tidal constituents (amplitudes and phases of daily and bi-daily tides) will be determined from the observed strain timeseries in a program called BAYTAP08 (Tamura 1991; Tamura and Agnew 2008). The original BAYTAP-G program was rewritten by Duncan Agnew as BAYTAP08: <a class="reference external" href="http://igppweb.ucsd.edu/~agnew/Baytap/baytap.html">http://igppweb.ucsd.edu/~agnew/Baytap/baytap.html</a>. The primary function of BAYTAP08 is to isolate distinct tidal amplitudes and phases from data streams contaminated by other signals through assuming a smoothly varying drift,
+which is empirically inferred by minimizing Akaike’s Bayesian Information Criterion (ABIC).</p>
 <p>To summarize, the program assumes a strain signal (<span class="math notranslate nohighlight">\(y_i\)</span>) composed of the following components:</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
@@ -349,11 +375,11 @@ varying drift, which is empirically inferred by minimizing Akaike’s Bayesian I
 <div class="math notranslate nohighlight">
 \[S = \sum_{i=1}^{N}r_i^2+ D^2 \sum_{i=1}^{n} (d_i - 2d_{i-1} + d_{i-2})^2 + W^2 \sum_{m=2}^{M}(A_m - A_{m-1})^2+(B_m-B_{m-1})^2\]</div>
 <ul class="simple">
-<li><p>D (drift) is an input smoothness parameter, where a very large D provides a linear drift with time. - W is an input parameter that controls how much the tidal admittance can vary over frequency bands.</p></li>
+<li><p>D (drift) is an input smoothness parameter, where a very large D provides a linear drift with time. - W is an input parameter that controls how much the tidal admittance can vary over frequency bands. We allow W to assume the default value of 1.</p></li>
 </ul>
 <p>Typically, the strainmeters have already been analyzed with BAYTAP, and those outputs are what we used to perform the preliminary corrections prior to detecting offsets and pulses in the previous step. Here, the goal is to reanalyze the tidal amplitudes and phases to perform tidal calibration. More specifically, we are interested in the M2 and O1 tidal constituent amplitudes and phases per gauge.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[201]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run baytap to retrieve the pressure response and tidal amplitudes and phases for the full metadata suite</span>
@@ -361,39 +387,20 @@ varying drift, which is empirically inferred by minimizing Akaike’s Bayesian I
 <br/></pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Docker container started.
-7dc565c4e42aae721fcd02b5f5c3da1778f95380746d2bd3299be70d395f7b8c
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-docker: Error response from daemon: Conflict. The container name &#34;/baytap&#34; is already in use by container &#34;7dc565c4e42aae721fcd02b5f5c3da1778f95380746d2bd3299be70d395f7b8c&#34;. You have to remove (or rename) that container to be able to reuse that name.
-See &#39;docker run --help&#39;.
-docker: Error response from daemon: Conflict. The container name &#34;/baytap&#34; is already in use by container &#34;7dc565c4e42aae721fcd02b5f5c3da1778f95380746d2bd3299be70d395f7b8c&#34;. You have to remove (or rename) that container to be able to reuse that name.
-See &#39;docker run --help&#39;.
-docker: Error response from daemon: Conflict. The container name &#34;/baytap&#34; is already in use by container &#34;7dc565c4e42aae721fcd02b5f5c3da1778f95380746d2bd3299be70d395f7b8c&#34;. You have to remove (or rename) that container to be able to reuse that name.
-See &#39;docker run --help&#39;.
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
+55222a7e1f6c1757836c78145af65a76f681e91a927ac93e052cc8c4bdc130eb
+Docker container started.
+Atmospheric pressure responses in microstrain/hPa) and tidal parameters in degrees/nanostrain
 baytap
 Docker processes finished. Container removed.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[202]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print the results for the M2 and O1 tidal constituents</span>
@@ -412,17 +419,17 @@ Docker processes finished. Container removed.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 CH0:
-M2 amp (nstrain) and phase (degree): 5.931 -46.133
-O1 amp (nstrain) and phase (degree): 3.802 132.222
+M2 amp (nstrain) and phase (degree): 5.941 -46.037
+O1 amp (nstrain) and phase (degree): 3.983 132.863
 CH1:
-M2 amp (nstrain) and phase (degree): 8.581 63.764
-O1 amp (nstrain) and phase (degree): 4.589 -116.438
+M2 amp (nstrain) and phase (degree): 8.598 63.713
+O1 amp (nstrain) and phase (degree): 4.622 -116.351
 CH2:
-M2 amp (nstrain) and phase (degree): 13.152 -165.700
-O1 amp (nstrain) and phase (degree): 2.561 10.531
+M2 amp (nstrain) and phase (degree): 13.152 -165.709
+O1 amp (nstrain) and phase (degree): 2.564 10.488
 CH3:
-M2 amp (nstrain) and phase (degree): 8.050 -120.416
-O1 amp (nstrain) and phase (degree): 3.678 60.458
+M2 amp (nstrain) and phase (degree): 8.066 -120.395
+O1 amp (nstrain) and phase (degree): 3.702 60.080
 </pre></div></div>
 </div>
 </section>
@@ -430,7 +437,7 @@ O1 amp (nstrain) and phase (degree): 3.678 60.458
 <h2>Predicted tides<a class="headerlink" href="#Predicted-tides" title="Link to this heading"></a></h2>
 <p>In this section, we will gather the predicted M2 and O1 tidal amplitudes and phases for the areal, differential shear, and engineering shear strains for the station using SPOTL (Some Programs for Ocean Tide Loading; Agnew, 2013). SPOTL, like BAYTAP, will be run from a Docker container.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[210]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">earthscopestraintools.processing</span> <span class="kn">import</span> <span class="n">spotl_predict_tides</span>
@@ -455,7 +462,6 @@ O1 amp (nstrain) and phase (degree): 3.678 60.458
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-spotl
 Docker started
 </pre></div></div>
 </div>
@@ -477,7 +483,7 @@ Docker container stopped and removed.
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[210]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -511,7 +517,7 @@ Docker container stopped and removed.
 \[\begin{split}\begin{pmatrix} a_{11} &amp; a_{12} &amp; a_{13} &amp; a_{14} \\ a_{21} &amp; a_{22} &amp; a_{23} &amp; a_{24} \\ a_{31} &amp; a_{32} &amp; a_{33} &amp; a_{34} \end{pmatrix}^{-1} \begin{pmatrix} e_{0} \\ e_{1} \\ e_{2} \\ e_{3} \end{pmatrix} = \begin{pmatrix} e_{EE} + e_{NN} \\ e_{EE} - e_{NN} \\ 2e_{EN} \end{pmatrix} = \begin{pmatrix} E_A \\ E_D \\ E_S \end{pmatrix}\end{split}\]</div>
 </div></blockquote>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[211]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute the observed real and imaginary components of the tidal amplitudes and phases,</span>
@@ -530,20 +536,28 @@ Docker container stopped and removed.
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Observed tidal matrix:
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[211]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-array([[  4.11010415,  -4.2759566 ,  -2.55496297,   2.81555825],
-       [  3.79339863,   7.69699213,  -2.04315652,  -4.1090671 ],
-       [-12.7444949 ,  -3.24853102,   2.51786294,   0.46806754],
-       [ -4.07551056,  -6.94209721,   1.81347995,   3.19983976]])
+array([[  4.12420475,  -4.27626194,  -2.70942648,   2.91946865],
+       [  3.80777711,   7.70885448,  -2.05156249,  -4.14173579],
+       [-12.74500502,  -3.24652907,   2.52116339,   0.46672387],
+       [ -4.08106121,  -6.95739142,   1.84652174,   3.2086074 ]])
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[215]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For the predicted tide matrix, 3x4</span>
@@ -567,7 +581,7 @@ Predicted tidal matrix:
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[215]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -578,7 +592,7 @@ array([[ 15.26065421,   1.55911854,  11.46017566,   0.08470101],
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[217]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate the orentation matrix from the coupling matrix</span>
@@ -590,7 +604,7 @@ array([[ 15.26065421,   1.55911854,  11.46017566,   0.08470101],
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tidal Orientation Matrix:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">orient_mat</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;****************************&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Residuals (obs-modelled)&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">obs_tides</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">coupling_mat</span><span class="p">,</span><span class="n">pred_tide_matrix</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obs_tide_matrix</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">coupling_mat</span><span class="p">,</span><span class="n">pred_tide_matrix</span><span class="p">))</span>
 <span class="c1"># Sum of squared residuals,</span>
 <span class="c1"># divided by number of data (4 per gauge)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;RMSE, per gauge:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">res2</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span>
@@ -604,25 +618,25 @@ array([[ 15.26065421,   1.55911854,  11.46017566,   0.08470101],
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Coupling Matrix:
- [[-0.08768021 -0.4255514   0.96202279]
- [-0.06332504 -0.55153723 -1.11030715]
- [-0.06623311  1.10791286 -0.04355453]
- [ 0.04523509  0.54143254  0.9372729 ]]
+ [[-0.09759912 -0.44106484  0.9756906 ]
+ [-0.06350349 -0.55316905 -1.11388831]
+ [-0.06603285  1.10820783 -0.04401844]
+ [ 0.04723211  0.54496425  0.93881452]]
 ****************************
 Tidal Orientation Matrix:
- [[-5.20459372 -2.7831816  -4.2866582   1.84583163]
- [-0.29496767 -0.14156385  0.6383292   0.16472085]
- [ 0.43438867 -0.30592907 -0.10936836  0.25357554]]
+ [[-4.8884553  -2.59321853 -4.13009602  1.81001004]
+ [-0.27530833 -0.13289096  0.6483382   0.1588481 ]
+ [ 0.41141518 -0.31490917 -0.12047325  0.25831448]]
 ****************************
 Residuals (obs-modelled)
-[[ 4.22549806  8.25265375  2.24726768 -5.30729136]
- [-5.0872427  -7.01938155  9.2869124   2.19473697]
- [11.92493261 -0.37161444 -4.68011578  3.04215113]
- [ 9.41722048  6.56019924 -5.4244892  -2.1733429 ]]
+[[ 0.10269965 -0.39044769 -0.07915587 -0.60647961]
+ [ 0.0105982  -0.04029265 -0.00816857 -0.06258628]
+ [-0.10018539  0.38088889  0.07721801  0.59163199]
+ [ 0.03924873 -0.14921743 -0.03025101 -0.23177836]]
 RMSE, per gauge:
- [0.40001328 0.02599496 0.35726657 0.14176508]
+ [0.36642864 0.03781398 0.35745786 0.14003806]
 RMSE:
- 0.2776792663582271
+ 0.26602942711926336
 </pre></div></div>
 </div>
 </section>
@@ -631,14 +645,6 @@ RMSE:
 <p>Agnew, D. C. (2012). SPOTL: Some Programs for Ocean-Tide Loading, SIO Technical Report, Scripps Institution of Oceanography. From <a class="reference external" href="https://igppweb.ucsd.edu/~agnew/Spotl/spotlmain.html">https://igppweb.ucsd.edu/~agnew/Spotl/spotlmain.html</a></p>
 <p>Hodgkinson, K., J. Langbein, B. Henderson, D. Mencin, and A. Borsa (2013), Tidal calibration of plate boundary observatory borehole strainmeters, J. Geophys. Res. Solid Earth, 118, 447–458, doi:10.1029/2012JB009651.</p>
 <p>Tamura, Y., &amp; Agnew, D. C. (2008). Baytap08 User’s Manual. UC San Diego: Library – Scripps Digital Collection. From <a class="reference external" href="https://escholarship.org/uc/item/4c27740c">https://escholarship.org/uc/item/4c27740c</a></p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 </section>
 </section>
 

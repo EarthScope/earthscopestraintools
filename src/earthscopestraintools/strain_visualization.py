@@ -106,8 +106,8 @@ def map_strain(areal:np.array,
 
         # Station text
         if isinstance(station_list,list):
-            t = ax.text(lons[i],lats[i],station_list[i])
-            t.set_bbox(dict(facecolor='grey', alpha=0.3, edgecolor='grey'))
+            t = ax.text(lons[i],lats[i],station_list[i],color='darkblue')
+            t.set_bbox(dict(facecolor='lightblue', alpha=0.8, edgecolor='grey'))
         
     # Aspect for map plotting at specified latitude           
     f = 1.0/np.cos(np.average(lats)*np.pi/180)
@@ -123,12 +123,14 @@ def map_strain(areal:np.array,
         scale_length = np.round(avg_length*2/3*scale,3)
     if units is None:
         units = ''
-    ax.arrow(scale_origin[0],scale_origin[1],scale_length,0,head_starts_at_zero=False,zorder=3,color='orange',length_includes_head=True,head_width=hw*0.6,width=lw*0.6)
-    ax.arrow(scale_origin[0],scale_origin[1],-scale_length,0,head_starts_at_zero=False,zorder=3,color='orange',length_includes_head=True,head_width=hw*0.6,width=lw*0.6)
-    t = ax.text(scale_origin[0],scale_origin[1]+0.1*yax_length,s=str(scale_length)+' '+units,horizontalalignment='center',verticalalignment='center')
-    t.set_bbox(dict(facecolor='red', alpha=0.5, edgecolor='red'))
-    ax.set_xlabel('East')
-    ax.set_ylabel('North')
+    else:
+        units = f'[{units}]'
+    ax.arrow(scale_origin[0],scale_origin[1],scale_length,0,head_starts_at_zero=False,zorder=3,color='red',length_includes_head=True,head_width=hw*0.6,width=lw*0.6)
+    ax.arrow(scale_origin[0],scale_origin[1],-scale_length,0,head_starts_at_zero=False,zorder=3,color='red',length_includes_head=True,head_width=hw*0.6,width=lw*0.6)
+    t = ax.text(scale_origin[0],scale_origin[1]+0.07*yax_length,s=str(scale_length)+' '+units,horizontalalignment='center',verticalalignment='center',color='indigo')
+    t.set_bbox(dict(facecolor='red', alpha=0.5, edgecolor='pink'))
+    ax.set_xlabel(f'East {units}')
+    ax.set_ylabel(f'North {units}')
     
     if isinstance(savefig,str):
         print('Saving Figure:',savefig)
@@ -136,24 +138,15 @@ def map_strain(areal:np.array,
 
     return
 
-def strain_video(areal:np.array,
-                 differential:np.array,
-                 shear:np.array,
-                 time:np.array,
+def strain_video(df,
                  interval:float=None,
                  title:str=None,
                  units:str=None,
                  savegif:str=None):
-    """Displays a gif of the strain timeseries provided, with time series and strain axes displayed. Strain is shown relative to the first data point. 
+    """Displays a gif of the strain time series provided, with time series and strain axes displayed. Strain is shown relative to the first data point. 
 
-    :param areal: Array of areal (Eee+Enn) strains
-    :type areal: np.array
-    :param differential: Array of differential (Eee-Enn) strains
-    :type differential: np.array
-    :param shear: Array of engineering shear (2Een) strains
-    :type shear: np.array
-    :param time: Datetime Index for the timeseries to be displayed on the x-axis 
-    :type time: np.array
+    :param df: Dataframe with datetime (in seconds) index and regional strain columns ('Eee+Enn', 'Eee-Enn', '2Ene')
+    :type df: pd.DataFrame
     :param interval: (Optional) Time between frames (in microseconds). 
     :type interval:
     :param title: (Optional) Plot title
@@ -162,22 +155,9 @@ def strain_video(areal:np.array,
     :type units: str 
     :return: Gif of the strain time series
     :rtype: matplotlib.animation
-
-    Example
-    -------
-    >>> from earthscopestraintools.strain_visualization import strain_video
-    >>> import numpy as np
-    >>> import pandas as pd
-    >>> # Enable interactive plotting if using jupyter lab
-    >>> %matplotlib widget
-    >>> # Make a crazy set of strains
-    >>> ea, ed, es = np.linspace(0,90,150),np.sin(np.linspace(0,180,150)),np.cos(np.linspace(0,360,150))
-    >>> # Set a time frame
-    >>> time = pd.date_range('2023-01-10','2023-01-30',150)
-    >>> # Call the function to create an animation
-    >>> anim = strain_video(areal=ea,differential=ed,shear=es,time=time,interval=50, units='ms',title='Wobbly Extension',savegif='StrainExample.gif')
     """
-
+    areal, differential, shear = df['Eee+Enn'].values, df['Eee-Enn'].values, df['2Ene'].values
+    time = df.index
     e = 1/2*(areal+differential) # 1/2 [(eEE+eNN)+(eEE-eNN)]
     eEE = e - e[0]
     n = 1/2*(areal-differential) # 1/2 [(eEE+eNN)-(eEE-eNN)]
@@ -194,8 +174,7 @@ def strain_video(areal:np.array,
 
     # Start Figure
     fig = plt.figure()
-    if isinstance(title,str):
-        fig.suptitle(title)
+    fig.suptitle(title)
     # First axis for principal strains
     ax = plt.subplot2grid((4,2),(0,0),rowspan=3,colspan=2)
     # Second axis for time series
@@ -205,6 +184,10 @@ def strain_video(areal:np.array,
     ax.set_xlim(-max(np.abs(eEE)+np.abs(eNN)),max(np.abs(eEE)+np.abs(eNN)))
     ax.set_ylim(-max(np.abs(eEE)+np.abs(eNN)),max(np.abs(eEE)+np.abs(eNN)))
 
+    if units is None:
+        units = ''
+    else:
+        units = f'[{units}]'
     ax.set_xlabel('East '+units)
     ax.set_ylabel('North '+units)
 
@@ -250,7 +233,7 @@ def strain_video(areal:np.array,
         
     if interval == None:
         interval = 200
-    anim = matplotlib.animation.FuncAnimation(fig=fig, func=animate,frames=len(time),interval=interval,repeat=False)
+    anim = matplotlib.animation.FuncAnimation(fig=fig, func=animate,frames=len(time),interval=interval,repeat=True)
     if isinstance(savegif,str):
         writergif = matplotlib.animation.PillowWriter() 
         print('Saving Figure:',savegif)
