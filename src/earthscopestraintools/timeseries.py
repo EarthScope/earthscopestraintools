@@ -266,7 +266,7 @@ class Timeseries:
         :return: Timeseries with 999999 gap fills removed, and appropriate flags set 
         :rtype: Timeseries
         """
-        logger.info("  Converting 999999 values to nan")
+        logger.info("Converting missing data from 999999 to nan")
         if interpolate:
             df = self.data.replace(999999, np.nan).interpolate(
                 method=method, limit_direction=limit_direction, limit=limit

@@ -293,7 +293,7 @@ def ts_from_mseed(
         data=df, series=series, units=units, level=level, period=period, name=name
     )
     if to_nan:
-        logger.info("Converting missing data from 999999 to nan")
+        #logger.info("Converting missing data from 999999 to nan")
         ts = ts.remove_999999s()
     if scale_factor:
         ts.data = ts.data * scale_factor
