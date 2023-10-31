@@ -800,8 +800,14 @@ class Timeseries:
         :rtype: dict
         '''
 
-        baytap_results = baytap_analysis(self.data,atmp_ts.data,self.quality_df,self.units,atmp_ts.quality_df,atmp_ts.units,
-                    latitude=latitude,longitude=longitude,elevation=elevation,dmin=0.001)
+        baytap_results = baytap_analysis(df=self.data,
+                                         atmp_df=atmp_ts.data,
+                                         quality_df=self.quality_df,
+                                         atmp_quality_df=atmp_ts.quality_df,
+                                         latitude=latitude,
+                                         longitude=longitude,
+                                         elevation=elevation,
+                                         dmin=0.001)
 
         return baytap_results
 
