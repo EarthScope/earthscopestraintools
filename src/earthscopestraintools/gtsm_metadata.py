@@ -406,7 +406,7 @@ class GtsmMetadata:
     def get_atmp_response(self):
         """Parse atmospheric pressure response from station processing metadata
 
-        :return: atmospheric response coefficients
+        :return: atmospheric response coefficients in microstrain/hPa
         :rtype: dict
         """
         url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
