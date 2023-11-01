@@ -139,25 +139,39 @@ def map_strain(areal:np.array,
     return
 
 def strain_video(df,
+                 start:str=None,
+                 end:str=None,
                  interval:float=None,
                  title:str=None,
                  units:str=None,
+                 repeat:bool=False,
                  savegif:str=None):
     """Displays a gif of the strain time series provided, with time series and strain axes displayed. Strain is shown relative to the first data point. 
 
     :param df: Dataframe with datetime (in seconds) index and regional strain columns ('Eee+Enn', 'Eee-Enn', '2Ene')
     :type df: pd.DataFrame
+    :param start: (Optional) Start of the video as a datetime string.
+    :type start: str
+    :param end: (Optional) End of the video as a datetime string.
+    :type end: str
     :param interval: (Optional) Time between frames (in microseconds). 
     :type interval:
     :param title: (Optional) Plot title
     :type title: str
+    :param repeat: (Optional) Choose if the animation repeats. Defaults to false.
+    :type repeat: bool
     :param units: (Optional) Units to label strain
     :type units: str 
     :return: Gif of the strain time series
     :rtype: matplotlib.animation
     """
-    areal, differential, shear = df['Eee+Enn'].values, df['Eee-Enn'].values, df['2Ene'].values
-    time = df.index
+    if start == None:
+        start = df.index[0]
+    if end == None:
+        end = df.index[-1]
+
+    areal, differential, shear = df[start:end]['Eee+Enn'].values, df[start:end]['Eee-Enn'].values, df[start:end]['2Ene'].values
+    time = df[start:end].index
     e = 1/2*(areal+differential) # 1/2 [(eEE+eNN)+(eEE-eNN)]
     eEE = e - e[0]
     n = 1/2*(areal-differential) # 1/2 [(eEE+eNN)-(eEE-eNN)]
@@ -233,7 +247,7 @@ def strain_video(df,
         
     if interval == None:
         interval = 200
-    anim = matplotlib.animation.FuncAnimation(fig=fig, func=animate,frames=len(time),interval=interval,repeat=True)
+    anim = matplotlib.animation.FuncAnimation(fig=fig, func=animate,frames=len(time),interval=interval,repeat=repeat)
     if isinstance(savegif,str):
         writergif = matplotlib.animation.PillowWriter() 
         print('Saving Figure:',savegif)

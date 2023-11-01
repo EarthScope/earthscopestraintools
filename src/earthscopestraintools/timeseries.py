@@ -813,22 +813,29 @@ class Timeseries:
 
     def strain_video(
         self,
+        start:str=None,
+        end:str=None,
         interval:float=None,
         title:str=None,
         units:str=None,
         savegif:str=None
         ):
         """Displays a gif of the strain time series provided, with time series and strain axes displayed. Strain is shown relative to the first data point. 
-
+        :param start: (Optional) Start of the video as a datetime string.
+        :type start: str
+        :param end: (Optional) End of the video as a datetime string.
+        :type end: str
         :param interval: (Optional) Time between frames (in microseconds). 
         :type interval:
         :param title: (Optional) Plot title
         :type title: str
+        :param repeat: (Optional) Choose if the animation repeats. Defaults to false.
+        :type repeat: bool
         :param units: (Optional) Units to label strain
         :type units: str 
         :return: Gif of the strain time series
         :rtype: matplotlib.animation
-
+        
         Example
         -------
         >>> # Import relevant modules from the earscopestraintools package
@@ -850,7 +857,7 @@ class Timeseries:
         >>> %matplotlib widget 
         >>> anim = strain_reg.strain_video(interval=1, title=f'{station}, One Week',units='ms',savegif=f'{station}.{start}.{end}.gif')
         """
-        anim = strain_video(self.data,interval=interval,title=title,units=units,savegif=savegif)
+        anim = strain_video(self.data,start=start,end=end,interval=interval,title=title,units=units,savegif=savegif)
         return anim
 
     def plot(

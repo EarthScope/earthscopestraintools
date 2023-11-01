@@ -124,6 +124,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.show_flagged_data"><code class="docutils literal notranslate"><span class="pre">Timeseries.show_flagged_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.show_flags"><code class="docutils literal notranslate"><span class="pre">Timeseries.show_flags()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.stats"><code class="docutils literal notranslate"><span class="pre">Timeseries.stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#earthscopestraintools.timeseries.Timeseries.strain_video"><code class="docutils literal notranslate"><span class="pre">Timeseries.strain_video()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.timeseries.plot_timeseries_comparison"><code class="docutils literal notranslate"><span class="pre">plot_timeseries_comparison()</span></code></a></li>
@@ -642,6 +643,48 @@ low-frequency strainmeter data , Bulletin Of The Seismological Society Of Americ
 <dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.stats">
 <span class="sig-name descname"><span class="pre">stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.stats" title="Link to this definition"></a></dt>
 <dd><p>displays summary information describing the Timeseries object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="earthscopestraintools.timeseries.Timeseries.strain_video">
+<span class="sig-name descname"><span class="pre">strain_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savegif</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#earthscopestraintools.timeseries.Timeseries.strain_video" title="Link to this definition"></a></dt>
+<dd><p>Displays a gif of the strain time series provided, with time series and strain axes displayed. Strain is shown relative to the first data point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interval</strong> – (Optional) Time between frames (in microseconds).</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – (Optional) Plot title</p></li>
+<li><p><strong>units</strong> (<em>str</em>) – (Optional) Units to label strain</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Gif of the strain time series</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.animation</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Import relevant modules from the earscopestraintools package</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">earthscopestraintools.mseed_tools</span> <span class="kn">import</span> <span class="n">ts_from_mseed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">earthscopestraintools.gtsm_metadata</span> <span class="kn">import</span> <span class="n">GtsmMetadata</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Metadata</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;PB&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">station</span> <span class="o">=</span> <span class="s1">&#39;B004&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span> <span class="o">=</span> <span class="n">GtsmMetadata</span><span class="p">(</span><span class="n">network</span><span class="p">,</span><span class="n">station</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Provide the start and end times</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start</span> <span class="o">=</span> <span class="s1">&#39;2019-07-01&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end</span> <span class="o">=</span> <span class="s1">&#39;2019-07-07&#39;</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># load data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strain_raw</span> <span class="o">=</span> <span class="n">ts_from_mseed</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="n">station</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;T0&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;RS*&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strain_linearized</span> <span class="o">=</span> <span class="n">strain_raw</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">reference_strains</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">reference_strains</span><span class="p">,</span><span class="n">gap</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">gap</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strain_reg</span> <span class="o">=</span> <span class="n">strain_linearized</span><span class="o">.</span><span class="n">apply_calibration_matrix</span><span class="p">(</span><span class="n">calibration_matrix</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">strain_matrices</span><span class="p">[</span><span class="s1">&#39;ER2010&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># make video, save .gif</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">widget</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">anim</span> <span class="o">=</span> <span class="n">strain_reg</span><span class="o">.</span><span class="n">strain_video</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s1">, One Week&#39;</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="s1">&#39;ms&#39;</span><span class="p">,</span><span class="n">savegif</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s1">.gif&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>
