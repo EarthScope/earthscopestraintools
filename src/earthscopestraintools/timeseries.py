@@ -407,15 +407,15 @@ class Timeseries:
             period = self.period
         elif not period:
             period = (new_index[1] - new_index[0]).total_seconds()
-
+        
         limit = int(limit_seconds / period)  # defaults to 1 hr
         data = interpolate(
-            self.data.reindex(new_index),
+            self.data.reindex(self.data.index.union(new_index)),
             replace=replace,
             method=method,
             limit=limit,
             limit_direction=limit_direction,
-        )
+        ).reindex(new_index)
         quality_df = self.quality_df.copy().reindex(data.index)
         quality_df[quality_df.isna()] = "i"
         # find any differences using the original data index
