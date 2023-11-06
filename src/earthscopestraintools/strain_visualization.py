@@ -141,6 +141,7 @@ def map_strain(areal:np.array,
 def strain_video(df,
                  start:str=None,
                  end:str=None,
+                 skip:int=1,
                  interval:float=None,
                  title:str=None,
                  units:str=None,
@@ -154,6 +155,8 @@ def strain_video(df,
     :type start: str
     :param end: (Optional) End of the video as a datetime string.
     :type end: str
+    :param skip: (optional) number of data points to skip per frame (eg. if using 5 minute Timeseries, skip=2 will decimate the dataset to a 10 minute period)
+    :type skip: int
     :param interval: (Optional) Time between frames (in microseconds). 
     :type interval:
     :param title: (Optional) Plot title
@@ -170,8 +173,8 @@ def strain_video(df,
     if end == None:
         end = df.index[-1]
 
-    areal, differential, shear = df[start:end]['Eee+Enn'].values, df[start:end]['Eee-Enn'].values, df[start:end]['2Ene'].values
-    time = df[start:end].index
+    areal, differential, shear = df[start:end]['Eee+Enn'].values[::skip], df[start:end]['Eee-Enn'].values[::skip], df[start:end]['2Ene'].values[::skip]
+    time = df[start:end].index[::skip]
     e = 1/2*(areal+differential) # 1/2 [(eEE+eNN)+(eEE-eNN)]
     eEE = e - e[0]
     n = 1/2*(areal-differential) # 1/2 [(eEE+eNN)-(eEE-eNN)]

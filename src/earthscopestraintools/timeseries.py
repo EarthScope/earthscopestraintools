@@ -815,6 +815,7 @@ class Timeseries:
         self,
         start:str=None,
         end:str=None,
+        skip:int=1,
         interval:float=None,
         title:str=None,
         units:str=None,
@@ -825,6 +826,8 @@ class Timeseries:
         :type start: str
         :param end: (Optional) End of the video as a datetime string.
         :type end: str
+        param skip: (optional) number of data points to skip per frame (eg. if using 5 minute Timeseries, skip=2 will decimate the dataset to a 10 minute period)
+        :type skip: int
         :param interval: (Optional) Time between frames (in microseconds). 
         :type interval:
         :param title: (Optional) Plot title
@@ -857,7 +860,7 @@ class Timeseries:
         >>> %matplotlib widget 
         >>> anim = strain_reg.strain_video(interval=1, title=f'{station}, One Week',units='ms',savegif=f'{station}.{start}.{end}.gif')
         """
-        anim = strain_video(self.data,start=start,end=end,interval=interval,title=title,units=units,savegif=savegif)
+        anim = strain_video(self.data,start=start,end=end,skip=skip,interval=interval,title=title,units=units,savegif=savegif)
         return anim
 
     def plot(
