@@ -1,5 +1,5 @@
 Welcome to earthscopestraintools, an open source python package for working with strainmeter data.  This project is actively under development and should not be considered stable at this time. 
-M. Gottlieb 10-3-2023
+M. Gottlieb and C. Hanagan 10-31-2023
 
 Documentation can be found at https://earthscopestraintools.readthedocs.io/en/latest/ 
 
