@@ -23,6 +23,7 @@ Submodules
    earthscopestraintools.gtsm_metadata
    earthscopestraintools.mseed_tools
    earthscopestraintools.processing
+   earthscopestraintools.strain_visualization
    earthscopestraintools.tdb2ascii
    earthscopestraintools.tdb2tdb
    earthscopestraintools.tiledbtools

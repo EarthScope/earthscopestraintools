@@ -37,7 +37,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.20
+                0.1.21
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -51,8 +51,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/DataStructures.html">Data Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TidalCalibrationEarthscopestraintools.html">Tidal Calibration</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a><ul>
@@ -67,6 +70,7 @@
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.strain_visualization.html">earthscopestraintools.strain_visualization module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.tiledbtools.html">earthscopestraintools.tiledbtools module</a></li>
@@ -81,12 +85,12 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.strain_visualization.html">earthscopestraintools.strain_visualization module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.tiledbtools.html">earthscopestraintools.tiledbtools module</a></li>
@@ -227,9 +231,19 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html#earthscopestraintools.gtsm_metadata.get_metadata_df"><code class="docutils literal notranslate"><span class="pre">get_metadata_df()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html#earthscopestraintools.mseed_tools.download_mseed"><code class="docutils literal notranslate"><span class="pre">download_mseed()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html#earthscopestraintools.mseed_tools.fdsn2bottlename"><code class="docutils literal notranslate"><span class="pre">fdsn2bottlename()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html#earthscopestraintools.mseed_tools.load_mseed_file_to_df"><code class="docutils literal notranslate"><span class="pre">load_mseed_file_to_df()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html#earthscopestraintools.mseed_tools.load_mseed_to_df"><code class="docutils literal notranslate"><span class="pre">load_mseed_to_df()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html#earthscopestraintools.mseed_tools.mseed2pandas"><code class="docutils literal notranslate"><span class="pre">mseed2pandas()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html#earthscopestraintools.mseed_tools.save_mseed_file"><code class="docutils literal notranslate"><span class="pre">save_mseed_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html#earthscopestraintools.mseed_tools.ts_from_mseed"><code class="docutils literal notranslate"><span class="pre">ts_from_mseed()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.apply_calibration_matrix"><code class="docutils literal notranslate"><span class="pre">apply_calibration_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.baytap_analysis"><code class="docutils literal notranslate"><span class="pre">baytap_analysis()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.butterworth_filter"><code class="docutils literal notranslate"><span class="pre">butterworth_filter()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_linear_trend_correction"><code class="docutils literal notranslate"><span class="pre">calculate_linear_trend_correction()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.calculate_offsets"><code class="docutils literal notranslate"><span class="pre">calculate_offsets()</span></code></a></li>
@@ -239,6 +253,12 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.decimate_to_hourly"><code class="docutils literal notranslate"><span class="pre">decimate_to_hourly()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.interpolate"><code class="docutils literal notranslate"><span class="pre">interpolate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.linearize"><code class="docutils literal notranslate"><span class="pre">linearize()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html#earthscopestraintools.processing.spotl_predict_tides"><code class="docutils literal notranslate"><span class="pre">spotl_predict_tides()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.strain_visualization.html">earthscopestraintools.strain_visualization module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.strain_visualization.html#earthscopestraintools.strain_visualization.map_strain"><code class="docutils literal notranslate"><span class="pre">map_strain()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.strain_visualization.html#earthscopestraintools.strain_visualization.strain_video"><code class="docutils literal notranslate"><span class="pre">strain_video()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="earthscopestraintools.tdb2ascii.html">earthscopestraintools.tdb2ascii module</a><ul>
@@ -319,6 +339,7 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.apply_calibration_matrix"><code class="docutils literal notranslate"><span class="pre">Timeseries.apply_calibration_matrix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.apply_corrections"><code class="docutils literal notranslate"><span class="pre">Timeseries.apply_corrections()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.baytap_analysis"><code class="docutils literal notranslate"><span class="pre">Timeseries.baytap_analysis()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.butterworth_filter"><code class="docutils literal notranslate"><span class="pre">Timeseries.butterworth_filter()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_magnitude"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_magnitude()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_offsets"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_offsets()</span></code></a></li>
@@ -326,6 +347,7 @@
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.calculate_tide_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.calculate_tide_correction()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.check_for_gaps"><code class="docutils literal notranslate"><span class="pre">Timeseries.check_for_gaps()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.decimate_1s_to_300s"><code class="docutils literal notranslate"><span class="pre">Timeseries.decimate_1s_to_300s()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.decimate_to_hourly"><code class="docutils literal notranslate"><span class="pre">Timeseries.decimate_to_hourly()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.dynamic_strain"><code class="docutils literal notranslate"><span class="pre">Timeseries.dynamic_strain()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.interpolate"><code class="docutils literal notranslate"><span class="pre">Timeseries.interpolate()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.linear_trend_correction"><code class="docutils literal notranslate"><span class="pre">Timeseries.linear_trend_correction()</span></code></a></li>
@@ -344,6 +366,7 @@
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.show_flagged_data"><code class="docutils literal notranslate"><span class="pre">Timeseries.show_flagged_data()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.show_flags"><code class="docutils literal notranslate"><span class="pre">Timeseries.show_flags()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.stats"><code class="docutils literal notranslate"><span class="pre">Timeseries.stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.Timeseries.strain_video"><code class="docutils literal notranslate"><span class="pre">Timeseries.strain_video()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.timeseries.html#earthscopestraintools.timeseries.plot_timeseries_comparison"><code class="docutils literal notranslate"><span class="pre">plot_timeseries_comparison()</span></code></a></li>

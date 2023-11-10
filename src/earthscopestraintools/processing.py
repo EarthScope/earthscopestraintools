@@ -95,7 +95,7 @@ def butterworth_filter(
     :type filter_type: str
     :param filter_order: the order of the filter
     :type filter_order: int
-    :param filter_cutoff_s: the filter cutoff in seconds
+    :param filter_cutoff_s: the filter cutoff frequency in seconds
     :type filter_cutoff_s: float
     :return: butterworth filtered data
     :rtype: pandas.DataFrame
@@ -140,7 +140,7 @@ def interpolate(
 
 
 def decimate_to_hourly(df: pd.DataFrame):
-    """decimates a timeseries to hourly by selecting the first minute of each hour
+    """decimates a timeseries to hourly by selecting the first and second and minute of each hour
 
     :param df: time series data to decimate
     :type df: pd.DataFrame
@@ -148,11 +148,13 @@ def decimate_to_hourly(df: pd.DataFrame):
     :rtype: pd.DataFrame
     """
     logger.info(f"Decimating to hourly")
-    return df[df.index.minute == 0]
+    df1 = df[df.index.minute == 0]
+    df2 = df1[df1.index.second == 0]
+    return df2
 
 
 def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3600):
-    """decimate 1hz data to 5 min data using \n
+    """Filter and decimate 1hz data to 5 min data using \n
     Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
     low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99
 
@@ -166,7 +168,7 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
     :rtype: pd.DataFrame
     """
     logger.info(f"Decimating to 300s")
-    df2 = interpolate(df, method="linear", limit=3600)
+    df2 = interpolate(df, method="linear", limit=limit)
 
     # zero the data to the first value prior to filtering
     initial_values = df2.iloc[0]
@@ -312,7 +314,7 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
 def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float = 0.75):
     """Calculate offsets using first differencing method (add more details).  
 
-    :param df: uncorrected data, as dataframe with datetime index and 1 channel per column
+    :param df: uncorrected data, as dataframe with datetime (in seconds) index and 1 channel per column
     :type df: pandas.DataFrame
     :param limit_multiplier: _description_, defaults to 10
     :type limit_multiplier: int, optional
@@ -324,7 +326,7 @@ def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float =
     logger.info(
         f"Calculating offsets using cutoff percentile of {cutoff_percentile} and limit multiplier of {limit_multiplier}."
     )
-    first_diffs = df.diff()
+    first_diffs = df.interpolate(method='linear',limit=3600,limit_direction='both').diff()
     #  drop a percentage of 1st differences to estimate an offset cutoff
     drop = round(len(first_diffs) * (1 - cutoff_percentile))
     offset_limit = []
@@ -333,7 +335,7 @@ def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float =
         # Offset limit is a multiplier x the average absolute value of first differences
         # within 2 st_dev of the first differences
         offset_limit.append(
-            np.mean(abs(first_diffs[ch].sort_values().iloc[0:-drop])) * limit_multiplier
+            np.mean(first_diffs[ch].abs().sort_values().iloc[0:-drop]) * limit_multiplier
         )
 
         # CH edit. Calculate offsets from the detrended series
@@ -365,11 +367,13 @@ def calculate_pressure_correction(df: pd.DataFrame, response_coefficients: dict)
     return data_df
 
 
-def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
-    """Generate a linear trend correction
+def calculate_linear_trend_correction(df, method='linear',trend_start=None, trend_end=None):
+    """Generate a linear trend correction via either a linear least squares calculation or a median trend calculation. The median trend calculation (based on MIDAS in Blewitt et al., 2016 for GNSS time series analysis) uses the median slope value from all points separated by roughly one lunar day, calculated after outliers beyond 2 median absolute deviations are removed. It will only work with > 3 days of data.
 
     :param df: uncorrected data, as dataframe with datetime index and 1 channel per column
     :type df: pd.DataFrame
+    :param method: linear or median
+    :type method: str, default is linear
     :param trend_start: start of window to calculate trend, defaults to first_valid_index()
     :type trend_start: datetime.datetime, optional
     :param trend_end: end of window to calculate trend, defaults to last_valid_index()
@@ -383,14 +387,34 @@ def calculate_linear_trend_correction(df, trend_start=None, trend_end=None):
     if not trend_end:
         trend_end = df.last_valid_index()
     logger.info(f"    Trend Start: {trend_start}")
-    logger.info(f"    Trend Start: {trend_end}")
+    logger.info(f"    Trend End: {trend_end}")
     df_trend_c = pd.DataFrame(data=df.index)
     windowed_df = df.copy()[trend_start:trend_end].interpolate().reset_index()
-    for ch in df.columns:
-        slope, intercept, r_value, p_value, std_err = stats.linregress(
-            windowed_df.index, windowed_df[ch]
-        )
-        df_trend_c[ch] = df_trend_c.index * slope
+    if method == 'linear':
+        for ch in df.columns:
+            slope, intercept, r_value, p_value, std_err = stats.linregress(
+                windowed_df.index, windowed_df[ch]
+            )
+            df_trend_c[ch] = df_trend_c.index * slope
+    elif method == 'median':
+        # Goal time difference
+        # Mean syndonic month, divided by lunar cycles (so 1 day)
+        tdiff = (29*24*60*60+12*60*60+44*60)/30 # seconds
+        windowed_df.index = windowed_df.time 
+        windowed_df.drop(['time'],axis=1,inplace=True)
+        end = pd.to_datetime(windowed_df.index[-1].timestamp() - tdiff,unit='s')
+        df1 = windowed_df[:end]
+        df2 = windowed_df[len(windowed_df)-len(df1):]
+        # actual time difference after shifting dataframes
+        new_tdiff = df2.index[0].timestamp()-df1.index[0].timestamp() # seconds
+        logger.info(f"  Median trend calculated with points {new_tdiff/60/60} hr apart.")
+        for ch in df.columns:
+            med = (df2[ch].values - df1[ch].values)/new_tdiff
+            medmad_std_dev1 = stats.median_abs_deviation(med)*1.4826 # See Blewitt et al. 2016 and Wilcox 2005
+            tmp = med[med<(np.median(med)+medmad_std_dev1*2)]
+            med_2sig = tmp[tmp>(np.median(med)-medmad_std_dev1*2)]
+            slope = np.median(med_2sig)
+            df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - df.index[0].timestamp())*slope
     # print("df_trend_c", df_trend_c)
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
@@ -455,3 +479,203 @@ def calculate_tide_correction(df, period, tidal_parameters, longitude):
         df2[ch] = np.fromstring(output, dtype=float, sep="\n")
     df2 = df2 * 1e-3
     return df2
+
+def baytap_analysis(df,
+                    atmp_df,
+                    quality_df = None,
+                    atmp_quality_df = None,
+                    latitude=None,
+                    longitude=None,
+                    elevation=None,
+                    dmin=0.001):
+    '''
+    This function accesses a docker container to run BAYTAP08 (Tamura 1991; Tamura and Agnew 2008) for tidal analysis. Time series (e.g. strain) and additional auxiliary input (e.g. pressure) are analyzed together to determine the amplitudes and phases of a combination of tidal constituents (M2, O1, P1, K1, N2, S2) in the time series, as well as a coefficient for the auxiliary input response. Please refer to the Baytap08 manual for more details, included suggested length of the time series for full detemination of the tidal constituent suite returned here (365+ days).
+    :param df: DataFrame of timeseries with datetime index and one channel per column. Strain should be in microstrain, and pressure in hPa. 
+    :type df: pd.DataFrame
+    :param atmp_df: DataFrame with atmospheric pressure data and datetime index
+    :type atmp_df: pd.DataFrame
+    :param quality_df: DataFrame with flags designating the quality of the data. Any points that are not good (g) are ignores in the time series analysis. 
+    :type quality_df: pd.DataFrame
+    :param units: Units of strain, should match microstrain or nanostrain
+    :type units: str
+    :param atmp_quality_df: DataFrame with flags designating the quality of the pressure data. Any points that are not good (g) are ignores in the time series analysis. 
+    :type atmp_quality_df: pd.DataFrame
+    :param atmp_units: Units of atmospheric pressure data, should be hpa
+    :type atmp_units: str
+    :param latitude: latitude of the station
+    :type latitude: float
+    :param longitude: longitude of the station
+    :type longitude: float
+    :param elevation: elevation of the station
+    :type elevation: float
+    :param dmin: Drift parameter for the program. Large drift expects a linear trend. Small drift allows for rapid changes in the residual time series. 
+    :type dmin: float
+    :return: Dictionary of amplitudes and phases for each tidal constituent per gauge, and atmospheric pressure coefficient.
+    :rtype: dict
+    '''
+    
+    logger.info("Please note, this method expects continuous data in microstrain and pressure in hPa.")
+    if quality_df is None and atmp_quality_df is None:
+        logger.info("If there are any gaps, please fill them with 999999s or provide a dataframe of quality flags")
+    df = df*1e3  #convert microstrain to nanostrain
+        
+    # Control file text
+    span = shift = ndata = int(len(df))
+    samp = ((df.index[-1].timestamp() - df.index[0].timestamp())/60/60)/(ndata-1)
+    # Check that pressure data is same length 
+    atmp_samp = ((atmp_df.index[-1].timestamp() - atmp_df.index[0].timestamp())/60/60)/(ndata-1)
+    if atmp_samp != samp:
+        print('Pressure data and strain data are not the same length, make sure they have the same sample rate and time frame.')
+    yr = str(df.index[0].year); mo = str(df.index[0].month).zfill(2)
+    day = str(df.index[0].day).zfill(2); hr = str(df.index[0].hour).zfill(2)
+    control_str = f'&param \nkind=7, \n'
+    control_str += f'span={span} , shift={shift} , \n'
+    control_str += f'dmin={dmin}, \n'
+    control_str += f'lpout=0, filout=1, \n'
+    control_str += f'iaug=1, lagp=0,\n'
+    control_str += f'maxitr=50,\n'
+    control_str += f'igrp=5, \n'
+    control_str += f'ndata={ndata},\n'
+    control_str += f'inform=3, \n'
+    control_str += f'year={yr},mon={mo},day={day},hr={hr},delta={samp},\n'
+    control_str += f'lat={latitude},long={longitude},ht={elevation},grav=0.0,\n'
+    control_str += f'rlim=999990.D0,spectw=3,\n'
+    control_str += f'&end\n'
+    control_str += f'BSM Strain {df.index[0]} to {df.index[-1]}\n'
+    control_str += f'----\n'
+    control_str += f'{"Station": <40} STATION NAME\n'
+    control_str += f'{"PBO GTSM21": <40} INSTRUMENT NAME\n'
+    control_str += f'----\n'
+    control_str += f'{"Strain (counts or nstrain)": <40} UNIT OF TIDAL DATA\n'
+    control_str += f'{"Barometric Pressure (mbar)": <40} TITLE OF ASSOSIATED DATASET\n'
+    
+    # Pressure data, auxiliary input    
+    if atmp_quality_df is not None:
+        atmp_df[atmp_quality_df != 'g'] = 999999
+    aux_dstr = 'hpa\n'+np.array2string(atmp_df.values.flatten(),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+    
+    baytap_results = {}
+    baytap_results['atmp_response'] = {}
+    baytap_results['tidal_params'] = {}
+
+    shell=True
+    #close any existing baytap containers
+    tmpout = subprocess.run('docker stop baytap',capture_output=True,shell=shell,text=True)
+    tmpout = subprocess.run('docker rm -f baytap',capture_output=True,shell=shell,text=True)
+    
+    # Start container with temp file system in the docker memory
+    cmd1 = f'docker run --rm -i -d --name baytap ghcr.io/earthscope/baytap08 /bin/bash'
+    subprocess.run(cmd1, shell=shell,text=True)
+    print('Docker container started.')
+    
+    for ch in df.columns:
+        if quality_df is not None:    
+            df[quality_df[ch] != 'g'] = 999999
+        dstr = ch+'\n'+np.array2string(df[ch].values,separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+        
+        # Write files for baytap
+        cmd2 = f'docker exec baytap /bin/bash -c "echo -e \'{dstr}\' > data.txt"'
+        cmd3 = f'docker exec baytap /bin/bash -c "echo -e \'{control_str}\' > control.txt"'
+        cmd4 = f'docker exec baytap /bin/bash -c "echo -e \'{aux_dstr}\' > aux.txt"'
+        # Run baytap
+        cmd5 = f'docker exec baytap /bin/bash -c "cat data.txt | baytap08 control.txt results.txt aux.txt >> decomp.txt"'
+        # Read results
+        cmd6 = f'docker exec baytap /bin/bash -c "cat results.txt"'
+        # Actually execute the commands
+        subprocess.run(cmd2, shell=shell,text=True)
+        subprocess.run(cmd3, shell=shell,text=True)
+        subprocess.run(cmd4, shell=shell,text=True)
+        subprocess.run(cmd5, shell=shell,text=True)
+        output = subprocess.run(cmd6,capture_output=True,shell=shell,text=True)
+        res = (output.stdout).split('\n')
+
+        # save the results
+        resp = list(filter(lambda x: 'respc' in x, res))
+        baytap_results['atmp_response'][ch] = float(resp[0].split(' ')[-1].replace('D','E'))/1000
+        dood_list = ['2 0 0 0 0 0','1-1 0 0 0 0','1 1-2 0 0 0',
+                    '1 1 0 0 0 0','2-1 0 1 0 0','2 2-2 0 0 0']
+        for const,dood in zip(['M2','O1','P1','K1','N2','S2'],dood_list):
+            tid = list(filter(lambda x: '>' in x and const in x, res))
+            baytap_results['tidal_params'][(ch, const, 'phz')] =  list(filter(lambda x: x != '', tid[0].split(' ')))[-4]
+            baytap_results['tidal_params'][(ch, const, 'amp')] =  list(filter(lambda x: x != '', tid[0].split(' ')))[-2]
+            baytap_results['tidal_params'][(ch, const, 'doodson')] = dood
+        # for k,v in baytap_results['tidal_params'].items():
+        #     if k[2] == 'amp':
+        #         baytap_results['tidal_params'][k] = str(float(v)*1000)
+    print('Atmospheric pressure responses in microstrain/hPa and tidal parameters in degrees/nanostrain ')
+    subprocess.run('docker rm -f baytap', shell=True,text=True)
+    print('Docker processes finished. Container removed.')
+            
+    return baytap_results
+
+def spotl_predict_tides(latitude,longitude,elevation,glob_oc,reg_oc,greenf):
+    '''
+    Returns the complex numbers (from amplitude and phase)
+    for the predicted areal and shear strains using spotl
+
+    Expects regional model polygons to have already been constructed in the working directory (in this case, in the Docker container).
+
+    :param latitude: Station latitude
+    :type latitude: float
+    :param longitude: Station longitude
+    :type longitude: float
+    :param elevation: Station elevation (m)
+    :type elevation: float
+    :param glob_oc: Global ocean model from SPOTL. e.g. osu.tpxo72.2010
+    :type glob_oc: str
+    :param reg_oc: Regional ocean model from SPOTL. e.g. osu.usawest.2010
+    :type reg_oc: str
+    :param greenf: Green's functions for the elastic earth structure from SPOTL. e.g. green.contap.std
+    :type greenf: str
+    :return: Areal, differential, and shear strain complex numbers for the M2 and O1 tides. (eEE+eNN)m2, (eEE-eNN)m2, (2EN)m2, (eEE+eNN)o1, (eEE-eNN)o1, (2EN)o1
+    :rtype: dict
+    '''
+    # Start Docker container
+    command = f'docker run --rm -w /opt/spotl/working/ --mount type=tmpfs,destination=/opt/spotl/work --name spotl -i -d ghcr.io/earthscope/spotl /bin/bash'
+    print('Docker started')
+    subprocess.check_output(command,shell=True)
+    # # Run polymake for regional models of interest
+    command = f'docker exec spotl /bin/bash -c "polymake << EOF > ../work/poly.{reg_oc} \n- {reg_oc} \nEOF"'
+    subprocess.check_output(command,shell=True)
+    # # M2 ocean load for the ocean model but exclude the area in specified polygon
+    command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1m2.f1"'
+    subprocess.check_output(command,shell=True)
+    # # M2 ocean load for the regional ocean model in the area in specified polygon
+    command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1m2.f2"'
+    subprocess.check_output(command,shell=True)
+    # #  Add the M2 loads computed above together
+    command = f'docker exec spotl /bin/bash -c "cat ../work/ex1m2.f1 ../work/ex1m2.f2 | loadcomb c >  ../work/tide.m2"'
+    subprocess.check_output(command,shell=True)
+    # # O1 ocean load for the ocean model but exclude the area in specified polygon
+    command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1o1.f1"'
+    subprocess.check_output(command,shell=True)
+    # # O1 ocean load for the regional ocean model in the area in specified polygon
+    command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1o1.f2"'
+    subprocess.check_output(command,shell=True)
+    # # Add the O1 loads computed above together
+    command = f'docker exec spotl /bin/bash -c "cat ../work/ex1o1.f1 ../work/ex1o1.f2 | loadcomb c >  ../work/tide.o1"'
+    subprocess.check_output(command,shell=True)
+    # # Compute solid earth wides and combine with above ocean loads
+    command = f'docker exec spotl /bin/bash -c "cat ../work/tide.m2 | loadcomb t >  ../work/m2.tide.total"'
+    subprocess.check_output(command,shell=True)
+    command = f'docker exec spotl /bin/bash -c "cat ../work/tide.o1 | loadcomb t >  ../work/o1.tide.total"'
+    subprocess.check_output(command,shell=True)
+    # # Find the amps and phases, compute complex numbers:
+    command = f'docker exec spotl /bin/bash -c "cat ../work/m2.tide.total"'
+    out = subprocess.check_output(command,shell=True,text=True)
+    outlist = list(filter(lambda x: x.startswith('s'), out.split('\n')))[0].split(' ')
+    Eamp, Ephase, Namp, Nphase, ENamp, ENphase = np.float64(list(filter(lambda x: x != '' and x != 's' , outlist)))
+    m2E, m2N, m2EN = complex(Eamp*np.cos(Ephase*np.pi/180),Eamp*np.sin(Ephase*np.pi/180)), complex(Namp*np.cos(Nphase*np.pi/180),Namp*np.sin(Nphase*np.pi/180)), complex(ENamp*np.cos(ENphase*np.pi/180),ENamp*np.sin(ENphase*np.pi/180))
+    command = f'docker exec spotl /bin/bash -c "cat ../work/o1.tide.total"'
+    out = subprocess.check_output(command,shell=True,text=True)
+    outlist = list(filter(lambda x: x.startswith('s'), out.split('\n')))[0].split(' ')
+    Eamp, Ephase, Namp, Nphase, ENamp, ENphase = np.float64(list(filter(lambda x: x != '' and x != 's' , outlist)))
+    o1E, o1N, o1EN = complex(Eamp*np.cos(Ephase*np.pi/180),Eamp*np.sin(Ephase*np.pi/180)), complex(Namp*np.cos(Nphase*np.pi/180),Namp*np.sin(Nphase*np.pi/180)), complex(ENamp*np.cos(ENphase*np.pi/180),ENamp*np.sin(ENphase*np.pi/180))
+    # Combine into areal and shear (differential and engineering) real and imaginary parts
+    arealm2, diffm2, engm2 = m2E+m2N, m2E-m2N, 2*m2EN
+    arealo1, diffo1, engo1 = o1E+o1N, o1E-o1N, 2*o1EN
+    pred_tides = {'M2':{'areal':arealm2,'differential':diffm2,'engineering':engm2},
+                    'O1':{'areal':arealo1,'differential':diffo1,'engineering':engo1}}
+    subprocess.run('docker rm -f spotl',shell=True)
+    print('Docker container stopped and removed.')
+    return pred_tides

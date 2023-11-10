@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metadata &mdash; Earthscope Strain Tools 1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Example of running level 2 processing steps" href="../notebooks/level2.html" />
+    <link rel="prev" title="Data Structures" href="DataStructures.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Earthscope Strain Tools
+              <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.1.21
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataStructures.html">Data Structures</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metadata</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#earthscopestraintools-gtsm-metadata-gtsmmetadata">earthscopestraintools.gtsm_metadata.GtsmMetadata</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TidalCalibrationEarthscopestraintools.html">Tidal Calibration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Earthscope Strain Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Metadata</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pages/Metadata.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="metadata">
+<h1>Metadata<a class="headerlink" href="#metadata" title="Link to this heading"></a></h1>
+<p>This library currently supports one type of strainmeter, the Gladwin Tensor Strainmeter (GTSM).  We have implemented a class and methods to load and store the metadata associated with these instruments.</p>
+<section id="earthscopestraintools-gtsm-metadata-gtsmmetadata">
+<h2>earthscopestraintools.gtsm_metadata.GtsmMetadata<a class="headerlink" href="#earthscopestraintools-gtsm-metadata-gtsmmetadata" title="Link to this heading"></a></h2>
+<p>Class for loading and storing GTSM processing metadata for a given station. Metadata sources include a <a class="reference external" href="https://www.unavco.org/data/strain-seismic/bsm-data/lib/docs/bsm_metadata.txt">summary table</a> containing basic information about all stations and <a class="reference external" href="http://bsm.unavco.org/bsm/level2/B001/B001.README.txt">individual pages</a> with station specific processing parameters such as pressure response coefficients, tidal constituents, and calibration matricies.</p>
+<p>A station metadata object will contain the following attributes:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attributes</p></th>
+<th class="head"><p></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>network</p></td>
+<td><p>(str) FDSN network code</p></td>
+</tr>
+<tr class="row-odd"><td><p>station</p></td>
+<td><p>(str) FDSN station code</p></td>
+</tr>
+<tr class="row-even"><td><p>latitude</p></td>
+<td><p>(float) station latitude</p></td>
+</tr>
+<tr class="row-odd"><td><p>longitude</p></td>
+<td><p>(float) station longitude</p></td>
+</tr>
+<tr class="row-even"><td><p>elevation</p></td>
+<td><p>(float) station elevation in meters</p></td>
+</tr>
+<tr class="row-odd"><td><p>gap</p></td>
+<td><p>(float), instrument gap in meters</p></td>
+</tr>
+<tr class="row-even"><td><p>diameter</p></td>
+<td><p>(float), instrument sensing diameter in meters</p></td>
+</tr>
+<tr class="row-odd"><td><p>start_date</p></td>
+<td><p>(str), formatted as “%Y-%m-%d”</p></td>
+</tr>
+<tr class="row-even"><td><p>orientation</p></td>
+<td><p>(float), degrees East of North for CH0</p></td>
+</tr>
+<tr class="row-odd"><td><p>reference_strains</p></td>
+<td><p>(dict), containing ‘linear_date’:’YYYY:DOY’ and each channel ie ‘CH0’:reference counts</p></td>
+</tr>
+<tr class="row-even"><td><p>strain_matrices</p></td>
+<td><p>(dict), contains one or more calibration matrices, keyed to the name of the calibration.</p></td>
+</tr>
+<tr class="row-odd"><td><p>atmp_response</p></td>
+<td><p>(dict), reponse coefficients for each channel</p></td>
+</tr>
+<tr class="row-even"><td><p>tidal_params</p></td>
+<td><p>(dict), keys are tuple of (channel, tidal constituent, phz/amp/doodson)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">earthscopestraintools.gtsm_metadata</span> <span class="kn">import</span> <span class="n">GtsmMetadata</span>
+<span class="n">meta</span> <span class="o">=</span> <span class="n">GtsmMetadata</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="s1">&#39;PB&#39;</span><span class="p">,</span><span class="n">station</span><span class="o">=</span><span class="s1">&#39;B004&#39;</span><span class="p">)</span>
+<span class="n">meta</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">network</span><span class="p">:</span> <span class="n">PB</span>
+<span class="n">station</span><span class="p">:</span> <span class="n">B004</span>
+<span class="n">latitude</span><span class="p">:</span> <span class="mf">48.20193</span>
+<span class="n">longitude</span><span class="p">:</span> <span class="o">-</span><span class="mf">124.42701</span>
+<span class="n">gap</span><span class="p">:</span> <span class="mf">0.0002</span>
+<span class="n">orientation</span> <span class="p">(</span><span class="n">CH0EofN</span><span class="p">):</span> <span class="mf">168.2</span>
+<span class="n">reference_strains</span><span class="p">:</span>
+ <span class="p">{</span><span class="s1">&#39;linear_date&#39;</span><span class="p">:</span> <span class="s1">&#39;2005:180&#39;</span><span class="p">,</span> <span class="s1">&#39;CH0&#39;</span><span class="p">:</span> <span class="mi">48391551</span><span class="p">,</span> <span class="s1">&#39;CH1&#39;</span><span class="p">:</span> <span class="mi">49872537</span><span class="p">,</span> <span class="s1">&#39;CH2&#39;</span><span class="p">:</span> <span class="mi">49840454</span><span class="p">,</span> <span class="s1">&#39;CH3&#39;</span><span class="p">:</span> <span class="mi">49541470</span><span class="p">}</span>
+<span class="n">strain_matrices</span><span class="p">:</span>
+<span class="n">lab</span><span class="p">:</span>
+ <span class="p">[[</span> <span class="mf">0.2967</span>  <span class="mf">0.5185</span>  <span class="mf">0.2958</span>  <span class="mf">0.2222</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.2887</span>  <span class="mf">0.2983</span>  <span class="mf">0.1688</span> <span class="o">-</span><span class="mf">0.1784</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.266</span>  <span class="o">-</span><span class="mf">0.2196</span>  <span class="mf">0.3531</span>  <span class="mf">0.1325</span><span class="p">]]</span>
+<span class="n">ER2010</span><span class="p">:</span>
+ <span class="p">[[</span> <span class="mf">1.65662916</span>  <span class="mf">2.37718929</span>  <span class="mf">2.36230912</span>  <span class="mf">0.39952254</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.04469343</span>  <span class="mf">0.51274012</span>  <span class="mf">0.50047667</span> <span class="o">-</span><span class="mf">0.09672701</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.39438025</span>  <span class="mf">1.05488877</span>  <span class="mf">1.64758286</span>  <span class="mf">0.22625875</span><span class="p">]]</span>
+<span class="n">CH_prelim</span><span class="p">:</span>
+ <span class="kc">None</span>
+<span class="n">atmp_response</span><span class="p">:</span>
+ <span class="p">{</span><span class="s1">&#39;CH0&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.004200000000000001</span><span class="p">,</span> <span class="s1">&#39;CH1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0036000000000000003</span><span class="p">,</span> <span class="s1">&#39;CH2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0046</span><span class="p">,</span> <span class="s1">&#39;CH3&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0040999999999999995</span><span class="p">}</span>
+<span class="n">tidal_params</span><span class="p">:</span>
+ <span class="p">{(</span><span class="s1">&#39;CH0&#39;</span><span class="p">,</span> <span class="s1">&#39;M2&#39;</span><span class="p">,</span> <span class="s1">&#39;phz&#39;</span><span class="p">):</span> <span class="s1">&#39;114.965&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;CH0&#39;</span><span class="p">,</span> <span class="s1">&#39;M2&#39;</span><span class="p">,</span> <span class="s1">&#39;amp&#39;</span><span class="p">):</span> <span class="s1">&#39;9.590&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;CH0&#39;</span><span class="p">,</span> <span class="s1">&#39;M2&#39;</span><span class="p">,</span> <span class="s1">&#39;doodson&#39;</span><span class="p">):</span> <span class="s1">&#39;2 0 0 0 0 0&#39;</span><span class="p">,</span> <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DataStructures.html" class="btn btn-neutral float-left" title="Data Structures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../notebooks/level2.html" class="btn btn-neutral float-right" title="Example of running level 2 processing steps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Earthscope Consortium.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

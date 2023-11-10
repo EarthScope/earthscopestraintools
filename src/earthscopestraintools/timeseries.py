@@ -8,13 +8,16 @@ from earthscopestraintools.processing import (
     interpolate,
     decimate_1s_to_300s,
     butterworth_filter,
+    decimate_to_hourly,
     apply_calibration_matrix,
     calculate_offsets,
     calculate_pressure_correction,
     calculate_tide_correction,
     calculate_linear_trend_correction,
+    baytap_analysis
 )
 from earthscopestraintools.event_processing import dynamic_strain, calculate_magnitude
+from earthscopestraintools.strain_visualization import strain_video
 from scipy import signal, stats
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -404,15 +407,15 @@ class Timeseries:
             period = self.period
         elif not period:
             period = (new_index[1] - new_index[0]).total_seconds()
-
+        
         limit = int(limit_seconds / period)  # defaults to 1 hr
         data = interpolate(
-            self.data.reindex(new_index),
+            self.data.reindex(self.data.index.union(new_index)),
             replace=replace,
             method=method,
             limit=limit,
             limit_direction=limit_direction,
-        )
+        ).reindex(new_index)
         quality_df = self.quality_df.copy().reindex(data.index)
         quality_df[quality_df.isna()] = "i"
         # find any differences using the original data index
@@ -483,6 +486,45 @@ class Timeseries:
             level=self.level,
             name=name,
         )
+
+    def decimate_to_hourly(
+        self, name: str = None
+    ):
+        """ Decimates a timeseries to hourly by selecting the first and second and minute of each hour
+
+        :param df: time series data to decimate
+        :type df: pd.DataFrame
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: Timeseries containing hourly decimated data
+        :rtype: Timeseries
+        """
+        data = decimate_to_hourly(self.data)
+        quality_df = self.quality_df.copy().reindex(data.index)
+        quality_df[quality_df.isna()] = "i"
+        # find any differences using the original data index
+        mask1 = (data.reindex(self.data.index) != self.data).any(axis=1)
+
+        # any nans from the original index
+        mask2 = self.data[mask1].isna()
+        quality_df[mask2] = "i"
+
+        # any 999999s from the original index
+        mask3 = self.data[mask1] == 999999
+        quality_df[mask3] = "i"
+        # quality_df = self.quality_df.reindex(data.index)
+        if not name:
+            name = f"{self.name}.decimated"
+        ts2 = Timeseries(
+            data=data,
+            quality_df=quality_df,
+            series=self.series,
+            units=self.units,
+            level="1",
+            period=3600,
+            name=name,
+        )
+        return ts2
 
     def calculate_offsets(
         self,
@@ -618,10 +660,11 @@ class Timeseries:
         return ts
 
     def linear_trend_correction(
-        self, trend_start=None, trend_end=None, name: str = None
+        self, method='linear',trend_start=None, trend_end=None, name: str = None
     ):
         """Generate a linear trend correction
-
+        :param method: linear or median
+        :type method: str, defaults to linear
         :param trend_start: start of window to calculate trend, defaults to first_valid_index()
         :type trend_start: datetime.datetime, optional
         :param trend_end: end of window to calculate trend, defaults to last_valid_index()
@@ -631,7 +674,7 @@ class Timeseries:
         :return: trend correction timeseries for each column/channel in input data
         :rtype: Timeseries
         """
-        data = calculate_linear_trend_correction(self.data, trend_start, trend_end)
+        data = calculate_linear_trend_correction(self.data, method, trend_start, trend_end)
         if not name:
             name = f"{self.name}.trend_c"
         ts = Timeseries(
@@ -739,6 +782,86 @@ class Timeseries:
             level=self.level,
             name=name,
         )
+
+    def baytap_analysis(self,atmp_ts,latitude=None,longitude=None,elevation=None,dmin=0.001):
+        '''
+        This function accesses a docker container to run BAYTAP08 (Tamura 1991; Tamura and Agnew 2008) for tidal analysis. Time series (e.g. strain) and additional auxiliary input (e.g. pressure) are analyzed together to determine the amplitudes and phases of a combination of tidal constituents (M2, O1, P1, K1, N2, S2) in the time series, as well as a coefficient for the auxiliary input response. 
+        :param atmp_ts: Atmospheric pressure time series with same sample period and time frame as the strain data.
+        :type atmp_ts: Timeseries
+        :param latitude: latitude of the station
+        :type latitude: float
+        :param longitude: longitude of the station
+        :type longitude: float
+        :param elevation: elevation of the station
+        :type elevation: float
+        :param dmin: Drift parameter for the program. Large drift expects a linear trend. Small drift allows for rapid changes in the residual time series. 
+        :type dmin: float
+        :return: Dictionary of amplitudes and phases for each tidal constituent per gauge, and atmospheric pressure coefficient.
+        :rtype: dict
+        '''
+
+        baytap_results = baytap_analysis(df=self.data,
+                                         atmp_df=atmp_ts.data,
+                                         quality_df=self.quality_df,
+                                         atmp_quality_df=atmp_ts.quality_df,
+                                         latitude=latitude,
+                                         longitude=longitude,
+                                         elevation=elevation,
+                                         dmin=0.001)
+
+        return baytap_results
+
+    def strain_video(
+        self,
+        start:str=None,
+        end:str=None,
+        skip:int=1,
+        interval:float=None,
+        title:str=None,
+        units:str=None,
+        savegif:str=None
+        ):
+        """Displays a gif of the strain time series provided, with time series and strain axes displayed. Strain is shown relative to the first data point. 
+        :param start: (Optional) Start of the video as a datetime string.
+        :type start: str
+        :param end: (Optional) End of the video as a datetime string.
+        :type end: str
+        param skip: (optional) number of data points to skip per frame (eg. if using 5 minute Timeseries, skip=2 will decimate the dataset to a 10 minute period)
+        :type skip: int
+        :param interval: (Optional) Time between frames (in microseconds). 
+        :type interval:
+        :param title: (Optional) Plot title
+        :type title: str
+        :param repeat: (Optional) Choose if the animation repeats. Defaults to false.
+        :type repeat: bool
+        :param units: (Optional) Units to label strain
+        :type units: str 
+        :return: Gif of the strain time series
+        :rtype: matplotlib.animation
+        
+        Example
+        -------
+        >>> # Import relevant modules from the earscopestraintools package
+        >>> from earthscopestraintools.mseed_tools import ts_from_mseed
+        >>> from earthscopestraintools.gtsm_metadata import GtsmMetadata
+        >>> # Metadata
+        >>> network = 'PB'
+        >>> station = 'B004' 
+        >>> meta = GtsmMetadata(network,station)
+        >>> # Provide the start and end times 
+        >>> start = '2019-07-01'
+        >>> end = '2019-07-07'
+        >>> 
+        >>> # load data
+        >>> strain_raw = ts_from_mseed(network=network, station=station, location='T0', channel='RS*', start=start, end=end)
+        >>> strain_linearized = strain_raw.linearize(reference_strains=meta.reference_strains,gap=meta.gap)
+        >>> strain_reg = strain_linearized.apply_calibration_matrix(calibration_matrix=meta.strain_matrices['ER2010'])
+        >>> # make video, save .gif
+        >>> %matplotlib widget 
+        >>> anim = strain_reg.strain_video(interval=1, title=f'{station}, One Week',units='ms',savegif=f'{station}.{start}.{end}.gif')
+        """
+        anim = strain_video(self.data,start=start,end=end,skip=skip,interval=interval,title=title,units=units,savegif=savegif)
+        return anim
 
     def plot(
         self,

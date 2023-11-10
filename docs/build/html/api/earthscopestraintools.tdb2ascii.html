@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="earthscopestraintools.tdb2tdb module" href="earthscopestraintools.tdb2tdb.html" />
-    <link rel="prev" title="earthscopestraintools.processing module" href="earthscopestraintools.processing.html" /> 
+    <link rel="prev" title="earthscopestraintools.strain_visualization module" href="earthscopestraintools.strain_visualization.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -37,7 +37,7 @@
               <img src="../_static/EarthScope_Logo-color.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.1.20
+                0.1.21
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -51,8 +51,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../pages/IntroductoryMaterial.html">Borehole Strainmeter Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/DataAvailability.html">Data Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/DataStructures.html">Data Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/level2.html">Example of running level 2 processing steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../notebooks/plot_event.html">Example of looking at high rate event data from a strainmeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TidalCalibrationEarthscopestraintools.html">Tidal Calibration</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="earthscopestraintools.html">earthscopestraintools package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="earthscopestraintools.html#submodules">Submodules</a><ul class="current">
@@ -67,6 +70,7 @@
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.strain_visualization.html">earthscopestraintools.strain_visualization module</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">earthscopestraintools.tdb2ascii module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.tdb2tdb.html">earthscopestraintools.tdb2tdb module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="earthscopestraintools.tiledbtools.html">earthscopestraintools.tiledbtools module</a></li>
@@ -81,12 +85,12 @@
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottle2tdb.html">earthscopestraintools.bottle2tdb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.bottletar.html">earthscopestraintools.bottletar module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.datasources_api_interact.html">earthscopestraintools.datasources_api_interact module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.edid.html">earthscopestraintools.edid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event.html">earthscopestraintools.event module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.event_processing.html">earthscopestraintools.event_processing module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.gtsm_metadata.html">earthscopestraintools.gtsm_metadata module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.mseed_tools.html">earthscopestraintools.mseed_tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.processing.html">earthscopestraintools.processing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="earthscopestraintools.strain_visualization.html">earthscopestraintools.strain_visualization module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">earthscopestraintools.tdb2ascii module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tdb2ascii.read_date_range"><code class="docutils literal notranslate"><span class="pre">read_date_range()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#earthscopestraintools.tdb2ascii.to_date"><code class="docutils literal notranslate"><span class="pre">to_date()</span></code></a></li>
@@ -155,7 +159,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="earthscopestraintools.processing.html" class="btn btn-neutral float-left" title="earthscopestraintools.processing module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="earthscopestraintools.strain_visualization.html" class="btn btn-neutral float-left" title="earthscopestraintools.strain_visualization module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="earthscopestraintools.tdb2tdb.html" class="btn btn-neutral float-right" title="earthscopestraintools.tdb2tdb module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
