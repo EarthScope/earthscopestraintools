@@ -79,7 +79,7 @@ def build_ancillary_buffer(gbt: GtsmBottleTar, session: str):
     return tiledb_buffer
 
 
-def write_buffer(uri, buffer: pd.DataFrame, cleanup_meta=True):
+def write_buffer(uri, buffer: pd.DataFrame, cleanup_meta=False):
     writer = RawStrainWriter(uri)
     writer.write_df_to_tiledb(buffer)
     if cleanup_meta:
