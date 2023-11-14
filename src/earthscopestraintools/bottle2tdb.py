@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 from earthscopestraintools.bottletar import GtsmBottleTar
-import tiledb
+#import tiledb
 from earthscopestraintools.tiledbtools import (
-    StrainArray,
+  #  StrainArray,
     RawStrainWriter,
     RawStrainReader,
 )
@@ -91,6 +91,7 @@ def write_buffer(uri,
             writer.array.vacuum_array_meta(print_it=True)
         writer.array.consolidate_fragment_meta(print_it=True)
         writer.array.vacuum_fragment_meta(print_it=True)
+
 
 
 def check_result(buffer, uri):
