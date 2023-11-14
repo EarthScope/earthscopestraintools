@@ -149,7 +149,7 @@ class StrainArray:
             return False
 
     def create(self, schema_type: str, schema_source: str = "s3"):
-        # schema should be one of 2D_INT, 2D_FLOAT, 3D. case insensitive
+        # schema_type should be one of 2D_INT, 2D_FLOAT, 3D. case insensitive
         schema_type = schema_type.upper()
         if schema_type in ["2D_INT", "2D_FLOAT", "3D"]:
             if schema_source == "s3":
@@ -263,20 +263,20 @@ class StrainArray:
         if print_it:
             logger.info("vacuumed fragments")
 
-    def cleanup_meta(self):
-        self.consolidate_array_meta(print_it=False)
-        self.vacuum_array_meta(print_it=False)
-        self.consolidate_fragment_meta(print_it=False)
-        self.vacuum_fragment_meta(print_it=False)
+    def cleanup_meta(self, print_it=False):
+        self.consolidate_array_meta(print_it=print_it)
+        self.vacuum_array_meta(print_it=print_it)
+        self.consolidate_fragment_meta(print_it=print_it)
+        self.vacuum_fragment_meta(print_it=print_it)
         logger.info("Consolidated and vacuumed metadata")
 
-    def cleanup(self):
-        self.consolidate_array_meta(print_it=False)
-        self.vacuum_array_meta(print_it=False)
-        self.consolidate_fragment_meta(print_it=False)
-        self.vacuum_fragment_meta(print_it=False)
-        self.consolidate_fragments(print_it=False)
-        self.vacuum_fragments(print_it=False)
+    def cleanup(self, print_it=False):
+        self.consolidate_array_meta(print_it=print_it)
+        self.vacuum_array_meta(print_it=print_it)
+        self.consolidate_fragment_meta(print_it=print_it)
+        self.vacuum_fragment_meta(print_it=print_it)
+        self.consolidate_fragments(print_it=print_it)
+        self.vacuum_fragments(print_it=print_it)
         logger.info("Consolidated and vacuumed fragments and metadata")
 
     def get_nonempty_domain(self):
@@ -763,7 +763,28 @@ class RawStrainWriter:
         else:
             logger.info(f"Array exists at {self.array.uri}")
 
-    def write_df_to_tiledb(self, df: pd.DataFrame):
+    def update_channels(self, channels):
+        # update the channel array metadata
+        write_update=False
+
+        with tiledb.open(self.array.uri, "r", ctx=self.array.ctx) as A:
+            try:
+                channels_json = A.meta["channels"]
+            except KeyError:
+                channels_json = '{"channels":[]}'
+
+        channels_dict = json.loads(channels_json)
+        for item in channels:
+            if item not in channels_dict["channels"]:
+                channels_dict["channels"].append(item)
+                write_update=True #theres a new channel
+        
+        if write_update:
+            with tiledb.open(self.array.uri, "w", ctx=self.array.ctx) as A:
+                A.meta["channels"] = json.dumps(channels_dict)
+        logger.info("array meta update complete")
+    
+    def write_df_to_tiledb(self, df: pd.DataFrame, update_channels=False):
         mode = "append"
         # make sure there arent any nans, replace with 999999 if so
         df = df.replace(np.nan, 999999)
@@ -774,26 +795,14 @@ class RawStrainWriter:
             mode=mode,
             ctx=self.array.ctx,
         )
-        # update the string dimension metadata
-        channels = df["channel"].unique()
-
-        if type(channels) == str:
-            channels = [channels]
-
-        with tiledb.open(self.array.uri, "r", ctx=self.array.ctx) as A:
-            try:
-                channels_json = A.meta["channels"]
-            except KeyError:
-                channels_json = '{"channels":[]}'
-
-            channels_dict = json.loads(channels_json)
-            for item in channels:
-                if item not in channels_dict["channels"]:
-                    channels_dict["channels"].append(item)
-
-            with tiledb.open(self.array.uri, "w", ctx=self.array.ctx) as A:
-                A.meta["channels"] = json.dumps(channels_dict)
-        logger.info("Write complete")
+        logger.info('Write complete')
+        
+        if update_channels:
+            channels = df["channel"].unique()
+            if type(channels) == str:
+                channels = [channels]
+            self.update_channels(channels)
+            
 
     def df_2_tiledb(
         self,

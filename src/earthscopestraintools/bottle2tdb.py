@@ -79,11 +79,18 @@ def build_ancillary_buffer(gbt: GtsmBottleTar, session: str):
     return tiledb_buffer
 
 
-def write_buffer(uri, buffer: pd.DataFrame, cleanup_meta=False):
+def write_buffer(uri, 
+                 buffer: pd.DataFrame, 
+                 update_channels=False,
+                 cleanup_meta=False):
     writer = RawStrainWriter(uri)
-    writer.write_df_to_tiledb(buffer)
+    writer.write_df_to_tiledb(buffer, update_channels)
     if cleanup_meta:
-        writer.array.cleanup_meta()
+        if update_channels:
+            writer.array.consolidate_array_meta(print_it=True)
+            writer.array.vacuum_array_meta(print_it=True)
+        writer.array.consolidate_fragment_meta(print_it=True)
+        writer.array.vacuum_fragment_meta(print_it=True)
 
 
 def check_result(buffer, uri):
@@ -99,72 +106,72 @@ def check_result(buffer, uri):
         logger.exception(f"{type(e)}")
 
 
-def bottle2tdb(
-    filepath: str,
-    strain_uri: str,
-    ancillary_uri: str,
-    session: str,
-    write_it=True,
-    print_it=False,
-    check_it=False,
-):
-    gbt = GtsmBottleTar(filepath, session)
-    strain_buffer = build_strain_buffer(gbt, session)
-    if session.casefold() == "Day".casefold():
-        ancillary_buffer = build_ancillary_buffer(gbt, session)
-    gbt.delete_bottles_from_disk()
+# def bottle2tdb(
+#     filepath: str,
+#     strain_uri: str,
+#     ancillary_uri: str,
+#     session: str,
+#     write_it=True,
+#     print_it=False,
+#     check_it=False,
+# ):
+#     gbt = GtsmBottleTar(filepath, session)
+#     strain_buffer = build_strain_buffer(gbt, session)
+#     if session.casefold() == "Day".casefold():
+#         ancillary_buffer = build_ancillary_buffer(gbt, session)
+#     gbt.delete_bottles_from_disk()
 
-    if write_it:
-        try:
-            logger.info(f"{filepath}: Writing to {strain_uri}")
-            write_buffer(strain_uri, strain_buffer)
-        except tiledb.TileDBError as e:
-            logger.error(e)
-            array = StrainArray(uri=strain_uri)
-            array.create(schema_type="2D_INT", schema_source="s3")
-            if session.casefold() == "Min".casefold():
-                period = 0.05
-            elif session.casefold() == "Hour".casefold():
-                period = 1
-            elif session.casefold() == "Day".casefold():
-                period = 600
-            else:
-                logger.error(
-                    f"Invalid session {session}, cannot determine period for array metadata"
-                )
-            array.set_array_meta(
-                station=gbt.file_metadata["fcid"], period=period
-            )  # todo: set network meta?
-            logger.info(f"{filepath}: Writing to {strain_uri}")
-            write_buffer(strain_uri, strain_buffer)
+#     if write_it:
+#         try:
+#             logger.info(f"{filepath}: Writing to {strain_uri}")
+#             write_buffer(strain_uri, strain_buffer)
+#         except tiledb.TileDBError as e:
+#             logger.error(e)
+#             array = StrainArray(uri=strain_uri)
+#             array.create(schema_type="2D_INT", schema_source="s3")
+#             if session.casefold() == "Min".casefold():
+#                 period = 0.05
+#             elif session.casefold() == "Hour".casefold():
+#                 period = 1
+#             elif session.casefold() == "Day".casefold():
+#                 period = 600
+#             else:
+#                 logger.error(
+#                     f"Invalid session {session}, cannot determine period for array metadata"
+#                 )
+#             array.set_array_meta(
+#                 station=gbt.file_metadata["fcid"], period=period
+#             )  # todo: set network meta?
+#             logger.info(f"{filepath}: Writing to {strain_uri}")
+#             write_buffer(strain_uri, strain_buffer)
 
-        if session.casefold() == "Day".casefold():
-            try:
-                logger.info(f"{filepath}: Writing to {ancillary_uri}")
-                write_buffer(ancillary_uri, ancillary_buffer)
-            except tiledb.TileDBError as e:
-                logger.error(e)
-                ancillary_array = StrainArray(uri=ancillary_uri)
-                ancillary_array.create(schema_type="2D_FLOAT", schema_source="s3")
-                ancillary_array.set_array_meta(
-                    station=gbt.file_metadata["fcid"], period=1800
-                )  # todo: set network meta?
-                logger.info(f"{filepath}: Writing to {ancillary_uri}")
-                write_buffer(ancillary_uri, ancillary_buffer)
+#         if session.casefold() == "Day".casefold():
+#             try:
+#                 logger.info(f"{filepath}: Writing to {ancillary_uri}")
+#                 write_buffer(ancillary_uri, ancillary_buffer)
+#             except tiledb.TileDBError as e:
+#                 logger.error(e)
+#                 ancillary_array = StrainArray(uri=ancillary_uri)
+#                 ancillary_array.create(schema_type="2D_FLOAT", schema_source="s3")
+#                 ancillary_array.set_array_meta(
+#                     station=gbt.file_metadata["fcid"], period=1800
+#                 )  # todo: set network meta?
+#                 logger.info(f"{filepath}: Writing to {ancillary_uri}")
+#                 write_buffer(ancillary_uri, ancillary_buffer)
 
-    if print_it:
-        logger.info(f"Strain Buffer:\n{strain_buffer}")
-        if session.casefold() == "Day".casefold():
-            logger.info(f"Ancillary Buffer:\n{ancillary_buffer}")
+#     if print_it:
+#         logger.info(f"Strain Buffer:\n{strain_buffer}")
+#         if session.casefold() == "Day".casefold():
+#             logger.info(f"Ancillary Buffer:\n{ancillary_buffer}")
 
-    if check_it:
-        logger.info(f"Reading data back from array")
-        logger.info(f"Network: {array.get_network()}")
-        logger.info(f"Station: {array.get_station()}")
-        logger.info(f"Period: {array.get_period()}")
-        check_result(strain_buffer, strain_uri)
-        if session.casefold() == "Day".casefold():
-            logger.info(f"Network: {ancillary_array.get_network()}")
-            logger.info(f"Station: {ancillary_array.get_station()}")
-            logger.info(f"Period: {ancillary_array.get_period()}")
-            check_result(ancillary_buffer, ancillary_uri)
+#     if check_it:
+#         logger.info(f"Reading data back from array")
+#         logger.info(f"Network: {array.get_network()}")
+#         logger.info(f"Station: {array.get_station()}")
+#         logger.info(f"Period: {array.get_period()}")
+#         check_result(strain_buffer, strain_uri)
+#         if session.casefold() == "Day".casefold():
+#             logger.info(f"Network: {ancillary_array.get_network()}")
+#             logger.info(f"Station: {ancillary_array.get_station()}")
+#             logger.info(f"Period: {ancillary_array.get_period()}")
+#             check_result(ancillary_buffer, ancillary_uri)
