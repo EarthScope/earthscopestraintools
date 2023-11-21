@@ -107,7 +107,7 @@ def map_strain(areal:np.array,
         # Station text
         if isinstance(station_list,list):
             t = ax.text(lons[i],lats[i],station_list[i],color='darkblue')
-            t.set_bbox(dict(facecolor='lightblue', alpha=0.8, edgecolor='grey'))
+            t.set_bbox(dict(facecolor='lightblue', alpha=0.8, edgecolor=colors[i]))
         
     # Aspect for map plotting at specified latitude           
     f = 1.0/np.cos(np.average(lats)*np.pi/180)

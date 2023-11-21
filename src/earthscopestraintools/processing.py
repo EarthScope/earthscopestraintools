@@ -501,7 +501,7 @@ def baytap_analysis(df,
     :param atmp_quality_df: DataFrame with flags designating the quality of the pressure data. Any points that are not good (g) are ignores in the time series analysis. 
     :type atmp_quality_df: pd.DataFrame
     :param atmp_units: Units of atmospheric pressure data, should be hpa
-    :type atmp_units: str
+    :type atmp_units: str 
     :param latitude: latitude of the station
     :type latitude: float
     :param longitude: longitude of the station
@@ -571,7 +571,7 @@ def baytap_analysis(df,
     for ch in df.columns:
         if quality_df is not None:    
             df[quality_df[ch] != 'g'] = 999999
-        dstr = ch+'\n'+np.array2string(np.round(df[ch].values,15),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+        dstr = ch+'\n'+np.array2string(np.round(df[ch].values,2),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
         
         # Write files for baytap
         cmd2 = f'docker exec baytap /bin/bash -c "echo -e \'{dstr}\' > data.txt"'
