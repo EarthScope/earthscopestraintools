@@ -865,8 +865,10 @@ class Timeseries:
         end:str=None,
         skip:int=1,
         interval:float=None,
+        azimuth_arrow:float=None,
         title:str=None,
         units:str=None,
+        repeat:bool=False,
         savegif:str=None
         ):
         """Displays a gif of the strain time series provided, with time series and strain axes displayed. Strain is shown relative to the first data point. 
@@ -878,6 +880,8 @@ class Timeseries:
         :type skip: int
         :param interval: (Optional) Time between frames (in microseconds). 
         :type interval:
+        :type azimuth_arrow: (Optional) Directional arrow to plot behind the strain axes, in degrees (default is None)
+        :param azimuth_arrow: float
         :param title: (Optional) Plot title
         :type title: str
         :param repeat: (Optional) Choose if the animation repeats. Defaults to false.
@@ -908,7 +912,8 @@ class Timeseries:
         >>> %matplotlib widget 
         >>> anim = strain_reg.strain_video(interval=1, title=f'{station}, One Week',units='ms',savegif=f'{station}.{start}.{end}.gif')
         """
-        anim = strain_video(self.data,start=start,end=end,skip=skip,interval=interval,title=title,units=units,savegif=savegif)
+        anim = strain_video(self.data,start=start,end=end,skip=skip,interval=interval,azimuth_arrow=azimuth_arrow,
+                            title=title,units=units,repeat=repeat,savegif=savegif)
         return anim
 
     def plot(

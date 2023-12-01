@@ -107,7 +107,7 @@ def map_strain(areal:np.array,
         # Station text
         if isinstance(station_list,list):
             t = ax.text(lons[i],lats[i],station_list[i],color='darkblue')
-            t.set_bbox(dict(facecolor='lightblue', alpha=0.8, edgecolor='grey'))
+            t.set_bbox(dict(facecolor='lightblue', alpha=0.8, edgecolor=colors[i]))
         
     # Aspect for map plotting at specified latitude           
     f = 1.0/np.cos(np.average(lats)*np.pi/180)
@@ -143,6 +143,7 @@ def strain_video(df,
                  end:str=None,
                  skip:int=1,
                  interval:float=None,
+                 azimuth_arrow:float=None,
                  title:str=None,
                  units:str=None,
                  repeat:bool=False,
@@ -158,7 +159,9 @@ def strain_video(df,
     :param skip: (optional) number of data points to skip per frame (eg. if using 5 minute Timeseries, skip=2 will decimate the dataset to a 10 minute period)
     :type skip: int
     :param interval: (Optional) Time between frames (in microseconds). 
-    :type interval:
+    :type interval: float
+    :type azimuth_arrow: (Optional) Directional arrow to plot behind the strain axes, in degrees (default is None)
+    :param azimuth_arrow: float
     :param title: (Optional) Plot title
     :type title: str
     :param repeat: (Optional) Choose if the animation repeats. Defaults to false.
@@ -224,6 +227,15 @@ def strain_video(df,
     a3 = ax.arrow(0,0,-0,-0,zorder=3,width=lw,color='black',head_width=hw,length_includes_head=True)
     a4 = ax.arrow(0,0,0,0,zorder=3,width=lw,color='black',head_width=hw,length_includes_head=True)
     
+    if azimuth_arrow != None: 
+        azs = np.max(eEE)*0.75
+        ax.arrow(0,0,azs*np.sin(azimuth_arrow*np.pi/180),
+                 azs*np.cos(azimuth_arrow*np.pi/180),
+                 width=lw,color='red',head_width=hw,zorder=2)
+        ax.arrow(0,0,-1*azs*np.sin(azimuth_arrow*np.pi/180),
+                 -1*azs*np.cos(azimuth_arrow*np.pi/180),
+                 width=lw,color='red',head_width=hw,zorder=2)
+
     def animate(j):
         # Moving line with time
         line.set_data([time[j],time[j]], [0,1])

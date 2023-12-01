@@ -501,7 +501,7 @@ def baytap_analysis(df,
     :param atmp_quality_df: DataFrame with flags designating the quality of the pressure data. Any points that are not good (g) are ignores in the time series analysis. 
     :type atmp_quality_df: pd.DataFrame
     :param atmp_units: Units of atmospheric pressure data, should be hpa
-    :type atmp_units: str
+    :type atmp_units: str 
     :param latitude: latitude of the station
     :type latitude: float
     :param longitude: longitude of the station
@@ -552,7 +552,7 @@ def baytap_analysis(df,
     # Pressure data, auxiliary input    
     if atmp_quality_df is not None:
         atmp_df[atmp_quality_df != 'g'] = 999999
-    aux_dstr = 'hpa\n'+np.array2string(atmp_df.values.flatten(),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+    aux_dstr = 'hpa\n'+np.array2string(np.round(atmp_df.values.flatten(),3),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
     
     baytap_results = {}
     baytap_results['atmp_response'] = {}
@@ -571,7 +571,7 @@ def baytap_analysis(df,
     for ch in df.columns:
         if quality_df is not None:    
             df[quality_df[ch] != 'g'] = 999999
-        dstr = ch+'\n'+np.array2string(df[ch].values,separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+        dstr = ch+'\n'+np.array2string(np.round(df[ch].values,2),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
         
         # Write files for baytap
         cmd2 = f'docker exec baytap /bin/bash -c "echo -e \'{dstr}\' > data.txt"'
@@ -581,11 +581,13 @@ def baytap_analysis(df,
         cmd5 = f'docker exec baytap /bin/bash -c "cat data.txt | baytap08 control.txt results.txt aux.txt >> decomp.txt"'
         # Read results
         cmd6 = f'docker exec baytap /bin/bash -c "cat results.txt"'
-        # Actually execute the commands
-        subprocess.run(cmd2, shell=shell,text=True)
+        # Actually execute the commands and catch errors
+        p = subprocess.run(cmd2, shell=True, text=True,capture_output=True)
+        if 'argument list too long' in p.stdout:
+            print('The data is too long, it could help to break it into multiple runs.')
         subprocess.run(cmd3, shell=shell,text=True)
         subprocess.run(cmd4, shell=shell,text=True)
-        subprocess.run(cmd5, shell=shell,text=True)
+        subprocess.run(cmd5,shell=shell,text=True,capture_output=True)
         output = subprocess.run(cmd6,capture_output=True,shell=shell,text=True)
         res = (output.stdout).split('\n')
 
