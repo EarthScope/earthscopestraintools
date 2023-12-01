@@ -29,7 +29,8 @@ def load_mseed_to_df(
 ):
     """
     Load miniseed data from fdsnws-dataselect a pandas dataframe, with time as the index and
-    each channel as a column.  Uses obspy as an intermediate step.
+    each channel as a column.  Uses obspy as an intermediate step.  Enforces completeness by 
+    building an index of all timestamps in date range and filling gaps with nans.
 
     :param net: FDSN 2 character network code, accepts wildcards
     :type net: str
@@ -57,8 +58,14 @@ def load_mseed_to_df(
     )
     if save_as:
         st.write(filename=save_as)
+    
     df = mseed2pandas(st, print_traces=print_traces)
-    return df
+    #
+    freq = df.index.to_series().diff().median()
+    timestamps = pd.date_range(start=start, end=end, freq=freq, inclusive='left')
+    df2 = df.reindex(timestamps)
+    df2.index.name = "time"
+    return df2
 
 
 def load_mseed_file_to_df(filename: str):
@@ -230,7 +237,8 @@ def ts_from_mseed(
     name: str = None,
     period: float = None,
     series: str = "raw",
-    units: str = "",
+    units: str = "unknown",
+    fill_value: int = 999999,
     to_nan: bool = True,
     scale_factor: float = None,
 ):
@@ -254,9 +262,11 @@ def ts_from_mseed(
     :type period: float, optional
     :param series: description of timeseries, ie 'raw', 'microstrain', 'atmp_c', 'tide_c', 'offset_c', 'trend_c', defaults to "raw"
     :type series: str, optional
-    :param units: units of timeseries, defaults to ""
+    :param units: units of timeseries, defaults to "counts" or "unknown" 
     :type units: str, optional
-    :param to_nan: option to convert 999999 gap fill values to numpy.nan, defaults to True
+    :param fill_value: gap fill value to replace if to_nan is set to True, defaults to 999999
+    :type fill_value: int, optional
+    :param to_nan: option to convert gap fill values to numpy.nan, defaults to True
     :type to_nan: bool, optional
     :param scale_factor: scale factor to apply to miniseed data, defaults to None
     :type scale_factor: float, optional
@@ -272,29 +282,16 @@ def ts_from_mseed(
         end=end,
     )
     level = "0"
-    if channel.startswith("RS"):
-        period = 600
-        series = series
+    series = series
+    if channel.startswith("RS") or channel.startswith("LS") or channel.startswith("BS"):
         units = "counts"
-    elif channel.startswith("LS"):
-        period = 1
-        series = series
-        units = "counts"
-    elif channel.startswith("BS"):
-        period = 0.05
-        series = series
-        units = "counts"
-    else:
-        period = period
-        series = series
     if name is None:
         name = f"{network}.{station}.{location}.{channel}"
     ts = Timeseries(
-        data=df, series=series, units=units, level=level, period=period, name=name
+        data=df, series=series, units=units, level=level, name=name
     )
     if to_nan:
-        logger.info("Converting missing data from 999999 to nan")
-        ts = ts.remove_999999s()
+        ts = ts.remove_fill_values(fill_value=fill_value)
     if scale_factor:
         ts.data = ts.data * scale_factor
     return ts

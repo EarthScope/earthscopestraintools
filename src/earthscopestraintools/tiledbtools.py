@@ -420,69 +420,69 @@ class ProcessedStrainReader:
         else:
             logger.info(f"Cannot check query completess without array period")
 
-    # def to_ts(
-    #     self,
-    #     data_types: Union[list, str],
-    #     timeseries: str,
-    #     attrs: list = None,
-    #     name: str = "timeseries",
-    #     units: str = None,
-    #     start_ts: int = None,
-    #     end_ts: int = None,
-    #     start_str: str = None,
-    #     end_str: str = None,
-    #     start_dt: datetime.datetime = None,
-    #     end_dt: datetime.datetime = None,
-    #     print_array_range=False,
-    #     to_na=True,
-    # ):
-    #     if attrs is None:
-    #         attrs = ["data", "quality", "level", "version"]
-    #     if units is None:
-    #         if timeseries == "counts":
-    #             units = "counts"
-    #         elif isinstance(data_types, str):
-    #             if data_types == "atmp":
-    #                 units = "hpa"
-    #             else:
-    #                 units = "microstrain"
-    #         elif isinstance(data_types, list):
-    #             if "atmp" in data_types:
-    #                 units = "hpa"
-    #             else:
-    #                 units = "microstrain"
+    def to_ts(
+        self,
+        data_types: Union[list, str],
+        timeseries: str,
+        attrs: list = None,
+        name: str = "timeseries",
+        units: str = None,
+        start_ts: int = None,
+        end_ts: int = None,
+        start_str: str = None,
+        end_str: str = None,
+        start_dt: datetime.datetime = None,
+        end_dt: datetime.datetime = None,
+        print_array_range=False,
+        fill_value: int = 999999,
+        to_na=True,
+    ):
+        if attrs is None:
+            attrs = ["data", "quality", "level", "version"]
+        if units is None:
+            if timeseries == "counts":
+                units = "counts"
+            elif isinstance(data_types, str):
+                if data_types == "atmp":
+                    units = "hpa"
+                else:
+                    units = "microstrain"
+            elif isinstance(data_types, list):
+                if "atmp" in data_types:
+                    units = "hpa"
+                else:
+                    units = "microstrain"
 
-    #     # print(units)
-    #     df = self.to_df(
-    #         data_types=data_types,
-    #         timeseries=timeseries,
-    #         attrs=attrs,
-    #         start_ts=start_ts,
-    #         end_ts=end_ts,
-    #         start_str=start_str,
-    #         end_str=end_str,
-    #         start_dt=start_dt,
-    #         end_dt=end_dt,
-    #         reindex=False,
-    #         print_array_range=print_array_range,
-    #     )
-    #     # print(df)
-    #     data = self.reindex_df(df=df, columns=data_types, attr="data")
-    #     quality_df = self.reindex_df(df=df, columns=data_types, attr="quality")
-    #     level = df.iloc[0]["level"]
-    #     ts = Timeseries(
-    #         data=data,
-    #         quality_df=quality_df,
-    #         series=timeseries,
-    #         units=units,
-    #         period=self.array.period,
-    #         level=level,
-    #         name=name,
-    #     )
-    #     if to_na:
-    #         ts = ts.remove_999999s(interpolate=False)
-    #     return ts
-
+        # print(units)
+        df = self.to_df(
+            data_types=data_types,
+            timeseries=timeseries,
+            attrs=attrs,
+            start_ts=start_ts,
+            end_ts=end_ts,
+            start_str=start_str,
+            end_str=end_str,
+            start_dt=start_dt,
+            end_dt=end_dt,
+            reindex=False,
+            print_array_range=print_array_range,
+        )
+        # print(df)
+        data = self.reindex_df(df=df, columns=data_types, attr="data")
+        quality_df = self.reindex_df(df=df, columns=data_types, attr="quality")
+        level = df.iloc[0]["level"]
+        ts = Timeseries(
+            data=data,
+            quality_df=quality_df,
+            series=timeseries,
+            units=units,
+            period=self.array.period,
+            level=level,
+            name=name,
+        )
+        if to_na:
+            ts = ts.remove_fill_values(fill_value=fill_value, interpolate=False)
+        return ts
 
 class ProcessedStrainWriter:
     def __init__(self, uri: str):
@@ -707,48 +707,49 @@ class RawStrainReader:
         else:
             logger.info(f"Cannot check query completess without array period")
 
-    # def to_ts(
-    #     self,
-    #     channels: list,
-    #     units: str,
-    #     start_ts: int = None,
-    #     end_ts: int = None,
-    #     start_str: str = None,
-    #     end_str: str = None,
-    #     start_dt: datetime.datetime = None,
-    #     end_dt: datetime.datetime = None,
-    #     to_nan: bool = True,
-    #     name: str = "",
-    # ):
-    #     # if not uri:
-    #     #     uri = lookup_s3_uri(network, station, period)
-    #     # reader = RawStrainReader(uri, period)
-    #     df = self.to_df(
-    #         channels=channels,
-    #         start_str=start_str,
-    #         end_str=end_str,
-    #         start_ts=start_ts,
-    #         end_ts=end_ts,
-    #         start_dt=start_dt,
-    #         end_dt=end_dt,
-    #     )
-    #     series = "raw"
-    #     level = "0"
-    #     # if name == None:
-    #     #    name = f"{network}.{station}.{series}.{units}"
-    #     ts = Timeseries(
-    #         data=df,
-    #         series=series,
-    #         units=units,
-    #         level=level,
-    #         period=self.array.period,
-    #         name=name,
-    #     )
-    #     if to_nan:
-    #         logger.info("Converting missing data from 999999 to nan")
-    #         return ts.remove_999999s()
-    #     else:
-    #         return ts
+    def to_ts(
+        self,
+        channels: list,
+        units: str,
+        start_ts: int = None,
+        end_ts: int = None,
+        start_str: str = None,
+        end_str: str = None,
+        start_dt: datetime.datetime = None,
+        end_dt: datetime.datetime = None,
+        fill_value: int = 999999,
+        to_nan: bool = True,
+        name: str = "",
+    ):
+        # if not uri:
+        #     uri = lookup_s3_uri(network, station, period)
+        # reader = RawStrainReader(uri, period)
+        df = self.to_df(
+            channels=channels,
+            start_str=start_str,
+            end_str=end_str,
+            start_ts=start_ts,
+            end_ts=end_ts,
+            start_dt=start_dt,
+            end_dt=end_dt,
+        )
+        series = "raw"
+        level = "0"
+        # if name == None:
+        #    name = f"{network}.{station}.{series}.{units}"
+        ts = Timeseries(
+            data=df,
+            series=series,
+            units=units,
+            level=level,
+            period=self.array.period,
+            name=name,
+        )
+        if to_nan:
+            logger.info(f"Converting missing data from {fill_value} to nan")
+            return ts.remove_fill_values(fill_value=fill_value)
+        else:
+            return ts
 
 
 class RawStrainWriter:
