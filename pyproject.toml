@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthscopestraintools"
-version ="0.1.26"
+version ="0.1.27"
 authors = [
   { name="Mike Gottlieb", email="mike.gottlieb@eartscope.org" },
 ]
@@ -27,7 +27,8 @@ dependencies = [
 
 [project.optional-dependencies]
 mseed = [ "obspy>=1.4.0" ]
-tiledb = ["tiledb==0.24.0", "pyarrow==13.0.0"]
+tiledb = ["tiledb==0.23.0", "pyarrow==13.0.0"]
+plotting = ["ipympl>=0.9.3"]
 
 [project.urls]
 "Homepage" = "https://gitlab.com/earthscope/gds/strain/earthscopestraintools"
