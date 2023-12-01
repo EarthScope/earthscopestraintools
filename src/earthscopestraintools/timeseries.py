@@ -820,6 +820,7 @@ class Timeseries:
         azimuth_arrow:float=None,
         title:str=None,
         units:str=None,
+        repeat:bool=False,
         savegif:str=None
         ):
         """Displays a gif of the strain time series provided, with time series and strain axes displayed. Strain is shown relative to the first data point. 
@@ -864,7 +865,7 @@ class Timeseries:
         >>> anim = strain_reg.strain_video(interval=1, title=f'{station}, One Week',units='ms',savegif=f'{station}.{start}.{end}.gif')
         """
         anim = strain_video(self.data,start=start,end=end,skip=skip,interval=interval,azimuth_arrow=azimuth_arrow,
-                            title=title,units=units,savegif=savegif)
+                            title=title,units=units,repeat=repeat,savegif=savegif)
         return anim
 
     def plot(
