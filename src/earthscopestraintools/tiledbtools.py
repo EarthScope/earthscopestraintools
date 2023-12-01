@@ -5,7 +5,6 @@ import pandas as pd
 import json
 import logging
 from typing import Union
-from earthscopestraintools.timeseries import Timeseries
 from earthscopestraintools.datasources_api_interact import get_session_edid
 
 logger = logging.getLogger(__name__)
@@ -149,7 +148,7 @@ class StrainArray:
             return False
 
     def create(self, schema_type: str, schema_source: str = "s3"):
-        # schema should be one of 2D_INT, 2D_FLOAT, 3D. case insensitive
+        # schema_type should be one of 2D_INT, 2D_FLOAT, 3D. case insensitive
         schema_type = schema_type.upper()
         if schema_type in ["2D_INT", "2D_FLOAT", "3D"]:
             if schema_source == "s3":
@@ -263,20 +262,20 @@ class StrainArray:
         if print_it:
             logger.info("vacuumed fragments")
 
-    def cleanup_meta(self):
-        self.consolidate_array_meta(print_it=False)
-        self.vacuum_array_meta(print_it=False)
-        self.consolidate_fragment_meta(print_it=False)
-        self.vacuum_fragment_meta(print_it=False)
+    def cleanup_meta(self, print_it=False):
+        self.consolidate_array_meta(print_it=print_it)
+        self.vacuum_array_meta(print_it=print_it)
+        self.consolidate_fragment_meta(print_it=print_it)
+        self.vacuum_fragment_meta(print_it=print_it)
         logger.info("Consolidated and vacuumed metadata")
 
-    def cleanup(self):
-        self.consolidate_array_meta(print_it=False)
-        self.vacuum_array_meta(print_it=False)
-        self.consolidate_fragment_meta(print_it=False)
-        self.vacuum_fragment_meta(print_it=False)
-        self.consolidate_fragments(print_it=False)
-        self.vacuum_fragments(print_it=False)
+    def cleanup(self, print_it=False):
+        self.consolidate_array_meta(print_it=print_it)
+        self.vacuum_array_meta(print_it=print_it)
+        self.consolidate_fragment_meta(print_it=print_it)
+        self.vacuum_fragment_meta(print_it=print_it)
+        self.consolidate_fragments(print_it=print_it)
+        self.vacuum_fragments(print_it=print_it)
         logger.info("Consolidated and vacuumed fragments and metadata")
 
     def get_nonempty_domain(self):
@@ -421,68 +420,68 @@ class ProcessedStrainReader:
         else:
             logger.info(f"Cannot check query completess without array period")
 
-    def to_ts(
-        self,
-        data_types: Union[list, str],
-        timeseries: str,
-        attrs: list = None,
-        name: str = "timeseries",
-        units: str = None,
-        start_ts: int = None,
-        end_ts: int = None,
-        start_str: str = None,
-        end_str: str = None,
-        start_dt: datetime.datetime = None,
-        end_dt: datetime.datetime = None,
-        print_array_range=False,
-        to_na=True,
-    ):
-        if attrs is None:
-            attrs = ["data", "quality", "level", "version"]
-        if units is None:
-            if timeseries == "counts":
-                units = "counts"
-            elif isinstance(data_types, str):
-                if data_types == "atmp":
-                    units = "hpa"
-                else:
-                    units = "microstrain"
-            elif isinstance(data_types, list):
-                if "atmp" in data_types:
-                    units = "hpa"
-                else:
-                    units = "microstrain"
+    # def to_ts(
+    #     self,
+    #     data_types: Union[list, str],
+    #     timeseries: str,
+    #     attrs: list = None,
+    #     name: str = "timeseries",
+    #     units: str = None,
+    #     start_ts: int = None,
+    #     end_ts: int = None,
+    #     start_str: str = None,
+    #     end_str: str = None,
+    #     start_dt: datetime.datetime = None,
+    #     end_dt: datetime.datetime = None,
+    #     print_array_range=False,
+    #     to_na=True,
+    # ):
+    #     if attrs is None:
+    #         attrs = ["data", "quality", "level", "version"]
+    #     if units is None:
+    #         if timeseries == "counts":
+    #             units = "counts"
+    #         elif isinstance(data_types, str):
+    #             if data_types == "atmp":
+    #                 units = "hpa"
+    #             else:
+    #                 units = "microstrain"
+    #         elif isinstance(data_types, list):
+    #             if "atmp" in data_types:
+    #                 units = "hpa"
+    #             else:
+    #                 units = "microstrain"
 
-        # print(units)
-        df = self.to_df(
-            data_types=data_types,
-            timeseries=timeseries,
-            attrs=attrs,
-            start_ts=start_ts,
-            end_ts=end_ts,
-            start_str=start_str,
-            end_str=end_str,
-            start_dt=start_dt,
-            end_dt=end_dt,
-            reindex=False,
-            print_array_range=print_array_range,
-        )
-        # print(df)
-        data = self.reindex_df(df=df, columns=data_types, attr="data")
-        quality_df = self.reindex_df(df=df, columns=data_types, attr="quality")
-        level = df.iloc[0]["level"]
-        ts = Timeseries(
-            data=data,
-            quality_df=quality_df,
-            series=timeseries,
-            units=units,
-            period=self.array.period,
-            level=level,
-            name=name,
-        )
-        if to_na:
-            ts = ts.remove_999999s(interpolate=False)
-        return ts
+    #     # print(units)
+    #     df = self.to_df(
+    #         data_types=data_types,
+    #         timeseries=timeseries,
+    #         attrs=attrs,
+    #         start_ts=start_ts,
+    #         end_ts=end_ts,
+    #         start_str=start_str,
+    #         end_str=end_str,
+    #         start_dt=start_dt,
+    #         end_dt=end_dt,
+    #         reindex=False,
+    #         print_array_range=print_array_range,
+    #     )
+    #     # print(df)
+    #     data = self.reindex_df(df=df, columns=data_types, attr="data")
+    #     quality_df = self.reindex_df(df=df, columns=data_types, attr="quality")
+    #     level = df.iloc[0]["level"]
+    #     ts = Timeseries(
+    #         data=data,
+    #         quality_df=quality_df,
+    #         series=timeseries,
+    #         units=units,
+    #         period=self.array.period,
+    #         level=level,
+    #         name=name,
+    #     )
+    #     if to_na:
+    #         ts = ts.remove_999999s(interpolate=False)
+    #     return ts
 
 
 class ProcessedStrainWriter:
@@ -597,7 +596,7 @@ class ProcessedStrainWriter:
             print(df_buffer.isna().sum())
         self.write_df_to_tiledb(df_buffer)
 
-    def ts_2_tiledb(self, ts: Timeseries, cleanup: bool = False):
+    def ts_2_tiledb(self, ts, cleanup: bool = False):
         self.df_2_tiledb(
             df=ts.data,
             data_types=ts.columns,
@@ -708,48 +707,48 @@ class RawStrainReader:
         else:
             logger.info(f"Cannot check query completess without array period")
 
-    def to_ts(
-        self,
-        channels: list,
-        units: str,
-        start_ts: int = None,
-        end_ts: int = None,
-        start_str: str = None,
-        end_str: str = None,
-        start_dt: datetime.datetime = None,
-        end_dt: datetime.datetime = None,
-        to_nan: bool = True,
-        name: str = "",
-    ):
-        # if not uri:
-        #     uri = lookup_s3_uri(network, station, period)
-        # reader = RawStrainReader(uri, period)
-        df = self.to_df(
-            channels=channels,
-            start_str=start_str,
-            end_str=end_str,
-            start_ts=start_ts,
-            end_ts=end_ts,
-            start_dt=start_dt,
-            end_dt=end_dt,
-        )
-        series = "raw"
-        level = "0"
-        # if name == None:
-        #    name = f"{network}.{station}.{series}.{units}"
-        ts = Timeseries(
-            data=df,
-            series=series,
-            units=units,
-            level=level,
-            period=self.array.period,
-            name=name,
-        )
-        if to_nan:
-            logger.info("Converting missing data from 999999 to nan")
-            return ts.remove_999999s()
-        else:
-            return ts
+    # def to_ts(
+    #     self,
+    #     channels: list,
+    #     units: str,
+    #     start_ts: int = None,
+    #     end_ts: int = None,
+    #     start_str: str = None,
+    #     end_str: str = None,
+    #     start_dt: datetime.datetime = None,
+    #     end_dt: datetime.datetime = None,
+    #     to_nan: bool = True,
+    #     name: str = "",
+    # ):
+    #     # if not uri:
+    #     #     uri = lookup_s3_uri(network, station, period)
+    #     # reader = RawStrainReader(uri, period)
+    #     df = self.to_df(
+    #         channels=channels,
+    #         start_str=start_str,
+    #         end_str=end_str,
+    #         start_ts=start_ts,
+    #         end_ts=end_ts,
+    #         start_dt=start_dt,
+    #         end_dt=end_dt,
+    #     )
+    #     series = "raw"
+    #     level = "0"
+    #     # if name == None:
+    #     #    name = f"{network}.{station}.{series}.{units}"
+    #     ts = Timeseries(
+    #         data=df,
+    #         series=series,
+    #         units=units,
+    #         level=level,
+    #         period=self.array.period,
+    #         name=name,
+    #     )
+    #     if to_nan:
+    #         logger.info("Converting missing data from 999999 to nan")
+    #         return ts.remove_999999s()
+    #     else:
+    #         return ts
 
 
 class RawStrainWriter:
@@ -763,7 +762,28 @@ class RawStrainWriter:
         else:
             logger.info(f"Array exists at {self.array.uri}")
 
-    def write_df_to_tiledb(self, df: pd.DataFrame):
+    def update_channels(self, channels):
+        # update the channel array metadata
+        write_update=False
+
+        with tiledb.open(self.array.uri, "r", ctx=self.array.ctx) as A:
+            try:
+                channels_json = A.meta["channels"]
+            except KeyError:
+                channels_json = '{"channels":[]}'
+
+        channels_dict = json.loads(channels_json)
+        for item in channels:
+            if item not in channels_dict["channels"]:
+                channels_dict["channels"].append(item)
+                write_update=True #theres a new channel
+        
+        if write_update:
+            with tiledb.open(self.array.uri, "w", ctx=self.array.ctx) as A:
+                A.meta["channels"] = json.dumps(channels_dict)
+        logger.info("array meta update complete")
+    
+    def write_df_to_tiledb(self, df: pd.DataFrame, update_channels=False):
         mode = "append"
         # make sure there arent any nans, replace with 999999 if so
         df = df.replace(np.nan, 999999)
@@ -774,26 +794,14 @@ class RawStrainWriter:
             mode=mode,
             ctx=self.array.ctx,
         )
-        # update the string dimension metadata
-        channels = df["channel"].unique()
-
-        if type(channels) == str:
-            channels = [channels]
-
-        with tiledb.open(self.array.uri, "r", ctx=self.array.ctx) as A:
-            try:
-                channels_json = A.meta["channels"]
-            except KeyError:
-                channels_json = '{"channels":[]}'
-
-            channels_dict = json.loads(channels_json)
-            for item in channels:
-                if item not in channels_dict["channels"]:
-                    channels_dict["channels"].append(item)
-
-            with tiledb.open(self.array.uri, "w", ctx=self.array.ctx) as A:
-                A.meta["channels"] = json.dumps(channels_dict)
-        logger.info("Write complete")
+        logger.info('Write complete')
+        
+        if update_channels:
+            channels = df["channel"].unique()
+            if type(channels) == str:
+                channels = [channels]
+            self.update_channels(channels)
+            
 
     def df_2_tiledb(
         self,
@@ -824,7 +832,7 @@ class RawStrainWriter:
         self.write_df_to_tiledb(df_buffer)
         self.array.cleanup_meta()
 
-    def ts_2_tiledb(self, ts: Timeseries, cleanup: bool = False):
+    def ts_2_tiledb(self, ts, cleanup: bool = False):
         self.df_2_tiledb(
             df=ts.data,
             print_it=False,
