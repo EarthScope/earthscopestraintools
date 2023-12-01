@@ -1,6 +1,6 @@
 from earthscopestraintools.tiledbtools import ProcessedStrainWriter, ProcessedStrainReader, RawStrainReader, RawStrainWriter
 from earthscopestraintools.timeseries import Timeseries
-from earthscopestraintools.edid import get_station_edid
+#from earthscopestraintools.edid import get_station_edid
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         name=f"from {uri}"
     )
     ts.stats()
-    ts2 = ts.remove_999999s()
+    ts2 = ts.remove_fill_values(fill_value=999999)
     ts2.stats()
     uri2 = "arrays/test_write.tdb"
     writer = ProcessedStrainWriter(uri=uri2)

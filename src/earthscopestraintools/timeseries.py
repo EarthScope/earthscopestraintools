@@ -40,7 +40,7 @@ class Timeseries:
     - series: (str) description of timeseries, ie 'raw', 'microstrain', 'atmp_c', 'tide_c', 'offset_c', 'trend_c' \n
     - units: (str) units of timeseries \n
     - level: (str) level of data. ie. '0','1','2a','2b' \n
-    - period: (float) sample period of data \n
+    - period: (float) sample period of data.  If not provided, this will be inferred from the data \n
     - name: (str) name of timeseries, including station name.  useful for showing stats.  
       defaults to network.station \n
     - network: (str) FDSN two character network code\n
@@ -53,7 +53,7 @@ class Timeseries:
         series: str = "",
         units: str = "",
         level: str = "",
-        period: float = 0,
+        period: float = None,
         name: str = None,
         network: str = "",
         station: str = "",
@@ -70,10 +70,15 @@ class Timeseries:
         else:
             self.quality_df = self.set_initial_quality_flags()
 
+        if period is not None:
+            self.period = period
+        else:
+            self.infer_period()
+        
         self.series = series
         self.units = units
         self.level = level
-        self.period = period
+        
         self.network = network
         self.station = station
         if name:
@@ -85,8 +90,9 @@ class Timeseries:
     def set_data(self, df):
         self.data = df
 
-    def set_period(self, period):
-        self.period = period
+    def infer_period(self):
+        self.period = self.data.index.to_series().diff().median().total_seconds()
+        #logger.info(f'period is {self.period} seconds')
 
     def set_units(self, units):
         self.units = units
@@ -111,6 +117,7 @@ class Timeseries:
         for ch in self.columns:
             qual_df[ch] = "g"
             qual_df[ch][self.data[ch] == missing_data] = "m"
+            qual_df[self.data.isna()] = "m"
 
         # print(qual_df.value_counts())
         return qual_df
@@ -249,14 +256,55 @@ class Timeseries:
     #         "Error, no local array specified.  Set with Timeseries.set_local_tdb_uri()"
     #     )
 
-    def remove_999999s(
+    # def remove_999999s(
+    #     self,
+    #     interpolate: bool = False,
+    #     method: str = "linear",
+    #     limit_direction: str = "both",
+    #     limit: any = None,
+    # ):
+    #     """remove 999999 gap fill values from data, options to either replace with nans or interpolate
+
+    #     :param interpolate: boolean of whether to interpolate across gaps using pd.DataFrame.interpolate(), defaults to False
+    #     :type interpolate: bool, optional
+    #     :param method: interpolation method from pd.DataFrame.interpolate(), defaults to "linear"
+    #     :type method: str, optional
+    #     :param limit_direction: limit direction from pd.DataFrame.interpolate(), defaults to "both"
+    #     :type limit_direction: str, optional
+    #     :param limit: limit from pd.DataFrame.interpolate(), defaults to None
+    #     :type limit: any, optional
+    #     :return: Timeseries with 999999 gap fills removed, and appropriate flags set 
+    #     :rtype: Timeseries
+    #     """
+    #     logger.info("  Converting 999999 values to nan")
+    #     if interpolate:
+    #         df = self.data.replace(999999, np.nan).interpolate(
+    #             method=method, limit_direction=limit_direction, limit=limit
+    #         )
+    #         quality_df = self.quality_df.replace("m", "i")
+    #     else:
+    #         df = self.data.replace(999999, np.nan)
+    #         quality_df = self.quality_df
+
+    #     return Timeseries(
+    #         data=df,
+    #         quality_df=quality_df,
+    #         series=self.series,
+    #         period=self.period,
+    #         units=self.units,
+    #         level=self.level,
+    #         name=self.name,
+    #     )
+    
+    def remove_fill_values(
         self,
+        fill_value,
         interpolate: bool = False,
         method: str = "linear",
         limit_direction: str = "both",
         limit: any = None,
     ):
-        """remove 999999 gap fill values from data, options to either replace with nans or interpolate
+        """remove gap fill values from data, options to either replace with nans or interpolate
 
         :param interpolate: boolean of whether to interpolate across gaps using pd.DataFrame.interpolate(), defaults to False
         :type interpolate: bool, optional
@@ -266,17 +314,17 @@ class Timeseries:
         :type limit_direction: str, optional
         :param limit: limit from pd.DataFrame.interpolate(), defaults to None
         :type limit: any, optional
-        :return: Timeseries with 999999 gap fills removed, and appropriate flags set 
+        :return: Timeseries with fill_value gap fills removed, and appropriate flags set 
         :rtype: Timeseries
         """
-        logger.info("  Converting 999999 values to nan")
+        logger.info(f"  Converting {fill_value} gap fill values to nan")
         if interpolate:
-            df = self.data.replace(999999, np.nan).interpolate(
+            df = self.data.replace(fill_value, np.nan).interpolate(
                 method=method, limit_direction=limit_direction, limit=limit
             )
             quality_df = self.quality_df.replace("m", "i")
         else:
-            df = self.data.replace(999999, np.nan)
+            df = self.data.replace(fill_value, np.nan)
             quality_df = self.quality_df
 
         return Timeseries(
@@ -918,7 +966,7 @@ class Timeseries:
         else:
             fig.suptitle(self.name)
         if remove_9s:
-            df = self.remove_999999s(interpolate=False).data
+            df = self.remove_fill_values(fill_value=999999, interpolate=False).data
         else:
             df = self.data.copy()
         if zero:

@@ -435,6 +435,7 @@ class ProcessedStrainReader:
         start_dt: datetime.datetime = None,
         end_dt: datetime.datetime = None,
         print_array_range=False,
+        fill_value: int = 999999,
         to_na=True,
     ):
         if attrs is None:
@@ -481,7 +482,7 @@ class ProcessedStrainReader:
             name=name,
         )
         if to_na:
-            ts = ts.remove_999999s(interpolate=False)
+            ts = ts.remove_fill_values(fill_value=fill_value, interpolate=False)
         return ts
 
 
@@ -718,6 +719,7 @@ class RawStrainReader:
         end_str: str = None,
         start_dt: datetime.datetime = None,
         end_dt: datetime.datetime = None,
+        fill_value: int = 999999,
         to_nan: bool = True,
         name: str = "",
     ):
@@ -746,8 +748,8 @@ class RawStrainReader:
             name=name,
         )
         if to_nan:
-            logger.info("Converting missing data from 999999 to nan")
-            return ts.remove_999999s()
+            logger.info(f"Converting missing data from {fill_value} to nan")
+            return ts.remove_fill_values(fill_value=fill_value)
         else:
             return ts
 
