@@ -45,6 +45,7 @@ class Timeseries:
       defaults to network.station \n
     - network: (str) FDSN two character network code\n
     - station: (str) FDSN four character station code
+    - show_stats: (bool) Print gap analysis. Defaults to True
     """
     def __init__(
         self,
@@ -57,6 +58,7 @@ class Timeseries:
         name: str = None,
         network: str = "",
         station: str = "",
+        show_stats: bool = True
     ):
         if data is not None:
             self.data = data
@@ -85,7 +87,7 @@ class Timeseries:
             self.name = name
         else:
             self.name = f"{self.network}.{self.station}"
-        self.check_for_gaps()
+        self.check_for_gaps(show_stats)
 
     def set_data(self, df):
         self.data = df
@@ -147,7 +149,7 @@ class Timeseries:
             version_df[ch] = version
         return version_df
 
-    def check_for_gaps(self):
+    def check_for_gaps(self, show_stats=True):
         """generates some statistics around nans, fill values, and missing epochs.
         """
         if self.period != 0 and self.data is not None:
@@ -162,11 +164,12 @@ class Timeseries:
             # print(self.nans, self.nines, self.epochs, expected_epochs)
             self.gap_percentage = round((1 - (self.epochs / expected_epochs)) * 100, 2)
 
-            logger.info(
-                f"    Found {self.nans} epochs with nans, {self.nines} epochs with 999999s, and "
-                f"{expected_epochs - len(self.data)} missing epochs.\n    Total missing data is "
-                f"{self.gap_percentage}%"
-            )
+            if show_stats:
+                logger.info(
+                    f"    Found {self.nans} epochs with nans, {self.nines} epochs with 999999s, and "
+                    f"{expected_epochs - len(self.data)} missing epochs.\n    Total missing data is "
+                    f"{self.gap_percentage}%"
+                )
         else:
             self.gaps = None
             self.gap_percentage = None
@@ -198,6 +201,63 @@ class Timeseries:
                 )
             logger.info(f"{outputstring}")
 
+    def truncate(self, new_start = None, new_end = None, in_place=False, show_stats=True):
+        """Uses pandas.DataFrame.truncate() to trim the start and/or end of a Timeseries object
+
+        :param new_start: new beginning of Timeseries, defaults to None
+        :type new_start: date, str, int, optional
+        :param new_end: new end of Timeseries, defaults to None
+        :type new_end: date, str, int, optional
+        :return: truncated Timeseries object
+        :rtype: Timeseries
+        """
+        logger.info(f"Truncating {self.name}")
+        if new_start and new_end:
+            df = self.data.truncate(before=new_start, after=new_end)
+            quality_df = self.quality_df.truncate(before=new_start, after=new_end)
+        elif new_start:
+            df = self.data.truncate(before=new_start)
+            quality_df = self.quality_df.truncate(before=new_start)
+        elif new_end:
+            df = self.data.truncate(after=new_end)
+            quality_df = self.quality_df.truncate(after=new_end)
+        if in_place:
+            self.data = df
+            self.quality_df = quality_df
+            self.check_for_gaps(show_stats)
+        else:  
+            return Timeseries(
+                data=df,
+                quality_df=quality_df,
+                series=self.series,
+                period=self.period,
+                units=self.units,
+                level=self.level,
+                name=self.name,
+            )
+    
+    def append(self, ts2, in_place=False, show_stats=True):
+        if self.series == ts2.series and self.columns == ts2.columns and self.period == ts2.period:
+            df = pd.concat([self.data,ts2.data])
+            quality_df = pd.concat([self.quality_df,ts2.quality_df])
+            if in_place:
+                self.data = df
+                self.quality_df = quality_df
+                self.check_for_gaps(show_stats)
+            else:    
+                return Timeseries(
+                    data=df,
+                    quality_df=quality_df,
+                    series=self.series,
+                    period=self.period,
+                    units=self.units,
+                    level=self.level,
+                    name=self.name,
+                    )
+        else:
+            logger.error(f"Append requires series, columns, and period to match between the two Timeseries objects")
+    
+    
     def show_flags(self):
         """returns a dataframe with all flags that are not 'g'
 
@@ -214,7 +274,7 @@ class Timeseries:
         """
         return self.data[self.quality_df[self.quality_df != "g"].any(axis=1)]
 
-
+    
     def save_csv(self, filename: str, datadir: str = "./", sep=",", compression=None):
         """save data attribute as csv.  flattens object, does not save quality flags, level, or version information
 
@@ -303,6 +363,7 @@ class Timeseries:
         method: str = "linear",
         limit_direction: str = "both",
         limit: any = None,
+        show_stats: bool = True
     ):
         """remove gap fill values from data, options to either replace with nans or interpolate
 
@@ -314,10 +375,13 @@ class Timeseries:
         :type limit_direction: str, optional
         :param limit: limit from pd.DataFrame.interpolate(), defaults to None
         :type limit: any, optional
+        :param show_stats: show gap analysis, defaults to True
+        :type show_stats: Bool, optional
         :return: Timeseries with fill_value gap fills removed, and appropriate flags set 
         :rtype: Timeseries
         """
-        logger.info(f"  Converting {fill_value} gap fill values to nan")
+        if show_stats:
+            logger.info(f"  Converting {fill_value} gap fill values to nan")
         if interpolate:
             df = self.data.replace(fill_value, np.nan).interpolate(
                 method=method, limit_direction=limit_direction, limit=limit
@@ -335,6 +399,7 @@ class Timeseries:
             units=self.units,
             level=self.level,
             name=self.name,
+            show_stats=show_stats
         )
 
     def decimate_1s_to_300s(
