@@ -68,6 +68,7 @@ class GtsmMetadata:
         self.strain_matrices = {k: v for k, v in matrices.items()}
         self.atmp_response = self.get_atmp_response()
         self.tidal_params = self.get_tidal_params()
+        self.detrend_params = self.get_detrend_params()
 
     #        self.xml = self.get_xml()
     #        self.detrend = self.get_detrend_xml()
@@ -349,6 +350,60 @@ class GtsmMetadata:
         reference_strains["CH3"] = int(self.meta_df.loc[self.station]["L3(cnts)"])
         return reference_strains
 
+    def get_detrend_params(self):
+        try:
+            url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
+
+            with request.urlopen(url) as response:
+                lines = response.readlines()
+            detrend_params = {}
+            for i, line in enumerate(lines):
+                line = line.decode("utf-8").rstrip()
+                if line.startswith("Borehole Trend Models"):
+                    keys = lines[i + 1].decode("utf-8").rstrip().split()[1:]
+                    detrend_params[lines[i + 2].decode("utf-8").rstrip().split()[0]] = {
+                        keys[0]: lines[i + 2].decode("utf-8").rstrip().split()[1],
+                        keys[1]: lines[i + 2].decode("utf-8").rstrip().split()[2],
+                        keys[2]: lines[i + 2].decode("utf-8").rstrip().split()[3],
+                        keys[3]: lines[i + 2].decode("utf-8").rstrip().split()[4],
+                        keys[4]: lines[i + 2].decode("utf-8").rstrip().split()[5],
+                        keys[5]: lines[i + 2].decode("utf-8").rstrip().split()[6],
+                    }
+                    detrend_params[lines[i + 3].decode("utf-8").rstrip().split()[0]] = {
+                        keys[0]: lines[i + 3].decode("utf-8").rstrip().split()[1],
+                        keys[1]: lines[i + 3].decode("utf-8").rstrip().split()[2],
+                        keys[2]: lines[i + 3].decode("utf-8").rstrip().split()[3],
+                        keys[3]: lines[i + 3].decode("utf-8").rstrip().split()[4],
+                        keys[4]: lines[i + 3].decode("utf-8").rstrip().split()[5],
+                        keys[5]: lines[i + 3].decode("utf-8").rstrip().split()[6],
+                    }
+                    detrend_params[lines[i + 4].decode("utf-8").rstrip().split()[0]] = {
+                        keys[0]: lines[i + 4].decode("utf-8").rstrip().split()[1],
+                        keys[1]: lines[i + 4].decode("utf-8").rstrip().split()[2],
+                        keys[2]: lines[i + 4].decode("utf-8").rstrip().split()[3],
+                        keys[3]: lines[i + 4].decode("utf-8").rstrip().split()[4],
+                        keys[4]: lines[i + 4].decode("utf-8").rstrip().split()[5],
+                        keys[5]: lines[i + 4].decode("utf-8").rstrip().split()[6],
+                    }
+                    detrend_params[lines[i + 5].decode("utf-8").rstrip().split()[0]] = {
+                        keys[0]: lines[i + 5].decode("utf-8").rstrip().split()[1],
+                        keys[1]: lines[i + 5].decode("utf-8").rstrip().split()[2],
+                        keys[2]: lines[i + 5].decode("utf-8").rstrip().split()[3],
+                        keys[3]: lines[i + 5].decode("utf-8").rstrip().split()[4],
+                        keys[4]: lines[i + 5].decode("utf-8").rstrip().split()[5],
+                        keys[5]: lines[i + 5].decode("utf-8").rstrip().split()[6],
+                    }
+                    try:
+                        detrend_params['detrend_date'] = lines[i + 6].decode("utf-8").rstrip().split()[3]
+                    except IndexError:
+                        logger.error('No detrend date found.')
+                        detrend_params['detrend_date'] = None
+                    
+            return detrend_params
+        except Exception as e:
+            logger.error("Could not read detrend params")
+            return None
+
     # def get_linearization_params_xml(self):
     #     # get reference strains from xml
     #     linear_dict = self.xml["strain_xml"]["inst_info"]["processing"][
@@ -515,6 +570,7 @@ class GtsmMetadata:
         # logger.info(self.atmp_response)
         logger.info(f"tidal_params:\n {self.tidal_params}")
         # logger.info(self.tidal_params)
+        logger.info(f"detrend_params:\n {self.detrend_params}")
 
         # print("reference strains:")
         # pp.pprint(self.linearization)
