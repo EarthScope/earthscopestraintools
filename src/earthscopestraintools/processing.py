@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy import signal, stats
 import subprocess
+import datetime
 
 #from earthscopestraintools.gtsm_metadata import GtsmMetadata
 import logging
@@ -416,6 +417,34 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
             df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - df.index[0].timestamp())*slope
     # print("df_trend_c", df_trend_c)
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
+
+def calculate_double_exponential_trend_correction(df, detrend_params):
+    """Use parameters from station metadata to calculate a double exponential trend correction.  Only 
+    works on gauge data (there are no detrend parameters in the metadata for regional strains)
+
+    :param df: uncorrected data, as dataframe with datetime index and CH0-CH3 as columns
+    :type df: pd.DataFrame
+    :param detrend_params: detrend_params dictionary loaded by GtsmMetadata module
+    :type detrend_params: dictionary
+    :return: trend correction timeseries for CH0-CH3
+    :rtype: _type_
+    """
+    channels = ['CH0', 'CH1', 'CH2', 'CH3']
+    if detrend_params['detrend_date'] is not None:
+        detrend_start = datetime.datetime.strptime(detrend_params['detrend_date'], '%Y-%m-%dT%H:%M:%S')
+        times = df.index._data - detrend_start
+        days = times.total_seconds() / 86400
+        detrend_df = pd.DataFrame(index=df.index) 
+        for channel in channels:
+            dtp = detrend_params[channel]
+            data = (float(dtp['F']) + 
+                float(dtp['A1'])  *  np.exp(days * float(dtp['T1'])) + 
+                float(dtp['M']) * days + 
+                float(dtp['A2']) * np.exp(days * float(dtp['T2'])))
+            detrend_df[channel] = data
+    else:
+        detrend_df = pd.DataFrame(index=df.index, columns=channels, data=0)
+    return detrend_df
 
 
 def calculate_tide_correction(df, period, tidal_parameters, longitude):

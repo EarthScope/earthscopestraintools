@@ -14,6 +14,7 @@ from earthscopestraintools.processing import (
     calculate_pressure_correction,
     calculate_tide_correction,
     calculate_linear_trend_correction,
+    calculate_double_exponential_trend_correction,
     baytap_analysis
 )
 from earthscopestraintools.event_processing import dynamic_strain, calculate_magnitude
@@ -800,6 +801,21 @@ class Timeseries:
         )
         return ts
 
+    def double_exponential_trend_correction(self, detrend_params, name: str = None):
+        df = calculate_double_exponential_trend_correction(self.data, detrend_params)
+        if not name:
+            name = f"{self.name}.trend_c"
+        ts = Timeseries(
+            data=df,
+            series="trend_c",
+            units="microstrain",
+            period=self.period,
+            level="2a",
+            name=name,
+        )
+        return ts
+
+    
     def apply_corrections(self, corrections: list = [], name: str = None):
         """applies one or more corrections to a Timeseries and returns the corrected Timeseries
 
