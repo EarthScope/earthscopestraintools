@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy import signal, stats
+from scipy.optimize import curve_fit
 import subprocess
 import datetime
 
@@ -446,6 +447,31 @@ def calculate_double_exponential_trend_correction(df, detrend_params):
         detrend_df = pd.DataFrame(index=df.index, columns=channels, data=0)
     return detrend_df
 
+def double_exponential_trend_model(t,F,A1,T1,M,A2,T2):
+  return F+A1*np.exp(T1*t)+M*t+A2*np.exp(T2*t) 
+
+def update_double_exponential_detrend_params(df, detrend_params):
+    channels = ['CH0', 'CH1', 'CH2', 'CH3']
+    new_detrend_params = {}
+    detrend_start = datetime.datetime.strptime(detrend_params['detrend_date'], '%Y-%m-%dT%H:%M:%S')
+    times = df.index._data - detrend_start
+    days = times.total_seconds() / 86400
+    for channel in channels:
+        F = float(detrend_params[channel]['F'])
+        A1 = float(detrend_params[channel]['A1'])
+        T1 = float(detrend_params[channel]['T1'])
+        M = float(detrend_params[channel]['M'])
+        A2 = float(detrend_params[channel]['A2'])
+        T2 = float(detrend_params[channel]['T2'])
+        popt, pcov = curve_fit(double_exponential_trend_model, days, df[channel].values, p0=[F,A1,T1,M,A2,T2])
+        new_detrend_params[channel] = {'F': popt[0],
+                                       'A1': popt[1],
+                                       'T1': popt[2],
+                                       'M': popt[3],
+                                       'A2': popt[4],
+                                       'T2': popt[5]}
+    new_detrend_params['detrend_date'] = detrend_params['detrend_date']
+    return new_detrend_params
 
 def calculate_tide_correction(df, period, tidal_parameters, longitude):
     """Generate tidal correction timeseries using SPOTL hartid
