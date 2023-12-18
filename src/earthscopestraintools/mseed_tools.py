@@ -63,7 +63,7 @@ def load_mseed_to_df(
     #
     freq = df.index.to_series().diff().median()
     timestamps = pd.date_range(start=start, end=end, freq=freq, inclusive='left')
-    df2 = df.reindex(timestamps)
+    df2 = df.reindex(timestamps, method='nearest')
     df2.index.name = "time"
     return df2
 
