@@ -448,9 +448,38 @@ def calculate_double_exponential_trend_correction(df, detrend_params):
     return detrend_df
 
 def double_exponential_trend_model(t,F,A1,T1,M,A2,T2):
-  return F+A1*np.exp(T1*t)+M*t+A2*np.exp(T2*t) 
+    """The model used to fit a double exponential trend
+
+    :param t: _description_
+    :type t: _type_
+    :param F: _description_
+    :type F: _type_
+    :param A1: _description_
+    :type A1: _type_
+    :param T1: _description_
+    :type T1: _type_
+    :param M: _description_
+    :type M: _type_
+    :param A2: _description_
+    :type A2: _type_
+    :param T2: _description_
+    :type T2: _type_
+    :return: _description_
+    :rtype: _type_
+    """
+    return F+A1*np.exp(T1*t)+M*t+A2*np.exp(T2*t) 
 
 def update_double_exponential_detrend_params(df, detrend_params):
+    """method to recalculate the six detrend coeffiecients for each channel.  As implemented,
+    this iterates on the coeffiecients in the metadata.  If there are none, 
+
+    :param df: _description_
+    :type df: _type_
+    :param detrend_params: _description_
+    :type detrend_params: _type_
+    :return: _description_
+    :rtype: _type_
+    """
     channels = ['CH0', 'CH1', 'CH2', 'CH3']
     new_detrend_params = {}
     detrend_start = datetime.datetime.strptime(detrend_params['detrend_date'], '%Y-%m-%dT%H:%M:%S')
