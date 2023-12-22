@@ -14,9 +14,11 @@ from earthscopestraintools.processing import (
     calculate_pressure_correction,
     calculate_tide_correction,
     calculate_linear_trend_correction,
+    baytap_analysis, 
+    get_eig,
     calculate_double_exponential_trend_correction,
-    baytap_analysis
 )
+
 from earthscopestraintools.event_processing import dynamic_strain, calculate_magnitude
 from earthscopestraintools.strain_visualization import strain_video
 from scipy import signal, stats
@@ -939,6 +941,32 @@ class Timeseries:
                                          dmin=0.001)
 
         return baytap_results
+    
+    def get_eig(self, name: str = None):
+        '''
+        Tool to extract eigenvalues and azimuth's (from north) from a timeseries with areal (Eee+Enn), differential (Eee-Enn), and engineering shear strain (2Een). 
+        :param df: dataframe with areal (Eee+Enn), differential (Eee-Enn), and engineering shear strain (2Een) columns
+        :type df: pd.DataFrame
+        :param name: name for new Timeseries, defaults to None
+        :type name: str, optional
+        :return: Timeseries containing amplitudes and azimuths (degrees from north) for the two eigenvectors
+        :rtype: Timeseries
+        '''
+        amp1, az1, amp2, az2 = get_eig(self.data)
+        df2 = pd.DataFrame(index=self.data.index)
+        df2['amp1'], df2['az1'] = amp1, az1
+        df2['amp2'], df2['az2'] = amp2, az2
+
+        return Timeseries(
+            data=df2,
+            quality_df=self.quality_df,
+            series="eigenvalues",
+            units="microstrain/degrees",
+            period=self.period,
+            level=self.level,
+            name=name,
+        )
+
 
     def strain_video(
         self,

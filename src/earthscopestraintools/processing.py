@@ -403,7 +403,7 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
         # Mean syndonic month, divided by lunar cycles (so 1 day)
         windowed_df.index = windowed_df.time
         tdiff = (29*24*60*60+12*60*60+44*60)/30 # seconds
-        end = pd.to_datetime(windowed_df.time[-1].timestamp() - tdiff,unit='s')
+        end = pd.to_datetime(windowed_df.time.iloc[-1].timestamp() - tdiff,unit='s')
         df1 = windowed_df[:end]
         df2 = windowed_df[len(windowed_df)-len(df1):]
         # actual time difference after shifting dataframes
@@ -415,7 +415,7 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
             tmp = med[med<(np.median(med)+medmad_std_dev1*2)]
             med_2sig = tmp[tmp>(np.median(med)-medmad_std_dev1*2)]
             slope = np.median(med_2sig)
-            df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - df.index[0].timestamp())*slope
+            df_trend_c[ch] = (pd.to_numeric(df.index)/1e9 - df.index[0].timestamp())*slope
     # print("df_trend_c", df_trend_c)
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
@@ -764,3 +764,58 @@ def spotl_predict_tides(latitude,longitude,elevation,glob_oc,reg_oc,greenf):
     subprocess.run('docker rm -f spotl',shell=True)
     print('Docker container stopped and removed.')
     return pred_tides
+
+def get_eig(df:pd.DataFrame):
+    '''
+    Tool to extract eigenvalues and azimuth's (from north) from a timeseries with areal (Eee+Enn), differential (Eee-Enn), and engineering shear strain (2Een). 
+    :param df: dataframe with areal (Eee+Enn), differential (Eee-Enn), and engineering shear strain (2Een) columns
+    :type df: pd.DataFrame
+    :return: Amplitudes and azimuths for the two eigenvectors in order, amp1, az1, amp2, az2
+    :rtype: np.array
+    '''
+
+    df = df - df.iloc[0]
+    time = df.index
+    df.index = np.arange(0,len(time))
+
+    prev_eigenvalues = None
+    consistent_ordering = []
+
+    amp1_list, az1_list, amp2_list, az2_list= [], [], [], []
+
+    for index, row in df.iterrows():
+        # Extracting relevant columns from the DataFrame
+        N = 0.5 * (row['Eee+Enn'] - row['Eee-Enn'])
+        E = 0.5 * (row['Eee+Enn'] + row['Eee-Enn'])
+        EN = 0.5 * (row['2Ene'])
+
+        # Forming the matrix
+        matrix = np.array([[E, EN], [EN, N]])
+
+        # Compute eigenvalues and eigenvectors
+        eigenvalues, eigenvectors = np.linalg.eig(matrix)
+
+        if prev_eigenvalues is not None:
+            # Calculate similarity metric (here, overlap of eigenvectors)
+            similarity_metric = np.abs(np.dot(np.conj(prev_eigenvectors.T), eigenvectors))
+            
+            # Determine the permutation to maintain consistent labeling
+            permutation = np.argmax(similarity_metric, axis=0)
+            consistent_ordering.append(permutation)
+        else:
+            consistent_ordering.append(np.arange(len(eigenvalues)))
+
+        # Rearrange eigenvalues and eigenvectors based on consistent_ordering
+        permutation = consistent_ordering[index]
+        eigenvalues = eigenvalues[permutation]
+        eigenvectors = eigenvectors[:, permutation]
+
+        amp1_list.append(eigenvalues[0])
+        az1_list.append((90 - np.degrees(np.arctan2(eigenvectors[0, 1], eigenvectors[0, 0]))) % 360)
+        amp2_list.append(eigenvalues[1])
+        az2_list.append((90 - np.degrees(np.arctan2(eigenvectors[1, 1], eigenvectors[1, 0]))) % 360)
+
+        prev_eigenvalues = eigenvalues
+        prev_eigenvectors = eigenvectors
+
+    return np.array(amp1_list), np.array(az1_list), np.array(amp2_list), np.array(az2_list)
