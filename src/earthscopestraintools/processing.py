@@ -401,7 +401,7 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
         # Mean syndonic month, divided by lunar cycles (so 1 day)
         windowed_df.index = windowed_df.time
         tdiff = (29*24*60*60+12*60*60+44*60)/30 # seconds
-        end = pd.to_datetime(windowed_df.time[-1].timestamp() - tdiff,unit='s')
+        end = pd.to_datetime(windowed_df.time.iloc[-1].timestamp() - tdiff,unit='s')
         df1 = windowed_df[:end]
         df2 = windowed_df[len(windowed_df)-len(df1):]
         # actual time difference after shifting dataframes
@@ -413,7 +413,7 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
             tmp = med[med<(np.median(med)+medmad_std_dev1*2)]
             med_2sig = tmp[tmp>(np.median(med)-medmad_std_dev1*2)]
             slope = np.median(med_2sig)
-            df_trend_c[ch] = (pd.to_numeric(df.index)/1e6 - df.index[0].timestamp())*slope
+            df_trend_c[ch] = (pd.to_numeric(df.index)/1e9 - df.index[0].timestamp())*slope
     # print("df_trend_c", df_trend_c)
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
