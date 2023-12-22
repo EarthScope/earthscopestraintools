@@ -61,11 +61,12 @@ def load_mseed_to_df(
     
     df = mseed2pandas(st, print_traces=print_traces)
     #
-    freq = df.index.to_series().diff().median()
-    timestamps = pd.date_range(start=start, end=end, freq=freq, inclusive='left')
-    df2 = df.reindex(timestamps)
-    df2.index.name = "time"
-    return df2
+    #freq = df.index.to_series().diff().median()
+    #timestamps = pd.date_range(start=start, end=end, freq=freq, inclusive='left')
+    #df2 = df.reindex(timestamps, method='nearest')
+    #df2 = df.reindex(timestamps, method=None)
+    #df2.index.name = "time"
+    return df
 
 
 def load_mseed_file_to_df(filename: str):
@@ -150,7 +151,7 @@ def download_mseed(
     except HTTPError as e:
         logger.error(f"{net} {sta} No data found for specified query {url}")
         st = Stream()
-    return st
+    return st.merge(fill_value=999999)
 
 
 def mseed2pandas(st: Stream, print_traces=True):

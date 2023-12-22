@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 from scipy import signal, stats
+from scipy.optimize import curve_fit
 import subprocess
+import datetime
 
 #from earthscopestraintools.gtsm_metadata import GtsmMetadata
 import logging
@@ -417,6 +419,88 @@ def calculate_linear_trend_correction(df, method='linear',trend_start=None, tren
     # print("df_trend_c", df_trend_c)
     return df_trend_c[df.columns].set_index(df_trend_c["time"])
 
+def calculate_double_exponential_trend_correction(df, detrend_params):
+    """Use parameters from station metadata to calculate a double exponential trend correction.  Only 
+    works on gauge data (there are no detrend parameters in the metadata for regional strains)
+
+    :param df: uncorrected data, as dataframe with datetime index and CH0-CH3 as columns
+    :type df: pd.DataFrame
+    :param detrend_params: detrend_params dictionary loaded by GtsmMetadata module
+    :type detrend_params: dictionary
+    :return: trend correction timeseries for CH0-CH3
+    :rtype: _type_
+    """
+    channels = ['CH0', 'CH1', 'CH2', 'CH3']
+    if detrend_params['detrend_date'] is not None:
+        detrend_start = datetime.datetime.strptime(detrend_params['detrend_date'], '%Y-%m-%dT%H:%M:%S')
+        times = df.index._data - detrend_start
+        days = times.total_seconds() / 86400
+        detrend_df = pd.DataFrame(index=df.index) 
+        for channel in channels:
+            dtp = detrend_params[channel]
+            data = (float(dtp['F']) + 
+                float(dtp['A1'])  *  np.exp(days * float(dtp['T1'])) + 
+                float(dtp['M']) * days + 
+                float(dtp['A2']) * np.exp(days * float(dtp['T2'])))
+            detrend_df[channel] = data
+    else:
+        detrend_df = pd.DataFrame(index=df.index, columns=channels, data=0)
+    return detrend_df
+
+def double_exponential_trend_model(t,F,A1,T1,M,A2,T2):
+    """The model used to fit a double exponential trend
+
+    :param t: _description_
+    :type t: _type_
+    :param F: _description_
+    :type F: _type_
+    :param A1: _description_
+    :type A1: _type_
+    :param T1: _description_
+    :type T1: _type_
+    :param M: _description_
+    :type M: _type_
+    :param A2: _description_
+    :type A2: _type_
+    :param T2: _description_
+    :type T2: _type_
+    :return: _description_
+    :rtype: _type_
+    """
+    return F+A1*np.exp(T1*t)+M*t+A2*np.exp(T2*t) 
+
+def update_double_exponential_detrend_params(df, detrend_params):
+    """method to recalculate the six detrend coeffiecients for each channel.  As implemented,
+    this iterates on the coeffiecients in the metadata.  If there are none, 
+
+    :param df: _description_
+    :type df: _type_
+    :param detrend_params: _description_
+    :type detrend_params: _type_
+    :return: _description_
+    :rtype: _type_
+    """
+    channels = ['CH0', 'CH1', 'CH2', 'CH3']
+    new_detrend_params = {}
+    detrend_start = datetime.datetime.strptime(detrend_params['detrend_date'], '%Y-%m-%dT%H:%M:%S')
+    times = df.index._data - detrend_start
+    days = times.total_seconds() / 86400
+    for channel in channels:
+        F = float(detrend_params[channel]['F'])
+        A1 = float(detrend_params[channel]['A1'])
+        T1 = float(detrend_params[channel]['T1'])
+        M = float(detrend_params[channel]['M'])
+        A2 = float(detrend_params[channel]['A2'])
+        T2 = float(detrend_params[channel]['T2'])
+        popt, pcov = curve_fit(double_exponential_trend_model, days, df[channel].values, p0=[F,A1,T1,M,A2,T2])
+        new_detrend_params[channel] = {'F': popt[0],
+                                       'A1': popt[1],
+                                       'T1': popt[2],
+                                       'M': popt[3],
+                                       'A2': popt[4],
+                                       'T2': popt[5]}
+    new_detrend_params['detrend_date'] = detrend_params['detrend_date']
+    return new_detrend_params
 
 def calculate_tide_correction(df, period, tidal_parameters, longitude):
     """Generate tidal correction timeseries using SPOTL hartid

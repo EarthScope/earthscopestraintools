@@ -20,6 +20,7 @@ Welcome to the Earthscope Strain Tools documentation!
    notebooks/plot_event.ipynb
    notebooks/TidalCalibrationEarthscopestraintools.ipynb
    notebooks/baytap_demo.ipynb
+   notebooks/load_level2.ipynb
    api
 
 .. note:: 
