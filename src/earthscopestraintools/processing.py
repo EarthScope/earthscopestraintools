@@ -62,8 +62,6 @@ def apply_calibration_matrix(
     :return: areal, differential, and shear strains based on the given calibration
     :rtype: pd.DataFrame
     """
-    # todo: implement use channels
-    logger.info(f"Applying {calibration_matrix_name} matrix: {calibration_matrix}")
     areal = "Eee+Enn"
     differential = "Eee-Enn"
     shear = "2Ene"
@@ -71,8 +69,18 @@ def apply_calibration_matrix(
         areal += "." + calibration_matrix_name
         differential += "." + calibration_matrix_name
         shear += "." + calibration_matrix_name
+    gage_weights = np.array(
+            [
+                [use_channels[0], 0, 0, 0],
+                [0, use_channels[1], 0, 0],
+                [0, 0, use_channels[2], 0],
+                [0, 0, 0, use_channels[3]],
+            ])
+    coupling_matrix = np.matmul(gage_weights, np.array([[1,1,1],[1,1,1],[1,1,1],[1,1,1]]))
+    weighted_calibration_matrix = np.linalg.pinv(np.linalg.pinv(calibration_matrix)*coupling_matrix)
+    logger.info(f"Applying {calibration_matrix_name} matrix:\n {weighted_calibration_matrix}")
     regional_strain_df = np.matmul(
-        calibration_matrix, df[df.columns].transpose()
+        weighted_calibration_matrix, df[df.columns].transpose()
     ).transpose()
     regional_strain_df = regional_strain_df.rename(
         columns={0: areal, 1: differential, 2: shear}

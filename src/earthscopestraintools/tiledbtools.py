@@ -815,14 +815,18 @@ class RawStrainWriter:
         print_it - bool, optional.  show the constructed dataframe as it is being written to tiledb.
         """
         df_buffer = pd.DataFrame(columns=["channel", "time", "data"])
-        for ch in df.columns:
-            data = df[ch].values
+        for i, ch in enumerate(df.columns):
+            channel_df = df[ch].dropna()
+            data = channel_df.values
             # convert datetimeindex to unix ms
-            timestamps = df.index.astype(int) / 10**6
+            timestamps = channel_df.index.astype(int) / 10**6
 
             d = {"channel": ch, "time": timestamps, "data": data}
-            ch_df = pd.DataFrame(data=d)
-            df_buffer = pd.concat([df_buffer, ch_df], axis=0).reset_index(drop=True)
+            if i == 0:
+                df_buffer = pd.DataFrame(data=d)
+            else:
+                ch_df = pd.DataFrame(data=d)
+                df_buffer = pd.concat([df_buffer, ch_df], axis=0).reset_index(drop=True)
             if self.array_type == "int":
                 df_buffer["data"] = df_buffer["data"].astype(np.int32)
             elif self.array_type == "float":
@@ -833,10 +837,13 @@ class RawStrainWriter:
         self.write_df_to_tiledb(df_buffer)
         self.array.cleanup_meta()
 
-    def ts_2_tiledb(self, ts, cleanup: bool = False):
+    def ts_2_tiledb(self, 
+                    ts, 
+                    print_it: bool = False,
+                    cleanup: bool = False):
         self.df_2_tiledb(
             df=ts.data,
-            print_it=False,
+            print_it=print_it,
         )
         logger.info(f"Wrote {ts.columns} to {self.array.uri}")
         if cleanup:

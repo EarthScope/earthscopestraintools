@@ -64,6 +64,7 @@ class GtsmMetadata:
         # matrices['weighted_strain_matrix'] = self.make_weighted_strain_matrix(gauge_weights=gauge_weights)
         matrices["lab"] = self.get_lab_strain_matrix()
         matrices["ER2010"] = self.get_er2010_strain_matrix()
+        matrices["KH2013"] = self.get_kh2013_strain_matrix()
         matrices["CH_prelim"] = self.get_ch_prelim_strain_matrix()
         self.strain_matrices = {k: v for k, v in matrices.items()}
         self.atmp_response = self.get_atmp_response()
@@ -307,6 +308,35 @@ class GtsmMetadata:
             return None
         except Exception as e:
             logger.error("Could not load ER2010 strain matrix")
+            return None
+
+    def get_kh2013_strain_matrix(self):
+        """parse KH2013 strain matrix from station metadata if available.  From
+        Hodgkinson, K., J. Langbein, B. Henderson, D. Mencin, and A. Borsa (2013), 
+        Tidal calibration of plate boundary observatory borehole strainmeters, 
+        J. Geophys. Res. Solid Earth, 118, 447–458, doi:10.1029/2012JB009651.
+        
+        :return: KH2013 calibration matrix
+        :rtype: np.array
+        """
+        url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
+        try:
+            with request.urlopen(url) as response:
+                lines = response.readlines()
+            for i, line in enumerate(lines):
+                line = line.decode("utf-8").rstrip()
+                if line.startswith("  Hodgkinson et al. (2013) Tidal Calibration"):
+                    kh2013 = np.array(
+                        [
+                            lines[i + 1].decode("utf-8").rstrip().split()[1:],
+                            lines[i + 2].decode("utf-8").rstrip().split()[1:],
+                            lines[i + 3].decode("utf-8").rstrip().split()[1:],
+                        ]
+                    )
+                    return kh2013.astype(float)
+            return None
+        except Exception as e:
+            logger.error("Could not load KH2013 strain matrix")
             return None
 
     def get_ch_prelim_strain_matrix(self):
