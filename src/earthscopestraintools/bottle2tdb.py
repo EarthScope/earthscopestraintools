@@ -19,7 +19,7 @@ else:
     )
 
 
-def build_strain_buffer(gbt: GtsmBottleTar, session: str):
+def build_strain_buffer(gbt: GtsmBottleTar, session: str, list_channels: bool=True):
     '''
     Testing the doc?
     '''
@@ -34,7 +34,8 @@ def build_strain_buffer(gbt: GtsmBottleTar, session: str):
         bottle = gbt.load_bottle(name)
         bottle.parse_filename()
         if bottle.file_metadata["channel"] in ["CH0", "CH1", "CH2", "CH3"]:
-            # logger.info(bottle.file_metadata["channel"])
+            if list_channels:
+                logger.info(bottle.file_metadata["channel"])
             bottle.read_header()
             channel = bottle.file_metadata["channel"]
             timestamps = bottle.get_unix_ms_timestamps()
@@ -52,7 +53,7 @@ def build_strain_buffer(gbt: GtsmBottleTar, session: str):
     return tiledb_buffer
 
 
-def build_ancillary_buffer(gbt: GtsmBottleTar, session: str):
+def build_ancillary_buffer(gbt: GtsmBottleTar, session: str, list_channels: bool=True):
     logger.info(
         f"{gbt.file_metadata['filename']}: loading ancillary bottles into dataframe"
     )
@@ -61,7 +62,8 @@ def build_ancillary_buffer(gbt: GtsmBottleTar, session: str):
         bottle = gbt.load_bottle(name)
         bottle.parse_filename()
         if bottle.file_metadata["channel"] not in ["CH0", "CH1", "CH2", "CH3"]:
-            logger.info(bottle.file_metadata["channel"])
+            if list_channels:
+                logger.info(bottle.file_metadata["channel"])
             bottle.read_header()
             channel = bottle.file_metadata["channel"]
             timestamps = bottle.get_unix_ms_timestamps()
