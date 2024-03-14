@@ -122,6 +122,7 @@ class Timeseries:
         for ch in self.columns:
             qual_df[ch] = "g"
             qual_df[ch][self.data[ch] == missing_data] = "m"
+            #qual_df.loc[self.data[ch] == missing_data, ch] = "m"
             qual_df[self.data.isna()] = "m"
 
         # print(qual_df.value_counts())

@@ -6,6 +6,7 @@ import json
 import logging
 from typing import Union
 from earthscopestraintools.datasources_api_interact import get_session_edid
+from earthscopestraintools.timeseries import Timeseries
 
 logger = logging.getLogger(__name__)
 
@@ -571,7 +572,7 @@ class ProcessedStrainWriter:
         for ch in data_types:
             data = df[ch].values
             # convert datetimeindex to unix ms
-            timestamps = df.index.astype(int) / 10**6
+            timestamps = df.index.astype(int) / 10**3
             version = int(datetime.datetime.now().strftime("%Y%j%H%M%S"))
             quality = quality_df[ch].values
 
@@ -688,6 +689,15 @@ class RawStrainReader:
             else:
                 df2 = pd.concat([df2, df_channel], axis=1)
         return df2
+
+    # def fill_gaps(self, df, fill_value=999999):
+    #     #uses the first and last valid indexes as start/stop, 
+    #     #and creates missing timestamps in between with fill value
+    #     start = df.first_valid_index()
+    #     end = df.last_valid_index()
+    #     if self.period is None:
+    #         self.period = df.index.to_series().diff().median().total_seconds()
+        
 
     def check_query_result(self, df, start, end):
         if self.array.period is not None:
@@ -815,14 +825,18 @@ class RawStrainWriter:
         print_it - bool, optional.  show the constructed dataframe as it is being written to tiledb.
         """
         df_buffer = pd.DataFrame(columns=["channel", "time", "data"])
-        for ch in df.columns:
-            data = df[ch].values
+        for i, ch in enumerate(df.columns):
+            channel_df = df[ch].dropna()
+            data = channel_df.values
             # convert datetimeindex to unix ms
-            timestamps = df.index.astype(int) / 10**6
+            timestamps = channel_df.index.astype(int) / 10**3
 
             d = {"channel": ch, "time": timestamps, "data": data}
-            ch_df = pd.DataFrame(data=d)
-            df_buffer = pd.concat([df_buffer, ch_df], axis=0).reset_index(drop=True)
+            if i == 0:
+                df_buffer = pd.DataFrame(data=d)
+            else:
+                ch_df = pd.DataFrame(data=d)
+                df_buffer = pd.concat([df_buffer, ch_df], axis=0).reset_index(drop=True)
             if self.array_type == "int":
                 df_buffer["data"] = df_buffer["data"].astype(np.int32)
             elif self.array_type == "float":
@@ -833,10 +847,13 @@ class RawStrainWriter:
         self.write_df_to_tiledb(df_buffer)
         self.array.cleanup_meta()
 
-    def ts_2_tiledb(self, ts, cleanup: bool = False):
+    def ts_2_tiledb(self, 
+                    ts, 
+                    print_it: bool = False,
+                    cleanup: bool = False):
         self.df_2_tiledb(
             df=ts.data,
-            print_it=False,
+            print_it=print_it,
         )
         logger.info(f"Wrote {ts.columns} to {self.array.uri}")
         if cleanup:
