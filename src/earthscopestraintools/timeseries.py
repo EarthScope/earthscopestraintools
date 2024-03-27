@@ -28,6 +28,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# suppress scientific notation by setting float_format
+pd.options.display.float_format = '{:.0f}'.format
 
 def test():
     print("test1")
@@ -121,8 +123,8 @@ class Timeseries:
         qual_df = pd.DataFrame(index=self.data.index)
         for ch in self.columns:
             qual_df[ch] = "g"
-            qual_df[ch][self.data[ch] == missing_data] = "m"
-            #qual_df.loc[self.data[ch] == missing_data, ch] = "m"
+#            qual_df[ch][self.data[ch] == missing_data] = "m"
+            qual_df.loc[self.data[ch] == missing_data, ch] = "m"
             qual_df[self.data.isna()] = "m"
 
         # print(qual_df.value_counts())
@@ -406,8 +408,10 @@ class Timeseries:
             show_stats=show_stats
         )
 
-    def decimate_1s_to_300s(
-        self, method: str = "linear", limit: int = 3600, name: str = None
+    def decimate_1s_to_300s(self, 
+                            method: str = "linear", 
+                            limit: int = 3600,
+                            name: str = None
     ):
         """decimate 1hz data to 5 min data using \n
         Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
