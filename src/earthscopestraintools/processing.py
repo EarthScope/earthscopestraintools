@@ -377,9 +377,8 @@ def decimate_1s_to_300s(df: pd.DataFrame,
     
     This function will interpolate gaps up to 'limit' samples.  If gaps remain, 
     it will break the dataframe into continuous chunks, apply the filter to each one,
-    and then recombine into a single dataframe.
+    and then recombine into a single dataframe.  Remaining gaps are filled with nans.
 
-    
     :param df: 1 hz data
     :type df: pd.DataFrame
     :param method: method to interpolate across gaps, defaults to "linear"
@@ -405,7 +404,6 @@ def decimate_1s_to_300s(df: pd.DataFrame,
 
     new_index = decimated_df.asfreq('5min').index
     decimated_df = decimated_df.reindex(index=new_index)
-
     return decimated_df
 
 def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float = 0.75):

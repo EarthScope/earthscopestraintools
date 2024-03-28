@@ -28,8 +28,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# suppress scientific notation by setting float_format
-pd.options.display.float_format = '{:.0f}'.format
 
 def test():
     print("test1")
@@ -410,13 +408,14 @@ class Timeseries:
 
     def decimate_1s_to_300s(self, 
                             method: str = "linear", 
-                            limit: int = 3600,
+                            limit: int = 3600,                            
                             name: str = None
     ):
         """decimate 1hz data to 5 min data using \n
         Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
         low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99
 
+        
         :param method: method to interpolate across gaps, defaults to "linear"
         :type method: str, optional
         :param limit: largest gap to interpolate, defaults to 3600 samples
@@ -428,14 +427,17 @@ class Timeseries:
         """
         
         data = decimate_1s_to_300s(self.data, method=method, limit=limit)
+        #force counts to nearest int, but let other units keep float precision
+        if self.units == 'counts':
+            data = data.round(0)
         quality_df = self.quality_df.copy().reindex(data.index)
         quality_df[quality_df.isna()] = "i"
         # find any differences using the original data index
-        mask1 = (data.reindex(self.data.index) != self.data).any(axis=1)
+        mask1 = (data.reindex(self.data.index) g!= self.data).any(axis=1)
 
         # any nans from the original index
         mask2 = self.data[mask1].isna()
-        quality_df[mask2] = "i"
+        quality_df[mask2] = "m"
 
         # any 999999s from the original index
         mask3 = self.data[mask1] == 999999
