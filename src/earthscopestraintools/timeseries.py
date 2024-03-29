@@ -433,7 +433,7 @@ class Timeseries:
         quality_df = self.quality_df.copy().reindex(data.index)
         quality_df[quality_df.isna()] = "i"
         # find any differences using the original data index
-        mask1 = (data.reindex(self.data.index) g!= self.data).any(axis=1)
+        mask1 = (data.reindex(self.data.index) != self.data).any(axis=1)
 
         # any nans from the original index
         mask2 = self.data[mask1].isna()
