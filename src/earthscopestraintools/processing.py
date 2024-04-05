@@ -171,7 +171,7 @@ def is_continuous(df):
     
     df2 = df.dropna()
     period = df2.index.to_series().diff().median().total_seconds()
-    if (df2.index.diff() > pd.Timedelta(seconds=period)).sum() == 0:
+    if (df2.index.to_series().diff() > pd.Timedelta(seconds=period)).sum() == 0:
         return True
     else:
         return False
