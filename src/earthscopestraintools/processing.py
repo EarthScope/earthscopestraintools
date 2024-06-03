@@ -119,36 +119,6 @@ def butterworth_filter(
         df2[ch] = signal.filtfilt(bn, an, df[ch])
     return df2
 
-
-def interpolate(
-    df: pd.DataFrame,
-    replace: int = 999999,
-    method: str = "linear",
-    limit: int = 3600,
-    limit_direction="both",
-):
-    """Interpolate across gaps in data using pd.DataFrame.interpolate()
-
-    :param df: data to be interpolated
-    :type df: pd.DataFrame
-    :param replace: gap fill value to interpolate across, defaults to 999999
-    :type replace: int, optional
-    :param method: interpolation method, defaults to "linear"
-    :type method: str, optional
-    :param limit: max number of samples to interpolate, defaults to 3600
-    :type limit: int, optional
-    :param limit_direction: ['forward', 'backward', 'both'], defaults to "both"
-    :type limit_direction: str, optional
-    :return: interpolated data
-    :rtype: pd.DataFrame
-    """
-    logger.info(f"Interpolating data using method={method} and limit={limit}")
-    df2 = df.replace(replace, np.nan).interpolate(
-        method=method, limit_direction=limit_direction, limit=limit
-    )
-    return df2
-
-
 def decimate_to_hourly(df: pd.DataFrame):
     """decimates a timeseries to hourly by selecting the first and second and minute of each hour
 
@@ -162,27 +132,104 @@ def decimate_to_hourly(df: pd.DataFrame):
     df2 = df1[df1.index.second == 0]
     return df2
 
+def interpolate(
+    df: pd.DataFrame,
+    replace: int = 999999,
+    method: str = "linear",
+    limit: int = 3600,
+    limit_direction="forward",
+):
+    """Interpolate across gaps in data using pd.DataFrame.interpolate()
 
-def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3600):
+    :param df: data to be interpolated
+    :type df: pd.DataFrame
+    :param replace: gap fill value to interpolate across, defaults to 999999
+    :type replace: int, optional
+    :param method: interpolation method, defaults to "linear"
+    :type method: str, optional
+    :param limit: max number of samples to interpolate, defaults to 3600
+    :type limit: int, optional
+    :param limit_direction: ['forward', 'backward', 'both'], defaults to "forward"
+    :type limit_direction: str, optional
+    :return: interpolated data
+    :rtype: pd.DataFrame
+    """
+    logger.info(f"Interpolating data using method={method} and limit={limit}")
+    df2 = df.replace(replace, np.nan).interpolate(
+        method=method, limit_direction=limit_direction, limit=limit
+    )
+    return df2
+
+def is_continuous(df):
+    """Method to determine if there are gaps in a dataframe
+
+    :param df: dataframe
+    :type df: pd.DataFrame
+    :return: True if no gaps, False if there are gaps
+    :rtype: bool
+    """
+    
+    df2 = df.dropna()
+    period = df2.index.to_series().diff().median().total_seconds()
+    if (df2.index.to_series().diff() > pd.Timedelta(seconds=period)).sum() == 0:
+        return True
+    else:
+        return False
+
+def split_into_continuous_dataframes(df):
+    """Method for breaking gappy data into multiple continuous dataframes.  
+    Used for decimation of 1s data to 300s.
+
+    :param df: non-continuous dataframe 
+    :type df: pd.DataFrame
+    :return: list of continuous dataframes
+    :rtype: list[pd.DataFrame]
+    """
+    
+    df = df.dropna()
+    global_start = 0
+    global_stop = len(df)
+    local_starts = np.flatnonzero(np.diff(df.index) != pd.Timedelta(seconds=1)) + 1
+    starts = [global_start]
+    for local_start in local_starts:
+        starts.append(local_start)
+    list_of_df = []
+    for i, start in enumerate(starts):
+        if i + 1 < len(starts):
+            list_of_df.append(df.iloc[start:starts[i+1]])
+        else:
+            list_of_df.append(df.iloc[start:global_stop])    
+    return list_of_df
+
+def start_df_at_300s(df):
+    """Method to force 1hz data to start at a round 300s timestamp.  Will throw away
+    up to 299 s of data.  Used for prepping data for 300s decimation.
+
+    :param df: dataframe containing 1 hz data
+    :type df: pd.Dataframe
+    :return: dataframe containing 1 hz data 
+    :rtype: pd.Dataframe
+    """
+    
+    temp_index = df.index[df.index.second == 0]
+    new_start = temp_index[temp_index.minute % 5 == 0][0]
+    df = df[df.index>=new_start]
+    return df
+
+
+def apply_Agnew_2007(df: pd.DataFrame):
     """Filter and decimate 1hz data to 5 min data using \n
     Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
-    low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99
+    low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99 \n
 
-    :param df: 1 hz data
+    :param df: 1 hz continuous data
     :type df: pd.DataFrame
-    :param method: method to interpolate across gaps, defaults to "linear"
-    :type method: str, optional
-    :param limit: largest gap to interpolate, defaults to 3600 samples
-    :type limit: int, optional
     :return: 300s (5 min) data
     :rtype: pd.DataFrame
     """
-    logger.info(f"Decimating to 300s")
-    df2 = interpolate(df, method="linear", limit=limit)
-
     # zero the data to the first value prior to filtering
-    initial_values = df2.iloc[0]
-    df3 = df2 - initial_values
+    initial_values = df.loc[df.first_valid_index()]
+    df2 = df - initial_values
 
     # perform a 5 stage filter-and-decimate
     # 1s -> 2s -> 4s -> 12s -> 60s -> 300s
@@ -286,9 +333,9 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
 
     channels = df.columns
 
-    stage1 = pd.DataFrame(index=df3.index)
+    stage1 = pd.DataFrame(index=df2.index)
     for ch in channels:
-        data = df3[ch].values
+        data = df2[ch].values
         stage1[ch] = signal.lfilter(wtsdby2d, 1.0, data)
     stage1d = stage1.iloc[::2]
 
@@ -317,9 +364,47 @@ def decimate_1s_to_300s(df: pd.DataFrame, method: str = "linear", limit: int = 3
     stage5d = stage5.iloc[::5]
 
     # add back in the initial values
-    decimated_data = (stage5d + initial_values).astype(int)
+    decimated_data = (stage5d + initial_values)
     return decimated_data
 
+
+def decimate_1s_to_300s(df: pd.DataFrame, 
+                        method: str = "linear", 
+                        limit: int = 3600):
+    """Filter and decimate 1hz data to 5 min data using \n
+    Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
+    low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99\n
+    
+    This function will interpolate gaps up to 'limit' samples.  If gaps remain, 
+    it will break the dataframe into continuous chunks, apply the filter to each one,
+    and then recombine into a single dataframe.  Remaining gaps are filled with nans.
+
+    :param df: 1 hz data
+    :type df: pd.DataFrame
+    :param method: method to interpolate across gaps, defaults to "linear"
+    :type method: str, optional
+    :param limit: largest gap to interpolate, defaults to 3600 samples
+    :type limit: int, optional
+    :return: 300s (5 min) data
+    :rtype: pd.DataFrame
+    """
+    logger.info(f"Decimating to 300s")
+    df_interpolated = interpolate(df, method=method, limit=limit)
+    if is_continuous(df_interpolated):
+        df_clean = start_df_at_300s(df_interpolated)
+        decimated_df = apply_Agnew_2007(df_clean)  
+    else:
+        dfs = split_into_continuous_dataframes(df_interpolated)
+        logger.info(f"Found {len(dfs)-1} gap(s) larger than interpolation limit of {limit} samples")
+        decimated_dfs = []
+        for df in dfs:
+            df_clean = start_df_at_300s(df)
+            decimated_dfs.append(apply_Agnew_2007(df_clean))
+        decimated_df = pd.concat(decimated_dfs)
+
+    new_index = decimated_df.asfreq('5min').index
+    decimated_df = decimated_df.reindex(index=new_index)
+    return decimated_df
 
 def calculate_offsets(df, limit_multiplier: int = 10, cutoff_percentile: float = 0.75):
     """Calculate offsets using first differencing method (add more details).  

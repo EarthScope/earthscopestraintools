@@ -73,12 +73,12 @@ class Timeseries:
         if quality_df is not None:
             self.quality_df = quality_df
         else:
-            self.quality_df = self.set_initial_quality_flags()
+            self.quality_df = self._set_initial_quality_flags()
 
         if period is not None:
             self.period = period
         else:
-            self.infer_period()
+            self._infer_period()
         
         self.series = series
         self.units = units
@@ -95,8 +95,11 @@ class Timeseries:
     def set_data(self, df):
         self.data = df
 
-    def infer_period(self):
-        self.period = self.data.index.to_series().diff().median().total_seconds()
+    def _infer_period(self):
+        try: 
+            self.period = self.data.index.to_series().diff().median().total_seconds()
+        except AttributeError:
+            self.period = 0
         #logger.info(f'period is {self.period} seconds')
 
     def set_units(self, units):
@@ -110,7 +113,7 @@ class Timeseries:
     def set_s3_tdb_uri(self, s3_tdb_uri):
         self.s3_tdb_uri = s3_tdb_uri
 
-    def set_initial_quality_flags(self, missing_data=999999):
+    def _set_initial_quality_flags(self, missing_data=999999):
         """used to flag any missing data
 
         :param missing_data: value used to represent gaps, defaults to 999999
@@ -121,14 +124,14 @@ class Timeseries:
         qual_df = pd.DataFrame(index=self.data.index)
         for ch in self.columns:
             qual_df[ch] = "g"
-            qual_df[ch][self.data[ch] == missing_data] = "m"
-            #qual_df.loc[self.data[ch] == missing_data, ch] = "m"
+#            qual_df[ch][self.data[ch] == missing_data] = "m"
+            qual_df.loc[self.data[ch] == missing_data, ch] = "m"
             qual_df[self.data.isna()] = "m"
 
         # print(qual_df.value_counts())
         return qual_df
 
-    def set_initial_level_flags(self, level):
+    def _set_initial_level_flags(self, level):
         """used to set level flag 
 
         :param level: level of data ['0','1','2a','2b']
@@ -141,7 +144,7 @@ class Timeseries:
             level_df[ch] = level
         return level_df
 
-    def set_initial_version(self):
+    def _set_initial_version(self):
         """adds a version timestamp to each data point
 
         :return: dataframe of version flags
@@ -406,13 +409,16 @@ class Timeseries:
             show_stats=show_stats
         )
 
-    def decimate_1s_to_300s(
-        self, method: str = "linear", limit: int = 3600, name: str = None
+    def decimate_1s_to_300s(self, 
+                            method: str = "linear", 
+                            limit: int = 3600,                            
+                            name: str = None
     ):
         """decimate 1hz data to 5 min data using \n
         Agnew, Duncan Carr, and K. Hodgkinson (2007), Designing compact causal digital filters for 
         low-frequency strainmeter data , Bulletin Of The Seismological Society Of America, 97, No. 1B, 91-99
 
+        
         :param method: method to interpolate across gaps, defaults to "linear"
         :type method: str, optional
         :param limit: largest gap to interpolate, defaults to 3600 samples
@@ -424,6 +430,9 @@ class Timeseries:
         """
         
         data = decimate_1s_to_300s(self.data, method=method, limit=limit)
+        #force counts to nearest int, but let other units keep float precision
+        if self.units == 'counts':
+            data = data.round(0)
         quality_df = self.quality_df.copy().reindex(data.index)
         quality_df[quality_df.isna()] = "i"
         # find any differences using the original data index
@@ -431,7 +440,7 @@ class Timeseries:
 
         # any nans from the original index
         mask2 = self.data[mask1].isna()
-        quality_df[mask2] = "i"
+        quality_df[mask2] = "m"
 
         # any 999999s from the original index
         mask3 = self.data[mask1] == 999999
