@@ -12,6 +12,7 @@ Welcome to the Earthscope Strain Tools documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   pages/Installation.md
    pages/IntroductoryMaterial.md
    pages/DataAvailability.md
    pages/DataStructures.md
