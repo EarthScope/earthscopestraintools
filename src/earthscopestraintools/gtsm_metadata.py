@@ -66,6 +66,7 @@ class GtsmMetadata:
         matrices["ER2010"] = self.get_er2010_strain_matrix()
         matrices["KH2013"] = self.get_kh2013_strain_matrix()
         matrices["CH_prelim"] = self.get_ch_prelim_strain_matrix()
+        matrices["EM2024"] = self.get_em2024_strain_matrix()
         self.strain_matrices = {k: v for k, v in matrices.items()}
         self.atmp_response = self.get_atmp_response()
         self.tidal_params = self.get_tidal_params()
@@ -341,7 +342,7 @@ class GtsmMetadata:
 
     def get_ch_prelim_strain_matrix(self):
         """parse CH preliminary strain matrix from station metadata if available.  
-        Calibrations of TABOO-STAR stations performed by Cassie Hanagan in 2022.
+        Calibrations of TABOO-STAR stations performed by Cassie Hanagan in 2023.
         
         :return: CH_PRELIM calibration matrix
         :rtype: np.array
@@ -364,6 +365,33 @@ class GtsmMetadata:
             return None
         except Exception as e:
             logger.exception("Could not load ch_prelim strain matrix")
+            return None
+        
+    def get_em2024_strain_matrix(self):
+        """parse EM2024 strain matrix from station metadata if available.  
+        Calibrations of TABOO-STAR stations performed by Eugenio Mandler in 2024.
+        
+        :return: EM2024 calibration matrix
+        :rtype: np.array
+        """
+        url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
+        try:
+            with request.urlopen(url) as response:
+                lines = response.readlines()
+            for i, line in enumerate(lines):
+                line = line.decode("utf-8").rstrip()
+                if line.startswith("  Mandler et al. 2024 Calibration"):
+                    em2024 = np.array(
+                        [
+                            lines[i + 3].decode("utf-8").rstrip().split()[1:],
+                            lines[i + 4].decode("utf-8").rstrip().split()[1:],
+                            lines[i + 5].decode("utf-8").rstrip().split()[1:],
+                        ]
+                    )
+                    return em2024.astype(float)
+            return None
+        except Exception as e:
+            logger.exception("Could not load EM2024 strain matrix")
             return None
 
     def get_reference_strains(self):

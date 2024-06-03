@@ -73,12 +73,12 @@ class Timeseries:
         if quality_df is not None:
             self.quality_df = quality_df
         else:
-            self.quality_df = self.set_initial_quality_flags()
+            self.quality_df = self._set_initial_quality_flags()
 
         if period is not None:
             self.period = period
         else:
-            self.infer_period()
+            self._infer_period()
         
         self.series = series
         self.units = units
@@ -95,8 +95,11 @@ class Timeseries:
     def set_data(self, df):
         self.data = df
 
-    def infer_period(self):
-        self.period = self.data.index.to_series().diff().median().total_seconds()
+    def _infer_period(self):
+        try: 
+            self.period = self.data.index.to_series().diff().median().total_seconds()
+        except AttributeError:
+            self.period = 0
         #logger.info(f'period is {self.period} seconds')
 
     def set_units(self, units):
@@ -110,7 +113,7 @@ class Timeseries:
     def set_s3_tdb_uri(self, s3_tdb_uri):
         self.s3_tdb_uri = s3_tdb_uri
 
-    def set_initial_quality_flags(self, missing_data=999999):
+    def _set_initial_quality_flags(self, missing_data=999999):
         """used to flag any missing data
 
         :param missing_data: value used to represent gaps, defaults to 999999
@@ -128,7 +131,7 @@ class Timeseries:
         # print(qual_df.value_counts())
         return qual_df
 
-    def set_initial_level_flags(self, level):
+    def _set_initial_level_flags(self, level):
         """used to set level flag 
 
         :param level: level of data ['0','1','2a','2b']
@@ -141,7 +144,7 @@ class Timeseries:
             level_df[ch] = level
         return level_df
 
-    def set_initial_version(self):
+    def _set_initial_version(self):
         """adds a version timestamp to each data point
 
         :return: dataframe of version flags
