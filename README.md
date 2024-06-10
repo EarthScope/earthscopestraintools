@@ -3,7 +3,7 @@ Welcome to earthscopestraintools, an open source python package for working with
 M. Gottlieb and C. Hanagan 6-1-2024
 
 
-![Read the Docs](https://readthedocs.org/projects/earthscopestraintools/badge/?version=latest)
+[![Read the Docs](https://readthedocs.org/projects/earthscopestraintools/badge/?version=latest)](https://earthscopestraintools.readthedocs.io/en/latest/)
 
 [![PyPI Version](https://img.shields.io/pypi/v/earthscopestraintools.svg)](https://pypi.org/project/earthscopestraintools) 
 
