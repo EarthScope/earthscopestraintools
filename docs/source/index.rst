@@ -8,6 +8,12 @@ Welcome to the Earthscope Strain Tools documentation!
 
 ``earthscopestraintools`` is an open source python-based software package for utilizing borehole strainmeter data.
 
+.. image:: https://badge.fury.io/py/earthscopestraintools.svg
+    :target: https://badge.fury.io/py/earthscopestraintools
+
+.. image:: https://zenodo.org/badge/692156370.svg
+  :target: https://zenodo.org/doi/10.5281/zenodo.11555774
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
