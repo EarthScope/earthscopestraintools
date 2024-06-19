@@ -233,7 +233,7 @@ def plot_coseismic_offset(
         #         if self.units:
         #             axs[i][0].set_ylabel(self.units)
         if coseismic_offset:
-            label = f"Co-seismic offset: {round(coseismic_offsets[i], 3)} ustrain"
+            label = f"Co-seismic offset: {round(coseismic_offsets.iloc[i], 3)} ustrain"
             axs[i][0].text(
                 0.85,
                 0.2,
