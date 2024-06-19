@@ -65,7 +65,9 @@ class GtsmMetadata:
         matrices["lab"] = self.get_lab_strain_matrix()
         matrices["ER2010"] = self.get_er2010_strain_matrix()
         matrices["KH2013"] = self.get_kh2013_strain_matrix()
-        matrices["CH_prelim"] = self.get_ch_prelim_strain_matrix()
+        matrices["CH2024"] = self.get_ch2024_strain_matrix()
+        #still support using deprecated name for CH calibrations
+        matrices["CH_prelim"] = matrices["CH2024"] 
         matrices["EM2024"] = self.get_em2024_strain_matrix()
         self.strain_matrices = {k: v for k, v in matrices.items()}
         self.atmp_response = self.get_atmp_response()
@@ -340,11 +342,11 @@ class GtsmMetadata:
             logger.error("Could not load KH2013 strain matrix")
             return None
 
-    def get_ch_prelim_strain_matrix(self):
-        """parse CH preliminary strain matrix from station metadata if available.  
-        Calibrations of TABOO-STAR stations performed by Cassie Hanagan in 2023.
+    def get_ch2024_strain_matrix(self):
+        """parse CH 2024 strain matrix from station metadata if available.  
+        Calibrations of TABOO-STAR stations performed by Cassie Hanagan in 2024.
         
-        :return: CH_PRELIM calibration matrix
+        :return: CH2024 calibration matrix
         :rtype: np.array
         """
         url = f"http://bsm.unavco.org/bsm/level2/{self.station}/{self.station}.README.txt"
@@ -354,17 +356,17 @@ class GtsmMetadata:
             for i, line in enumerate(lines):
                 line = line.decode("utf-8").rstrip()
                 if line.startswith("  CH Preliminary Tidal Calibration"):
-                    ch_prelim = np.array(
+                    ch2024 = np.array(
                         [
                             lines[i + 3].decode("utf-8").rstrip().split()[1:],
                             lines[i + 4].decode("utf-8").rstrip().split()[1:],
                             lines[i + 5].decode("utf-8").rstrip().split()[1:],
                         ]
                     )
-                    return ch_prelim.astype(float)
+                    return ch2024.astype(float)
             return None
         except Exception as e:
-            logger.exception("Could not load ch_prelim strain matrix")
+            logger.exception("Could not load CH2024 strain matrix")
             return None
         
     def get_em2024_strain_matrix(self):
