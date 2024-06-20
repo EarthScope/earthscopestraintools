@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from scipy import signal, stats
@@ -665,6 +666,180 @@ def baytap_analysis(df,
                     elevation=None,
                     dmin=0.001):
     '''
+    This function runs BAYTAP08 locally if available, otherwise uses a docker container to run BAYTAP08 (Tamura 1991; Tamura and Agnew 2008) for tidal analysis. Time series (e.g. strain) and additional auxiliary input (e.g. pressure) are analyzed together to determine the amplitudes and phases of a combination of tidal constituents (M2, O1, P1, K1, N2, S2) in the time series, as well as a coefficient for the auxiliary input response. Please refer to the Baytap08 manual for more details, included suggested length of the time series for full detemination of the tidal constituent suite returned here (365+ days).
+    :param df: DataFrame of timeseries with datetime index and one channel per column. Strain should be in microstrain, and pressure in hPa. 
+    :type df: pd.DataFrame
+    :param atmp_df: DataFrame with atmospheric pressure data and datetime index
+    :type atmp_df: pd.DataFrame
+    :param quality_df: DataFrame with flags designating the quality of the data. Any points that are not good (g) are ignores in the time series analysis. 
+    :type quality_df: pd.DataFrame
+    :param units: Units of strain, should match microstrain or nanostrain
+    :type units: str
+    :param atmp_quality_df: DataFrame with flags designating the quality of the pressure data. Any points that are not good (g) are ignores in the time series analysis. 
+    :type atmp_quality_df: pd.DataFrame
+    :param atmp_units: Units of atmospheric pressure data, should be hpa
+    :type atmp_units: str 
+    :param latitude: latitude of the station
+    :type latitude: float
+    :param longitude: longitude of the station
+    :type longitude: float
+    :param elevation: elevation of the station
+    :type elevation: float
+    :param dmin: Drift parameter for the program. Large drift expects a linear trend. Small drift allows for rapid changes in the residual time series. 
+    :type dmin: float
+    :return: Dictionary of amplitudes and phases for each tidal constituent per gauge, and atmospheric pressure coefficient.
+    :rtype: dict
+    '''
+
+    # check if baytap in path, or else use baytap container
+    result = subprocess.run("which baytap08", shell=True)
+    if result.returncode == 0:
+        baytap_results = _baytap_analysis_local(df,
+                    atmp_df,
+                    quality_df,
+                    atmp_quality_df,
+                    latitude,
+                    longitude,
+                    elevation,
+                    dmin)
+    else:
+        baytap_results = _baytap_analysis_docker(df,
+                    atmp_df,
+                    quality_df,
+                    atmp_quality_df,
+                    latitude,
+                    longitude,
+                    elevation,
+                    dmin)
+    return baytap_results
+    
+
+def _baytap_analysis_local(df,
+                    atmp_df,
+                    quality_df = None,
+                    atmp_quality_df = None,
+                    latitude=None,
+                    longitude=None,
+                    elevation=None,
+                    dmin=0.001):
+    '''
+    This function runs a local BAYTAP08 (Tamura 1991; Tamura and Agnew 2008) for tidal analysis. Time series (e.g. strain) and additional auxiliary input (e.g. pressure) are analyzed together to determine the amplitudes and phases of a combination of tidal constituents (M2, O1, P1, K1, N2, S2) in the time series, as well as a coefficient for the auxiliary input response. Please refer to the Baytap08 manual for more details, included suggested length of the time series for full detemination of the tidal constituent suite returned here (365+ days).
+    :param df: DataFrame of timeseries with datetime index and one channel per column. Strain should be in microstrain, and pressure in hPa. 
+    :type df: pd.DataFrame
+    :param atmp_df: DataFrame with atmospheric pressure data and datetime index
+    :type atmp_df: pd.DataFrame
+    :param quality_df: DataFrame with flags designating the quality of the data. Any points that are not good (g) are ignores in the time series analysis. 
+    :type quality_df: pd.DataFrame
+    :param units: Units of strain, should match microstrain or nanostrain
+    :type units: str
+    :param atmp_quality_df: DataFrame with flags designating the quality of the pressure data. Any points that are not good (g) are ignores in the time series analysis. 
+    :type atmp_quality_df: pd.DataFrame
+    :param atmp_units: Units of atmospheric pressure data, should be hpa
+    :type atmp_units: str 
+    :param latitude: latitude of the station
+    :type latitude: float
+    :param longitude: longitude of the station
+    :type longitude: float
+    :param elevation: elevation of the station
+    :type elevation: float
+    :param dmin: Drift parameter for the program. Large drift expects a linear trend. Small drift allows for rapid changes in the residual time series. 
+    :type dmin: float
+    :return: Dictionary of amplitudes and phases for each tidal constituent per gauge, and atmospheric pressure coefficient.
+    :rtype: dict
+    '''
+    
+    logger.info("Please note, this method expects continuous data in microstrain and pressure in hPa.")
+    if quality_df is None and atmp_quality_df is None:
+        logger.info("If there are any gaps, please fill them with 999999s or provide a dataframe of quality flags")
+    df = df*1e3  #convert microstrain to nanostrain
+        
+    # Control file text
+    span = shift = ndata = int(len(df))
+    samp = ((df.index[-1].timestamp() - df.index[0].timestamp())/60/60)/(ndata-1)
+    # Check that pressure data is same length 
+    atmp_samp = ((atmp_df.index[-1].timestamp() - atmp_df.index[0].timestamp())/60/60)/(ndata-1)
+    if atmp_samp != samp:
+        print('Pressure data and strain data are not the same length, make sure they have the same sample rate and time frame.')
+    yr = str(df.index[0].year); mo = str(df.index[0].month).zfill(2)
+    day = str(df.index[0].day).zfill(2); hr = str(df.index[0].hour).zfill(2)
+    control_str = f'&param \nkind=7, \n'
+    control_str += f'span={span} , shift={shift} , \n'
+    control_str += f'dmin={dmin}, \n'
+    control_str += f'lpout=0, filout=1, \n'
+    control_str += f'iaug=1, lagp=0,\n'
+    control_str += f'maxitr=50,\n'
+    control_str += f'igrp=5, \n'
+    control_str += f'ndata={ndata},\n'
+    control_str += f'inform=3, \n'
+    control_str += f'year={yr},mon={mo},day={day},hr={hr},delta={samp},\n'
+    control_str += f'lat={latitude},long={longitude},ht={elevation},grav=0.0,\n'
+    control_str += f'rlim=999990.D0,spectw=3,\n'
+    control_str += f'&end\n'
+    control_str += f'BSM Strain {df.index[0]} to {df.index[-1]}\n'
+    control_str += f'----\n'
+    control_str += f'{"Station": <40} STATION NAME\n'
+    control_str += f'{"PBO GTSM21": <40} INSTRUMENT NAME\n'
+    control_str += f'----\n'
+    control_str += f'{"Strain (counts or nstrain)": <40} UNIT OF TIDAL DATA\n'
+    control_str += f'{"Barometric Pressure (mbar)": <40} TITLE OF ASSOSIATED DATASET\n'
+    
+    # Pressure data, auxiliary input    
+    if atmp_quality_df is not None:
+        atmp_df[atmp_quality_df != 'g'] = 999999
+    aux_dstr = 'hpa\n'+np.array2string(np.round(atmp_df.values.flatten(),3),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+    
+    baytap_results = {}
+    baytap_results['atmp_response'] = {}
+    baytap_results['tidal_params'] = {}
+
+    shell=True
+    
+    for ch in df.columns:
+        if quality_df is not None:    
+            df[quality_df[ch] != 'g'] = 999999
+        dstr = ch+'\n'+np.array2string(np.round(df[ch].values,2),separator='\n',threshold=999999,suppress_small=True).replace('[','').replace(']','')
+        
+        # Write files for baytap
+        subprocess.run("mkdir -p baytap_temp", shell=shell,text=True)
+        with open("baytap_temp/data.txt", "w") as file:
+            file.write(dstr)
+        with open("baytap_temp/control.txt", "w") as file:
+            file.write(control_str)
+        with open("baytap_temp/aux.txt", "w") as file:
+            file.write(aux_dstr)
+        # Run baytap
+        cmd5 = f'cat baytap_temp/data.txt | baytap08 baytap_temp/control.txt baytap_temp/results.txt baytap_temp/aux.txt >> baytap_temp/decomp.txt'
+        # Read results
+        cmd6 = f'cat baytap_temp/results.txt'
+        subprocess.run(cmd5,shell=shell,text=True,capture_output=True)
+        output = subprocess.run(cmd6,capture_output=True,shell=shell,text=True)
+        res = (output.stdout).split('\n')
+        # save the results
+        resp = list(filter(lambda x: 'respc' in x, res))
+        baytap_results['atmp_response'][ch] = float(resp[0].split(' ')[-1].replace('D','E'))/1000
+        dood_list = ['2 0 0 0 0 0','1-1 0 0 0 0','1 1-2 0 0 0',
+                    '1 1 0 0 0 0','2-1 0 1 0 0','2 2-2 0 0 0']
+        for const,dood in zip(['M2','O1','P1','K1','N2','S2'],dood_list):
+            tid = list(filter(lambda x: '>' in x and const in x, res))
+            baytap_results['tidal_params'][(ch, const, 'phz')] =  list(filter(lambda x: x != '', tid[0].split(' ')))[-4]
+            baytap_results['tidal_params'][(ch, const, 'amp')] =  list(filter(lambda x: x != '', tid[0].split(' ')))[-2]
+            baytap_results['tidal_params'][(ch, const, 'doodson')] = dood
+        # for k,v in baytap_results['tidal_params'].items():
+        #     if k[2] == 'amp':
+        #         baytap_results['tidal_params'][k] = str(float(v)*1000)
+    print('Atmospheric pressure responses in microstrain/hPa and tidal parameters in degrees/nanostrain ')
+    subprocess.run("rm -r baytap_temp", shell=shell,text=True)
+    return baytap_results
+
+def _baytap_analysis_docker(df,
+                    atmp_df,
+                    quality_df = None,
+                    atmp_quality_df = None,
+                    latitude=None,
+                    longitude=None,
+                    elevation=None,
+                    dmin=0.001):
+    '''
     This function accesses a docker container to run BAYTAP08 (Tamura 1991; Tamura and Agnew 2008) for tidal analysis. Time series (e.g. strain) and additional auxiliary input (e.g. pressure) are analyzed together to determine the amplitudes and phases of a combination of tidal constituents (M2, O1, P1, K1, N2, S2) in the time series, as well as a coefficient for the auxiliary input response. Please refer to the Baytap08 manual for more details, included suggested length of the time series for full detemination of the tidal constituent suite returned here (365+ days).
     :param df: DataFrame of timeseries with datetime index and one channel per column. Strain should be in microstrain, and pressure in hPa. 
     :type df: pd.DataFrame
@@ -790,6 +965,127 @@ def spotl_predict_tides(latitude,longitude,elevation,glob_oc,reg_oc,greenf):
     '''
     Returns the complex numbers (from amplitude and phase)
     for the predicted areal and shear strains using spotl
+
+    Expects regional model polygons to have already been constructed in the working directory (in this case, in the Docker container).
+
+    :param latitude: Station latitude
+    :type latitude: float
+    :param longitude: Station longitude
+    :type longitude: float
+    :param elevation: Station elevation (m)
+    :type elevation: float
+    :param glob_oc: Global ocean model from SPOTL. e.g. osu.tpxo72.2010
+    :type glob_oc: str
+    :param reg_oc: Regional ocean model from SPOTL. e.g. osu.usawest.2010
+    :type reg_oc: str
+    :param greenf: Green's functions for the elastic earth structure from SPOTL. e.g. green.contap.std
+    :type greenf: str
+    :return: Areal, differential, and shear strain complex numbers for the M2 and O1 tides. (eEE+eNN)m2, (eEE-eNN)m2, (2EN)m2, (eEE+eNN)o1, (eEE-eNN)o1, (2EN)o1
+    :rtype: dict
+    '''
+    # check if spotl in path, or else use spotl container
+    result = subprocess.run("which polymake", shell=True)
+    if result.returncode == 0:
+        pred_tides = _spotl_predict_tides_local(latitude,longitude,elevation,glob_oc,reg_oc,greenf)
+    else:
+        pred_tides = _spotl_predict_tides_docker(latitude,longitude,elevation,glob_oc,reg_oc,greenf)
+    return pred_tides
+
+def _spotl_predict_tides_local(latitude,longitude,elevation,glob_oc,reg_oc,greenf):
+    '''
+    Returns the complex numbers (from amplitude and phase)
+    for the predicted areal and shear strains using a locally installed version of spotl
+
+    Expects regional model polygons to have already been constructed in the working directory (in this case, in the Docker container).
+
+    :param latitude: Station latitude
+    :type latitude: float
+    :param longitude: Station longitude
+    :type longitude: float
+    :param elevation: Station elevation (m)
+    :type elevation: float
+    :param glob_oc: Global ocean model from SPOTL. e.g. osu.tpxo72.2010
+    :type glob_oc: str
+    :param reg_oc: Regional ocean model from SPOTL. e.g. osu.usawest.2010
+    :type reg_oc: str
+    :param greenf: Green's functions for the elastic earth structure from SPOTL. e.g. green.contap.std
+    :type greenf: str
+    :return: Areal, differential, and shear strain complex numbers for the M2 and O1 tides. (eEE+eNN)m2, (eEE-eNN)m2, (2EN)m2, (eEE+eNN)o1, (eEE-eNN)o1, (2EN)o1
+    :rtype: dict
+    '''
+    cwd = os.getcwd()
+    temp_dir = f"{cwd}/temp"
+    subprocess.run(f"mkdir -p {temp_dir}", shell=True,text=True)
+    work_dir = "/opt/spotl/working"
+    #subprocess.run(f"cd {work_dir}", shell=True,text=True)
+    os.chdir(work_dir)
+    print(os.getcwd())
+    
+    #subprocess.run(f"cp /opt/spotl/working/* {temp_dir}", shell=True,text=True)
+
+    # # Run polymake for regional models of interest
+    # command = f'docker exec spotl /bin/bash -c "polymake << EOF > ../work/poly.{reg_oc} \n- {reg_oc} \nEOF"'
+    command = f'polymake << EOF > {temp_dir}/poly.{reg_oc} \n- {reg_oc} \nEOF'
+    subprocess.check_output(command,shell=True)
+    # # M2 ocean load for the ocean model but exclude the area in specified polygon
+    #command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1m2.f1"'
+    command = f'nloadf BSM {latitude} {longitude} {elevation} m2.{glob_oc} {greenf} l poly.{reg_oc} - > {temp_dir}/ex1m2.f1'
+    subprocess.check_output(command,shell=True)
+    # # M2 ocean load for the regional ocean model in the area in specified polygon
+    #command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} m2.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1m2.f2"'
+    command = f'nloadf BSM {latitude} {longitude} {elevation} m2.{reg_oc} {greenf} l poly.{reg_oc} + > {temp_dir}/ex1m2.f2'
+    subprocess.check_output(command,shell=True)
+    # #  Add the M2 loads computed above together
+    #command = f'docker exec spotl /bin/bash -c "cat ../work/ex1m2.f1 ../work/ex1m2.f2 | loadcomb c >  ../work/tide.m2"'
+    command = f'cat {temp_dir}/ex1m2.f1 {temp_dir}/ex1m2.f2 | loadcomb c > {temp_dir}/tide.m2'
+    subprocess.check_output(command,shell=True)
+    # # O1 ocean load for the ocean model but exclude the area in specified polygon
+    #command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{glob_oc} {greenf} l ../work/poly.{reg_oc} - > ../work/ex1o1.f1"'
+    command = f'nloadf BSM {latitude} {longitude} {elevation} o1.{glob_oc} {greenf} l {temp_dir}/poly.{reg_oc} - > {temp_dir}/ex1o1.f1'
+    subprocess.check_output(command,shell=True)
+    # # O1 ocean load for the regional ocean model in the area in specified polygon
+    #command = f'docker exec spotl /bin/bash -c "nloadf BSM {latitude} {longitude} {elevation} o1.{reg_oc} {greenf} l ../work/poly.{reg_oc} + > ../work/ex1o1.f2"'
+    command = f'nloadf BSM {latitude} {longitude} {elevation} o1.{reg_oc} {greenf} l {temp_dir}/poly.{reg_oc} + > {temp_dir}/ex1o1.f2'
+    subprocess.check_output(command,shell=True)
+    # # Add the O1 loads computed above together
+    # command = f'docker exec spotl /bin/bash -c "cat ../work/ex1o1.f1 ../work/ex1o1.f2 | loadcomb c >  ../work/tide.o1"'
+    command = f'cat {temp_dir}/ex1o1.f1 {temp_dir}/ex1o1.f2 | loadcomb c >  {temp_dir}/tide.o1'
+    subprocess.check_output(command,shell=True)
+    # # Compute solid earth wides and combine with above ocean loads
+    #command = f'docker exec spotl /bin/bash -c "cat ../work/tide.m2 | loadcomb t >  ../work/m2.tide.total"'
+    command = f'cat {temp_dir}/tide.m2 | loadcomb t >  {temp_dir}/m2.tide.total'
+    subprocess.check_output(command,shell=True)
+    #command = f'docker exec spotl /bin/bash -c "cat ../work/tide.o1 | loadcomb t >  ../work/o1.tide.total"'
+    command = f'cat {temp_dir}/tide.o1 | loadcomb t >  {temp_dir}/o1.tide.total'
+    subprocess.check_output(command,shell=True)
+    # # Find the amps and phases, compute complex numbers:
+    # command = f'docker exec spotl /bin/bash -c "cat ../work/m2.tide.total"'
+    command = f'cat {temp_dir}/m2.tide.total'
+    out = subprocess.check_output(command,shell=True,text=True)
+    outlist = list(filter(lambda x: x.startswith('s'), out.split('\n')))[0].split(' ')
+    Eamp, Ephase, Namp, Nphase, ENamp, ENphase = np.float64(list(filter(lambda x: x != '' and x != 's' , outlist)))
+    m2E, m2N, m2EN = complex(Eamp*np.cos(Ephase*np.pi/180),Eamp*np.sin(Ephase*np.pi/180)), complex(Namp*np.cos(Nphase*np.pi/180),Namp*np.sin(Nphase*np.pi/180)), complex(ENamp*np.cos(ENphase*np.pi/180),ENamp*np.sin(ENphase*np.pi/180))
+    #command = f'docker exec spotl /bin/bash -c "cat ../work/o1.tide.total"'
+    command = f'cat {temp_dir}/o1.tide.total'
+    out = subprocess.check_output(command,shell=True,text=True)
+    outlist = list(filter(lambda x: x.startswith('s'), out.split('\n')))[0].split(' ')
+    Eamp, Ephase, Namp, Nphase, ENamp, ENphase = np.float64(list(filter(lambda x: x != '' and x != 's' , outlist)))
+    o1E, o1N, o1EN = complex(Eamp*np.cos(Ephase*np.pi/180),Eamp*np.sin(Ephase*np.pi/180)), complex(Namp*np.cos(Nphase*np.pi/180),Namp*np.sin(Nphase*np.pi/180)), complex(ENamp*np.cos(ENphase*np.pi/180),ENamp*np.sin(ENphase*np.pi/180))
+    # Combine into areal and shear (differential and engineering) real and imaginary parts
+    arealm2, diffm2, engm2 = m2E+m2N, m2E-m2N, 2*m2EN
+    arealo1, diffo1, engo1 = o1E+o1N, o1E-o1N, 2*o1EN
+    pred_tides = {'M2':{'areal':arealm2,'differential':diffm2,'engineering':engm2},
+                    'O1':{'areal':arealo1,'differential':diffo1,'engineering':engo1}}
+    #subprocess.run('docker rm -f spotl',shell=True)
+    #print('Docker container stopped and removed.')
+    os.chdir(cwd)
+    subprocess.run(f"rm -r {cwd}/temp", shell=True,text=True)
+    return pred_tides
+
+def _spotl_predict_tides_docker(latitude,longitude,elevation,glob_oc,reg_oc,greenf):
+    '''
+    Returns the complex numbers (from amplitude and phase)
+    for the predicted areal and shear strains using spotl in a docker image
 
     Expects regional model polygons to have already been constructed in the working directory (in this case, in the Docker container).
 
